@@ -2,7 +2,7 @@ defmodule Importer.ImporterTest do
   use BusDetective.DataCase
 
   alias BusDetective.GTFS
-  alias BusDetective.GTFS.{Agency, Service}
+  alias BusDetective.GTFS.{Agency, Service, ServiceException}
 
   setup do
     gtfs_file = Path.join(File.cwd!(), "test/fixtures/google_transit_info.zip")
@@ -55,5 +55,26 @@ defmodule Importer.ImporterTest do
              start_date: ~D[2015-02-22],
              end_date: ~D[2015-06-30]
            } = service
+  end
+
+  test "it imports the correct number of service exceptions", %{gtfs_file: gtfs_file} do
+    Importer.import(gtfs_file)
+    [agency] = GTFS.list_agencies()
+    service = GTFS.get_service(agency: agency, remote_id: "2")
+
+    assert 1 == length(GTFS.list_service_exceptions(agency: agency, service: service))
+  end
+
+  test "it imports a service exception correctly", %{gtfs_file: gtfs_file} do
+    Importer.import(gtfs_file)
+
+    [agency] = GTFS.list_agencies()
+    service = GTFS.get_service(agency: agency, remote_id: "2")
+    [service_exception] = GTFS.list_service_exceptions(agency: agency, service: service)
+
+    assert %ServiceException{
+      date: ~D[2015-05-25],
+      exception: 1
+    } = service_exception
   end
 end

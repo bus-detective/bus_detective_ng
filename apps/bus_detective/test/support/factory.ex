@@ -1,7 +1,7 @@
 defmodule BusDetective.Factory do
   use ExMachina.Ecto, repo: BusDetective.Repo
 
-  alias BusDetective.GTFS.{Agency, Service}
+  alias BusDetective.GTFS.{Agency, Service, ServiceException}
 
   def agency_factory do
     %Agency{
@@ -26,6 +26,17 @@ defmodule BusDetective.Factory do
       sunday: Enum.random([true, false]),
       start_date: Timex.shift(date, days: -30),
       end_date: Timex.shift(date, days: 30)
+    }
+  end
+
+  def service_exception_factory do
+    date = Timex.to_date(Timex.now())
+
+    %ServiceException{
+      agency: build(:agency),
+      service: build(:service),
+      date: date,
+      exception: Enum.random(0..10)
     }
   end
 end

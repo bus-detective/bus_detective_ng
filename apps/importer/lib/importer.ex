@@ -4,13 +4,14 @@ defmodule Importer do
   """
 
   alias BusDetective.GTFS
-  alias BusDetective.GTFS.{Agency, Service}
+  alias BusDetective.GTFS.{Agency, Service, ServiceException}
 
   def import(gtfs_file) do
     with {:ok, tmp_path} <- Briefly.create(directory: true),
          {:ok, file_map} <- unzip_gtfs_file(gtfs_file, tmp_path) do
       [agency] = import_agencies(file_map["agency"])
       import_services(file_map["calendar"], agency: agency)
+      import_service_exceptions(file_map["calendar_dates"], agency: agency)
     else
       error -> error
     end
@@ -64,25 +65,44 @@ defmodule Importer do
     file
     |> File.stream!()
     |> CSV.decode(headers: true)
-    |> Enum.each(fn {:ok, raw_service} ->
-      start_date = Timex.parse!(raw_service["start_date"], "%Y%m%d", :strftime) |> Timex.to_date()
-      end_date = Timex.parse!(raw_service["end_date"], "%Y%m%d", :strftime) |> Timex.to_date()
+    |> Enum.each(fn {:ok, raw_service_exception} ->
+      start_date = Timex.parse!(raw_service_exception["start_date"], "%Y%m%d", :strftime) |> Timex.to_date()
+      end_date = Timex.parse!(raw_service_exception["end_date"], "%Y%m%d", :strftime) |> Timex.to_date()
 
       service = %{
         agency_id: agency_id,
-        remote_id: raw_service["service_id"],
-        monday: raw_service["monday"],
-        tuesday: raw_service["tuesday"],
-        wednesday: raw_service["wednesday"],
-        thursday: raw_service["thursday"],
-        friday: raw_service["friday"],
-        saturday: raw_service["saturday"],
-        sunday: raw_service["sunday"],
+        remote_id: raw_service_exception["service_id"],
+        monday: raw_service_exception["monday"],
+        tuesday: raw_service_exception["tuesday"],
+        wednesday: raw_service_exception["wednesday"],
+        thursday: raw_service_exception["thursday"],
+        friday: raw_service_exception["friday"],
+        saturday: raw_service_exception["saturday"],
+        sunday: raw_service_exception["sunday"],
         start_date: start_date,
         end_date: end_date
       }
 
       {:ok, %Service{}} = GTFS.create_service(service)
+    end)
+  end
+
+  defp import_service_exceptions(file, agency: agency = %Agency{id: agency_id}) do
+    file
+    |> File.stream!()
+    |> CSV.decode(headers: true)
+    |> Enum.each(fn {:ok, raw_service_exception} ->
+      %Service{id: service_id} = GTFS.get_service(agency: agency, remote_id: raw_service_exception["service_id"])
+      date = Timex.parse!(raw_service_exception["date"], "%Y%m%d", :strftime) |> Timex.to_date()
+
+      service_exception = %{
+        agency_id: agency_id,
+        service_id: service_id,
+        date: date,
+        exception: raw_service_exception["exception_type"]
+      }
+
+      {:ok, %ServiceException{}} = GTFS.create_service_exception(service_exception)
     end)
   end
 end

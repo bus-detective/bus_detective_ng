@@ -6,7 +6,7 @@ defmodule BusDetective.GTFS do
   import Ecto.Query, warn: false
   alias BusDetective.Repo
 
-  alias BusDetective.GTFS.{Agency, Service}
+  alias BusDetective.GTFS.{Agency, Service, ServiceException}
 
   @doc """
   Returns the list of agencies.
@@ -198,54 +198,52 @@ defmodule BusDetective.GTFS do
   #   Service.changeset(service, %{})
   # end
 
-  # alias BusDetective.GTFS.ServiceException
+  @doc """
+  Returns the list of service_exceptions.
 
-  # @doc """
-  # Returns the list of service_exceptions.
+  ## Examples
 
-  # ## Examples
+      iex> list_service_exceptions()
+      [%ServiceException{}, ...]
 
-  #     iex> list_service_exceptions()
-  #     [%ServiceException{}, ...]
+  """
+  def list_service_exceptions(agency: %Agency{id: agency_id}, service: %Service{id: service_id}) do
+    Repo.all(from(se in ServiceException, where: se.agency_id == ^agency_id and se.service_id == ^service_id))
+  end
 
-  # """
-  # def list_service_exceptions do
-  #   Repo.all(ServiceException)
-  # end
+  @doc """
+  Gets a single service_exception.
 
-  # @doc """
-  # Gets a single service_exception.
+  Raises `Ecto.NoResultsError` if the Service exception does not exist.
 
-  # Raises `Ecto.NoResultsError` if the Service exception does not exist.
+  ## Examples
 
-  # ## Examples
+      iex> get_service_exception!(123)
+      %ServiceException{}
 
-  #     iex> get_service_exception!(123)
-  #     %ServiceException{}
+      iex> get_service_exception!(456)
+      ** (Ecto.NoResultsError)
 
-  #     iex> get_service_exception!(456)
-  #     ** (Ecto.NoResultsError)
+  """
+  def get_service_exception!(id), do: Repo.get!(ServiceException, id)
 
-  # """
-  # def get_service_exception!(id), do: Repo.get!(ServiceException, id)
+  @doc """
+  Creates a service_exception.
 
-  # @doc """
-  # Creates a service_exception.
+  ## Examples
 
-  # ## Examples
+      iex> create_service_exception(%{field: value})
+      {:ok, %ServiceException{}}
 
-  #     iex> create_service_exception(%{field: value})
-  #     {:ok, %ServiceException{}}
+      iex> create_service_exception(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
 
-  #     iex> create_service_exception(%{field: bad_value})
-  #     {:error, %Ecto.Changeset{}}
-
-  # """
-  # def create_service_exception(attrs \\ %{}) do
-  #   %ServiceException{}
-  #   |> ServiceException.changeset(attrs)
-  #   |> Repo.insert()
-  # end
+  """
+  def create_service_exception(attrs \\ %{}) do
+    %ServiceException{}
+    |> ServiceException.changeset(attrs)
+    |> Repo.insert()
+  end
 
   # @doc """
   # Updates a service_exception.
