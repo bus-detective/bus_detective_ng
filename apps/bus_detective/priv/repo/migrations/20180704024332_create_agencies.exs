@@ -14,7 +14,6 @@ defmodule BusDetective.Repo.Migrations.CreateAgencies do
       add :gtfs_trip_updates_url, :string
       add :gtfs_vehicle_positions_url, :string
       add :gtfs_service_alerts_url, :string
-      add :display_name, :string
 
       timestamps()
     end

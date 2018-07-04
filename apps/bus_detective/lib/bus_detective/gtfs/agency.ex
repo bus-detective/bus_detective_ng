@@ -4,7 +4,6 @@ defmodule BusDetective.GTFS.Agency do
 
 
   schema "agencies" do
-    field :display_name, :string
     field :fare_url, :string
     field :gtfs_endpoint, :string
     field :gtfs_service_alerts_url, :string
@@ -23,7 +22,6 @@ defmodule BusDetective.GTFS.Agency do
   @doc false
   def changeset(agency, attrs) do
     agency
-    |> cast(attrs, [:remote_id, :name, :url, :fare_url, :timezone, :language, :phone, :gtfs_endpoint, :gtfs_trip_updates_url, :gtfs_vehicle_positions_url, :gtfs_service_alerts_url, :display_name])
-    |> validate_required([:display_name])
+    |> cast(attrs, [:remote_id, :name, :url, :fare_url, :timezone, :language, :phone, :gtfs_endpoint, :gtfs_trip_updates_url, :gtfs_vehicle_positions_url, :gtfs_service_alerts_url])
   end
 end

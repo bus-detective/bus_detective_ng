@@ -37,7 +37,8 @@ defmodule Importer.Mixfile do
   defp deps do
     [
       {:briefly, "~> 0.3"},
-      {:bus_detective, path: "../bus_detective"}
+      {:bus_detective, in_umbrella: true},
+      {:csv, "~> 2.0.0"}
     ]
   end
 
