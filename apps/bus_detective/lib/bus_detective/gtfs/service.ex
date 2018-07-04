@@ -2,8 +2,10 @@ defmodule BusDetective.GTFS.Service do
   use Ecto.Schema
   import Ecto.Changeset
 
+  alias BusDetective.GTFS.Agency
+
   schema "services" do
-    field(:agency_id, :integer)
+    belongs_to(:agency, Agency)
     field(:end_date, :date)
     field(:friday, :boolean, default: false)
     field(:monday, :boolean, default: false)

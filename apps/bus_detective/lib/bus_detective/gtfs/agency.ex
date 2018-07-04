@@ -34,5 +34,6 @@ defmodule BusDetective.GTFS.Agency do
       :gtfs_vehicle_positions_url,
       :gtfs_service_alerts_url
     ])
+    |> validate_required([:name, :url, :timezone])
   end
 end

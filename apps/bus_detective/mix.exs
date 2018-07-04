@@ -37,6 +37,7 @@ defmodule BusDetective.Mixfile do
   defp deps do
     [
       {:ecto, "~> 2.1"},
+      {:ex_machina, "~> 2.2", only: [:dev, :test]},
       {:geo_postgis, "~> 2.0"},
       {:postgrex, ">= 0.0.0"}
     ]

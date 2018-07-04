@@ -6,7 +6,7 @@ defmodule BusDetective.GTFS do
   import Ecto.Query, warn: false
   alias BusDetective.Repo
 
-  alias BusDetective.GTFS.Agency
+  alias BusDetective.GTFS.{Agency, Service}
 
   @doc """
   Returns the list of agencies.
@@ -21,21 +21,21 @@ defmodule BusDetective.GTFS do
     Repo.all(Agency)
   end
 
-  @doc """
-  Gets a single agency.
+  # @doc """
+  # Gets a single agency.
 
-  Raises `Ecto.NoResultsError` if the Agency does not exist.
+  # Raises `Ecto.NoResultsError` if the Agency does not exist.
 
-  ## Examples
+  # ## Examples
 
-      iex> get_agency!(123)
-      %Agency{}
+  #     iex> get_agency!(123)
+  #     %Agency{}
 
-      iex> get_agency!(456)
-      ** (Ecto.NoResultsError)
+  #     iex> get_agency!(456)
+  #     ** (Ecto.NoResultsError)
 
-  """
-  def get_agency!(id), do: Repo.get!(Agency, id)
+  # """
+  # def get_agency!(id), do: Repo.get!(Agency, id)
 
   @doc """
   Creates a agency.
@@ -55,54 +55,52 @@ defmodule BusDetective.GTFS do
     |> Repo.insert()
   end
 
-  @doc """
-  Updates a agency.
+  # @doc """
+  # Updates a agency.
 
-  ## Examples
+  # ## Examples
 
-      iex> update_agency(agency, %{field: new_value})
-      {:ok, %Agency{}}
+  #     iex> update_agency(agency, %{field: new_value})
+  #     {:ok, %Agency{}}
 
-      iex> update_agency(agency, %{field: bad_value})
-      {:error, %Ecto.Changeset{}}
+  #     iex> update_agency(agency, %{field: bad_value})
+  #     {:error, %Ecto.Changeset{}}
 
-  """
-  def update_agency(%Agency{} = agency, attrs) do
-    agency
-    |> Agency.changeset(attrs)
-    |> Repo.update()
-  end
+  # """
+  # def update_agency(%Agency{} = agency, attrs) do
+  #   agency
+  #   |> Agency.changeset(attrs)
+  #   |> Repo.update()
+  # end
 
-  @doc """
-  Deletes a Agency.
+  # @doc """
+  # Deletes a Agency.
 
-  ## Examples
+  # ## Examples
 
-      iex> delete_agency(agency)
-      {:ok, %Agency{}}
+  #     iex> delete_agency(agency)
+  #     {:ok, %Agency{}}
 
-      iex> delete_agency(agency)
-      {:error, %Ecto.Changeset{}}
+  #     iex> delete_agency(agency)
+  #     {:error, %Ecto.Changeset{}}
 
-  """
-  def delete_agency(%Agency{} = agency) do
-    Repo.delete(agency)
-  end
+  # """
+  # def delete_agency(%Agency{} = agency) do
+  #   Repo.delete(agency)
+  # end
 
-  @doc """
-  Returns an `%Ecto.Changeset{}` for tracking agency changes.
+  # @doc """
+  # Returns an `%Ecto.Changeset{}` for tracking agency changes.
 
-  ## Examples
+  # ## Examples
 
-      iex> change_agency(agency)
-      %Ecto.Changeset{source: %Agency{}}
+  #     iex> change_agency(agency)
+  #     %Ecto.Changeset{source: %Agency{}}
 
-  """
-  def change_agency(%Agency{} = agency) do
-    Agency.changeset(agency, %{})
-  end
-
-  alias BusDetective.GTFS.Service
+  # """
+  # def change_agency(%Agency{} = agency) do
+  #   Agency.changeset(agency, %{})
+  # end
 
   @doc """
   Returns the list of services.
@@ -113,25 +111,27 @@ defmodule BusDetective.GTFS do
       [%Service{}, ...]
 
   """
-  def list_services do
-    Repo.all(Service)
+  def list_services(agency: %Agency{id: agency_id}) do
+    Repo.all(from(service in Service, where: service.agency_id == ^agency_id))
   end
 
   @doc """
-  Gets a single service.
+  Gets a single service by agency and remote_id.
 
-  Raises `Ecto.NoResultsError` if the Service does not exist.
+  Returns nil if no matching service exists
 
   ## Examples
 
-      iex> get_service!(123)
+      iex> get_service(agency_id: 5, remote_id: "6")
       %Service{}
 
-      iex> get_service!(456)
+      iex> get_service!(agency_id: 5, remote_id: "6")
       ** (Ecto.NoResultsError)
 
   """
-  def get_service!(id), do: Repo.get!(Service, id)
+  def get_service(agency: %Agency{id: agency_id}, remote_id: remote_id) do
+    Repo.one(from(service in Service, where: service.agency_id == ^agency_id and service.remote_id == ^remote_id))
+  end
 
   @doc """
   Creates a service.
@@ -151,626 +151,626 @@ defmodule BusDetective.GTFS do
     |> Repo.insert()
   end
 
-  @doc """
-  Updates a service.
+  # @doc """
+  # Updates a service.
 
-  ## Examples
+  # ## Examples
 
-      iex> update_service(service, %{field: new_value})
-      {:ok, %Service{}}
+  #     iex> update_service(service, %{field: new_value})
+  #     {:ok, %Service{}}
 
-      iex> update_service(service, %{field: bad_value})
-      {:error, %Ecto.Changeset{}}
+  #     iex> update_service(service, %{field: bad_value})
+  #     {:error, %Ecto.Changeset{}}
 
-  """
-  def update_service(%Service{} = service, attrs) do
-    service
-    |> Service.changeset(attrs)
-    |> Repo.update()
-  end
+  # """
+  # def update_service(%Service{} = service, attrs) do
+  #   service
+  #   |> Service.changeset(attrs)
+  #   |> Repo.update()
+  # end
 
-  @doc """
-  Deletes a Service.
+  # @doc """
+  # Deletes a Service.
 
-  ## Examples
+  # ## Examples
 
-      iex> delete_service(service)
-      {:ok, %Service{}}
+  #     iex> delete_service(service)
+  #     {:ok, %Service{}}
 
-      iex> delete_service(service)
-      {:error, %Ecto.Changeset{}}
+  #     iex> delete_service(service)
+  #     {:error, %Ecto.Changeset{}}
 
-  """
-  def delete_service(%Service{} = service) do
-    Repo.delete(service)
-  end
+  # """
+  # def delete_service(%Service{} = service) do
+  #   Repo.delete(service)
+  # end
 
-  @doc """
-  Returns an `%Ecto.Changeset{}` for tracking service changes.
+  # @doc """
+  # Returns an `%Ecto.Changeset{}` for tracking service changes.
 
-  ## Examples
+  # ## Examples
 
-      iex> change_service(service)
-      %Ecto.Changeset{source: %Service{}}
+  #     iex> change_service(service)
+  #     %Ecto.Changeset{source: %Service{}}
 
-  """
-  def change_service(%Service{} = service) do
-    Service.changeset(service, %{})
-  end
+  # """
+  # def change_service(%Service{} = service) do
+  #   Service.changeset(service, %{})
+  # end
 
-  alias BusDetective.GTFS.ServiceException
+  # alias BusDetective.GTFS.ServiceException
 
-  @doc """
-  Returns the list of service_exceptions.
+  # @doc """
+  # Returns the list of service_exceptions.
 
-  ## Examples
+  # ## Examples
 
-      iex> list_service_exceptions()
-      [%ServiceException{}, ...]
+  #     iex> list_service_exceptions()
+  #     [%ServiceException{}, ...]
 
-  """
-  def list_service_exceptions do
-    Repo.all(ServiceException)
-  end
+  # """
+  # def list_service_exceptions do
+  #   Repo.all(ServiceException)
+  # end
 
-  @doc """
-  Gets a single service_exception.
+  # @doc """
+  # Gets a single service_exception.
 
-  Raises `Ecto.NoResultsError` if the Service exception does not exist.
+  # Raises `Ecto.NoResultsError` if the Service exception does not exist.
 
-  ## Examples
+  # ## Examples
 
-      iex> get_service_exception!(123)
-      %ServiceException{}
+  #     iex> get_service_exception!(123)
+  #     %ServiceException{}
 
-      iex> get_service_exception!(456)
-      ** (Ecto.NoResultsError)
+  #     iex> get_service_exception!(456)
+  #     ** (Ecto.NoResultsError)
 
-  """
-  def get_service_exception!(id), do: Repo.get!(ServiceException, id)
+  # """
+  # def get_service_exception!(id), do: Repo.get!(ServiceException, id)
 
-  @doc """
-  Creates a service_exception.
+  # @doc """
+  # Creates a service_exception.
 
-  ## Examples
+  # ## Examples
 
-      iex> create_service_exception(%{field: value})
-      {:ok, %ServiceException{}}
+  #     iex> create_service_exception(%{field: value})
+  #     {:ok, %ServiceException{}}
 
-      iex> create_service_exception(%{field: bad_value})
-      {:error, %Ecto.Changeset{}}
+  #     iex> create_service_exception(%{field: bad_value})
+  #     {:error, %Ecto.Changeset{}}
 
-  """
-  def create_service_exception(attrs \\ %{}) do
-    %ServiceException{}
-    |> ServiceException.changeset(attrs)
-    |> Repo.insert()
-  end
+  # """
+  # def create_service_exception(attrs \\ %{}) do
+  #   %ServiceException{}
+  #   |> ServiceException.changeset(attrs)
+  #   |> Repo.insert()
+  # end
 
-  @doc """
-  Updates a service_exception.
+  # @doc """
+  # Updates a service_exception.
 
-  ## Examples
+  # ## Examples
 
-      iex> update_service_exception(service_exception, %{field: new_value})
-      {:ok, %ServiceException{}}
+  #     iex> update_service_exception(service_exception, %{field: new_value})
+  #     {:ok, %ServiceException{}}
 
-      iex> update_service_exception(service_exception, %{field: bad_value})
-      {:error, %Ecto.Changeset{}}
+  #     iex> update_service_exception(service_exception, %{field: bad_value})
+  #     {:error, %Ecto.Changeset{}}
 
-  """
-  def update_service_exception(%ServiceException{} = service_exception, attrs) do
-    service_exception
-    |> ServiceException.changeset(attrs)
-    |> Repo.update()
-  end
+  # """
+  # def update_service_exception(%ServiceException{} = service_exception, attrs) do
+  #   service_exception
+  #   |> ServiceException.changeset(attrs)
+  #   |> Repo.update()
+  # end
 
-  @doc """
-  Deletes a ServiceException.
+  # @doc """
+  # Deletes a ServiceException.
 
-  ## Examples
+  # ## Examples
 
-      iex> delete_service_exception(service_exception)
-      {:ok, %ServiceException{}}
+  #     iex> delete_service_exception(service_exception)
+  #     {:ok, %ServiceException{}}
 
-      iex> delete_service_exception(service_exception)
-      {:error, %Ecto.Changeset{}}
+  #     iex> delete_service_exception(service_exception)
+  #     {:error, %Ecto.Changeset{}}
 
-  """
-  def delete_service_exception(%ServiceException{} = service_exception) do
-    Repo.delete(service_exception)
-  end
+  # """
+  # def delete_service_exception(%ServiceException{} = service_exception) do
+  #   Repo.delete(service_exception)
+  # end
 
-  @doc """
-  Returns an `%Ecto.Changeset{}` for tracking service_exception changes.
+  # @doc """
+  # Returns an `%Ecto.Changeset{}` for tracking service_exception changes.
 
-  ## Examples
+  # ## Examples
 
-      iex> change_service_exception(service_exception)
-      %Ecto.Changeset{source: %ServiceException{}}
+  #     iex> change_service_exception(service_exception)
+  #     %Ecto.Changeset{source: %ServiceException{}}
 
-  """
-  def change_service_exception(%ServiceException{} = service_exception) do
-    ServiceException.changeset(service_exception, %{})
-  end
+  # """
+  # def change_service_exception(%ServiceException{} = service_exception) do
+  #   ServiceException.changeset(service_exception, %{})
+  # end
 
-  alias BusDetective.GTFS.Route
+  # alias BusDetective.GTFS.Route
 
-  @doc """
-  Returns the list of routes.
+  # @doc """
+  # Returns the list of routes.
 
-  ## Examples
+  # ## Examples
 
-      iex> list_routes()
-      [%Route{}, ...]
+  #     iex> list_routes()
+  #     [%Route{}, ...]
 
-  """
-  def list_routes do
-    Repo.all(Route)
-  end
+  # """
+  # def list_routes do
+  #   Repo.all(Route)
+  # end
 
-  @doc """
-  Gets a single route.
+  # @doc """
+  # Gets a single route.
 
-  Raises `Ecto.NoResultsError` if the Route does not exist.
+  # Raises `Ecto.NoResultsError` if the Route does not exist.
 
-  ## Examples
+  # ## Examples
 
-      iex> get_route!(123)
-      %Route{}
+  #     iex> get_route!(123)
+  #     %Route{}
 
-      iex> get_route!(456)
-      ** (Ecto.NoResultsError)
+  #     iex> get_route!(456)
+  #     ** (Ecto.NoResultsError)
 
-  """
-  def get_route!(id), do: Repo.get!(Route, id)
+  # """
+  # def get_route!(id), do: Repo.get!(Route, id)
 
-  @doc """
-  Creates a route.
+  # @doc """
+  # Creates a route.
 
-  ## Examples
+  # ## Examples
 
-      iex> create_route(%{field: value})
-      {:ok, %Route{}}
+  #     iex> create_route(%{field: value})
+  #     {:ok, %Route{}}
 
-      iex> create_route(%{field: bad_value})
-      {:error, %Ecto.Changeset{}}
+  #     iex> create_route(%{field: bad_value})
+  #     {:error, %Ecto.Changeset{}}
 
-  """
-  def create_route(attrs \\ %{}) do
-    %Route{}
-    |> Route.changeset(attrs)
-    |> Repo.insert()
-  end
+  # """
+  # def create_route(attrs \\ %{}) do
+  #   %Route{}
+  #   |> Route.changeset(attrs)
+  #   |> Repo.insert()
+  # end
 
-  @doc """
-  Updates a route.
+  # @doc """
+  # Updates a route.
 
-  ## Examples
+  # ## Examples
 
-      iex> update_route(route, %{field: new_value})
-      {:ok, %Route{}}
+  #     iex> update_route(route, %{field: new_value})
+  #     {:ok, %Route{}}
 
-      iex> update_route(route, %{field: bad_value})
-      {:error, %Ecto.Changeset{}}
+  #     iex> update_route(route, %{field: bad_value})
+  #     {:error, %Ecto.Changeset{}}
 
-  """
-  def update_route(%Route{} = route, attrs) do
-    route
-    |> Route.changeset(attrs)
-    |> Repo.update()
-  end
+  # """
+  # def update_route(%Route{} = route, attrs) do
+  #   route
+  #   |> Route.changeset(attrs)
+  #   |> Repo.update()
+  # end
 
-  @doc """
-  Deletes a Route.
+  # @doc """
+  # Deletes a Route.
 
-  ## Examples
+  # ## Examples
 
-      iex> delete_route(route)
-      {:ok, %Route{}}
+  #     iex> delete_route(route)
+  #     {:ok, %Route{}}
 
-      iex> delete_route(route)
-      {:error, %Ecto.Changeset{}}
+  #     iex> delete_route(route)
+  #     {:error, %Ecto.Changeset{}}
 
-  """
-  def delete_route(%Route{} = route) do
-    Repo.delete(route)
-  end
+  # """
+  # def delete_route(%Route{} = route) do
+  #   Repo.delete(route)
+  # end
 
-  @doc """
-  Returns an `%Ecto.Changeset{}` for tracking route changes.
+  # @doc """
+  # Returns an `%Ecto.Changeset{}` for tracking route changes.
 
-  ## Examples
+  # ## Examples
 
-      iex> change_route(route)
-      %Ecto.Changeset{source: %Route{}}
+  #     iex> change_route(route)
+  #     %Ecto.Changeset{source: %Route{}}
 
-  """
-  def change_route(%Route{} = route) do
-    Route.changeset(route, %{})
-  end
+  # """
+  # def change_route(%Route{} = route) do
+  #   Route.changeset(route, %{})
+  # end
 
-  alias BusDetective.GTFS.Stop
+  # alias BusDetective.GTFS.Stop
 
-  @doc """
-  Returns the list of stops.
+  # @doc """
+  # Returns the list of stops.
 
-  ## Examples
+  # ## Examples
 
-      iex> list_stops()
-      [%Stop{}, ...]
+  #     iex> list_stops()
+  #     [%Stop{}, ...]
 
-  """
-  def list_stops do
-    Repo.all(Stop)
-  end
+  # """
+  # def list_stops do
+  #   Repo.all(Stop)
+  # end
 
-  @doc """
-  Gets a single stop.
+  # @doc """
+  # Gets a single stop.
 
-  Raises `Ecto.NoResultsError` if the Stop does not exist.
+  # Raises `Ecto.NoResultsError` if the Stop does not exist.
 
-  ## Examples
+  # ## Examples
 
-      iex> get_stop!(123)
-      %Stop{}
+  #     iex> get_stop!(123)
+  #     %Stop{}
 
-      iex> get_stop!(456)
-      ** (Ecto.NoResultsError)
+  #     iex> get_stop!(456)
+  #     ** (Ecto.NoResultsError)
 
-  """
-  def get_stop!(id), do: Repo.get!(Stop, id)
+  # """
+  # def get_stop!(id), do: Repo.get!(Stop, id)
 
-  @doc """
-  Creates a stop.
+  # @doc """
+  # Creates a stop.
 
-  ## Examples
+  # ## Examples
 
-      iex> create_stop(%{field: value})
-      {:ok, %Stop{}}
+  #     iex> create_stop(%{field: value})
+  #     {:ok, %Stop{}}
 
-      iex> create_stop(%{field: bad_value})
-      {:error, %Ecto.Changeset{}}
+  #     iex> create_stop(%{field: bad_value})
+  #     {:error, %Ecto.Changeset{}}
 
-  """
-  def create_stop(attrs \\ %{}) do
-    %Stop{}
-    |> Stop.changeset(attrs)
-    |> Repo.insert()
-  end
+  # """
+  # def create_stop(attrs \\ %{}) do
+  #   %Stop{}
+  #   |> Stop.changeset(attrs)
+  #   |> Repo.insert()
+  # end
 
-  @doc """
-  Updates a stop.
+  # @doc """
+  # Updates a stop.
 
-  ## Examples
+  # ## Examples
 
-      iex> update_stop(stop, %{field: new_value})
-      {:ok, %Stop{}}
+  #     iex> update_stop(stop, %{field: new_value})
+  #     {:ok, %Stop{}}
 
-      iex> update_stop(stop, %{field: bad_value})
-      {:error, %Ecto.Changeset{}}
+  #     iex> update_stop(stop, %{field: bad_value})
+  #     {:error, %Ecto.Changeset{}}
 
-  """
-  def update_stop(%Stop{} = stop, attrs) do
-    stop
-    |> Stop.changeset(attrs)
-    |> Repo.update()
-  end
+  # """
+  # def update_stop(%Stop{} = stop, attrs) do
+  #   stop
+  #   |> Stop.changeset(attrs)
+  #   |> Repo.update()
+  # end
 
-  @doc """
-  Deletes a Stop.
+  # @doc """
+  # Deletes a Stop.
 
-  ## Examples
+  # ## Examples
 
-      iex> delete_stop(stop)
-      {:ok, %Stop{}}
+  #     iex> delete_stop(stop)
+  #     {:ok, %Stop{}}
 
-      iex> delete_stop(stop)
-      {:error, %Ecto.Changeset{}}
+  #     iex> delete_stop(stop)
+  #     {:error, %Ecto.Changeset{}}
 
-  """
-  def delete_stop(%Stop{} = stop) do
-    Repo.delete(stop)
-  end
+  # """
+  # def delete_stop(%Stop{} = stop) do
+  #   Repo.delete(stop)
+  # end
 
-  @doc """
-  Returns an `%Ecto.Changeset{}` for tracking stop changes.
+  # @doc """
+  # Returns an `%Ecto.Changeset{}` for tracking stop changes.
 
-  ## Examples
+  # ## Examples
 
-      iex> change_stop(stop)
-      %Ecto.Changeset{source: %Stop{}}
+  #     iex> change_stop(stop)
+  #     %Ecto.Changeset{source: %Stop{}}
 
-  """
-  def change_stop(%Stop{} = stop) do
-    Stop.changeset(stop, %{})
-  end
+  # """
+  # def change_stop(%Stop{} = stop) do
+  #   Stop.changeset(stop, %{})
+  # end
 
-  alias BusDetective.GTFS.Shape
+  # alias BusDetective.GTFS.Shape
 
-  @doc """
-  Returns the list of shapes.
+  # @doc """
+  # Returns the list of shapes.
 
-  ## Examples
+  # ## Examples
 
-      iex> list_shapes()
-      [%Shape{}, ...]
+  #     iex> list_shapes()
+  #     [%Shape{}, ...]
 
-  """
-  def list_shapes do
-    Repo.all(Shape)
-  end
+  # """
+  # def list_shapes do
+  #   Repo.all(Shape)
+  # end
 
-  @doc """
-  Gets a single shape.
+  # @doc """
+  # Gets a single shape.
 
-  Raises `Ecto.NoResultsError` if the Shape does not exist.
+  # Raises `Ecto.NoResultsError` if the Shape does not exist.
 
-  ## Examples
+  # ## Examples
 
-      iex> get_shape!(123)
-      %Shape{}
+  #     iex> get_shape!(123)
+  #     %Shape{}
 
-      iex> get_shape!(456)
-      ** (Ecto.NoResultsError)
+  #     iex> get_shape!(456)
+  #     ** (Ecto.NoResultsError)
 
-  """
-  def get_shape!(id), do: Repo.get!(Shape, id)
+  # """
+  # def get_shape!(id), do: Repo.get!(Shape, id)
 
-  @doc """
-  Creates a shape.
+  # @doc """
+  # Creates a shape.
 
-  ## Examples
+  # ## Examples
 
-      iex> create_shape(%{field: value})
-      {:ok, %Shape{}}
+  #     iex> create_shape(%{field: value})
+  #     {:ok, %Shape{}}
 
-      iex> create_shape(%{field: bad_value})
-      {:error, %Ecto.Changeset{}}
+  #     iex> create_shape(%{field: bad_value})
+  #     {:error, %Ecto.Changeset{}}
 
-  """
-  def create_shape(attrs \\ %{}) do
-    %Shape{}
-    |> Shape.changeset(attrs)
-    |> Repo.insert()
-  end
+  # """
+  # def create_shape(attrs \\ %{}) do
+  #   %Shape{}
+  #   |> Shape.changeset(attrs)
+  #   |> Repo.insert()
+  # end
 
-  @doc """
-  Updates a shape.
+  # @doc """
+  # Updates a shape.
 
-  ## Examples
+  # ## Examples
 
-      iex> update_shape(shape, %{field: new_value})
-      {:ok, %Shape{}}
+  #     iex> update_shape(shape, %{field: new_value})
+  #     {:ok, %Shape{}}
 
-      iex> update_shape(shape, %{field: bad_value})
-      {:error, %Ecto.Changeset{}}
+  #     iex> update_shape(shape, %{field: bad_value})
+  #     {:error, %Ecto.Changeset{}}
 
-  """
-  def update_shape(%Shape{} = shape, attrs) do
-    shape
-    |> Shape.changeset(attrs)
-    |> Repo.update()
-  end
+  # """
+  # def update_shape(%Shape{} = shape, attrs) do
+  #   shape
+  #   |> Shape.changeset(attrs)
+  #   |> Repo.update()
+  # end
 
-  @doc """
-  Deletes a Shape.
+  # @doc """
+  # Deletes a Shape.
 
-  ## Examples
+  # ## Examples
 
-      iex> delete_shape(shape)
-      {:ok, %Shape{}}
+  #     iex> delete_shape(shape)
+  #     {:ok, %Shape{}}
 
-      iex> delete_shape(shape)
-      {:error, %Ecto.Changeset{}}
+  #     iex> delete_shape(shape)
+  #     {:error, %Ecto.Changeset{}}
 
-  """
-  def delete_shape(%Shape{} = shape) do
-    Repo.delete(shape)
-  end
+  # """
+  # def delete_shape(%Shape{} = shape) do
+  #   Repo.delete(shape)
+  # end
 
-  @doc """
-  Returns an `%Ecto.Changeset{}` for tracking shape changes.
+  # @doc """
+  # Returns an `%Ecto.Changeset{}` for tracking shape changes.
 
-  ## Examples
+  # ## Examples
 
-      iex> change_shape(shape)
-      %Ecto.Changeset{source: %Shape{}}
+  #     iex> change_shape(shape)
+  #     %Ecto.Changeset{source: %Shape{}}
 
-  """
-  def change_shape(%Shape{} = shape) do
-    Shape.changeset(shape, %{})
-  end
+  # """
+  # def change_shape(%Shape{} = shape) do
+  #   Shape.changeset(shape, %{})
+  # end
 
-  alias BusDetective.GTFS.Trip
+  # alias BusDetective.GTFS.Trip
 
-  @doc """
-  Returns the list of trips.
+  # @doc """
+  # Returns the list of trips.
 
-  ## Examples
+  # ## Examples
 
-      iex> list_trips()
-      [%Trip{}, ...]
+  #     iex> list_trips()
+  #     [%Trip{}, ...]
 
-  """
-  def list_trips do
-    Repo.all(Trip)
-  end
+  # """
+  # def list_trips do
+  #   Repo.all(Trip)
+  # end
 
-  @doc """
-  Gets a single trip.
+  # @doc """
+  # Gets a single trip.
 
-  Raises `Ecto.NoResultsError` if the Trip does not exist.
+  # Raises `Ecto.NoResultsError` if the Trip does not exist.
 
-  ## Examples
+  # ## Examples
 
-      iex> get_trip!(123)
-      %Trip{}
+  #     iex> get_trip!(123)
+  #     %Trip{}
 
-      iex> get_trip!(456)
-      ** (Ecto.NoResultsError)
+  #     iex> get_trip!(456)
+  #     ** (Ecto.NoResultsError)
 
-  """
-  def get_trip!(id), do: Repo.get!(Trip, id)
+  # """
+  # def get_trip!(id), do: Repo.get!(Trip, id)
 
-  @doc """
-  Creates a trip.
+  # @doc """
+  # Creates a trip.
 
-  ## Examples
+  # ## Examples
 
-      iex> create_trip(%{field: value})
-      {:ok, %Trip{}}
+  #     iex> create_trip(%{field: value})
+  #     {:ok, %Trip{}}
 
-      iex> create_trip(%{field: bad_value})
-      {:error, %Ecto.Changeset{}}
+  #     iex> create_trip(%{field: bad_value})
+  #     {:error, %Ecto.Changeset{}}
 
-  """
-  def create_trip(attrs \\ %{}) do
-    %Trip{}
-    |> Trip.changeset(attrs)
-    |> Repo.insert()
-  end
+  # """
+  # def create_trip(attrs \\ %{}) do
+  #   %Trip{}
+  #   |> Trip.changeset(attrs)
+  #   |> Repo.insert()
+  # end
 
-  @doc """
-  Updates a trip.
+  # @doc """
+  # Updates a trip.
 
-  ## Examples
+  # ## Examples
 
-      iex> update_trip(trip, %{field: new_value})
-      {:ok, %Trip{}}
+  #     iex> update_trip(trip, %{field: new_value})
+  #     {:ok, %Trip{}}
 
-      iex> update_trip(trip, %{field: bad_value})
-      {:error, %Ecto.Changeset{}}
+  #     iex> update_trip(trip, %{field: bad_value})
+  #     {:error, %Ecto.Changeset{}}
 
-  """
-  def update_trip(%Trip{} = trip, attrs) do
-    trip
-    |> Trip.changeset(attrs)
-    |> Repo.update()
-  end
+  # """
+  # def update_trip(%Trip{} = trip, attrs) do
+  #   trip
+  #   |> Trip.changeset(attrs)
+  #   |> Repo.update()
+  # end
 
-  @doc """
-  Deletes a Trip.
+  # @doc """
+  # Deletes a Trip.
 
-  ## Examples
+  # ## Examples
 
-      iex> delete_trip(trip)
-      {:ok, %Trip{}}
+  #     iex> delete_trip(trip)
+  #     {:ok, %Trip{}}
 
-      iex> delete_trip(trip)
-      {:error, %Ecto.Changeset{}}
+  #     iex> delete_trip(trip)
+  #     {:error, %Ecto.Changeset{}}
 
-  """
-  def delete_trip(%Trip{} = trip) do
-    Repo.delete(trip)
-  end
+  # """
+  # def delete_trip(%Trip{} = trip) do
+  #   Repo.delete(trip)
+  # end
 
-  @doc """
-  Returns an `%Ecto.Changeset{}` for tracking trip changes.
+  # @doc """
+  # Returns an `%Ecto.Changeset{}` for tracking trip changes.
 
-  ## Examples
+  # ## Examples
 
-      iex> change_trip(trip)
-      %Ecto.Changeset{source: %Trip{}}
+  #     iex> change_trip(trip)
+  #     %Ecto.Changeset{source: %Trip{}}
 
-  """
-  def change_trip(%Trip{} = trip) do
-    Trip.changeset(trip, %{})
-  end
+  # """
+  # def change_trip(%Trip{} = trip) do
+  #   Trip.changeset(trip, %{})
+  # end
 
-  alias BusDetective.GTFS.StopTime
+  # alias BusDetective.GTFS.StopTime
 
-  @doc """
-  Returns the list of stop_times.
+  # @doc """
+  # Returns the list of stop_times.
 
-  ## Examples
+  # ## Examples
 
-      iex> list_stop_times()
-      [%StopTime{}, ...]
+  #     iex> list_stop_times()
+  #     [%StopTime{}, ...]
 
-  """
-  def list_stop_times do
-    Repo.all(StopTime)
-  end
+  # """
+  # def list_stop_times do
+  #   Repo.all(StopTime)
+  # end
 
-  @doc """
-  Gets a single stop_time.
+  # @doc """
+  # Gets a single stop_time.
 
-  Raises `Ecto.NoResultsError` if the Stop time does not exist.
+  # Raises `Ecto.NoResultsError` if the Stop time does not exist.
 
-  ## Examples
+  # ## Examples
 
-      iex> get_stop_time!(123)
-      %StopTime{}
+  #     iex> get_stop_time!(123)
+  #     %StopTime{}
 
-      iex> get_stop_time!(456)
-      ** (Ecto.NoResultsError)
+  #     iex> get_stop_time!(456)
+  #     ** (Ecto.NoResultsError)
 
-  """
-  def get_stop_time!(id), do: Repo.get!(StopTime, id)
+  # """
+  # def get_stop_time!(id), do: Repo.get!(StopTime, id)
 
-  @doc """
-  Creates a stop_time.
+  # @doc """
+  # Creates a stop_time.
 
-  ## Examples
+  # ## Examples
 
-      iex> create_stop_time(%{field: value})
-      {:ok, %StopTime{}}
+  #     iex> create_stop_time(%{field: value})
+  #     {:ok, %StopTime{}}
 
-      iex> create_stop_time(%{field: bad_value})
-      {:error, %Ecto.Changeset{}}
+  #     iex> create_stop_time(%{field: bad_value})
+  #     {:error, %Ecto.Changeset{}}
 
-  """
-  def create_stop_time(attrs \\ %{}) do
-    %StopTime{}
-    |> StopTime.changeset(attrs)
-    |> Repo.insert()
-  end
+  # """
+  # def create_stop_time(attrs \\ %{}) do
+  #   %StopTime{}
+  #   |> StopTime.changeset(attrs)
+  #   |> Repo.insert()
+  # end
 
-  @doc """
-  Updates a stop_time.
+  # @doc """
+  # Updates a stop_time.
 
-  ## Examples
+  # ## Examples
 
-      iex> update_stop_time(stop_time, %{field: new_value})
-      {:ok, %StopTime{}}
+  #     iex> update_stop_time(stop_time, %{field: new_value})
+  #     {:ok, %StopTime{}}
 
-      iex> update_stop_time(stop_time, %{field: bad_value})
-      {:error, %Ecto.Changeset{}}
+  #     iex> update_stop_time(stop_time, %{field: bad_value})
+  #     {:error, %Ecto.Changeset{}}
 
-  """
-  def update_stop_time(%StopTime{} = stop_time, attrs) do
-    stop_time
-    |> StopTime.changeset(attrs)
-    |> Repo.update()
-  end
+  # """
+  # def update_stop_time(%StopTime{} = stop_time, attrs) do
+  #   stop_time
+  #   |> StopTime.changeset(attrs)
+  #   |> Repo.update()
+  # end
 
-  @doc """
-  Deletes a StopTime.
+  # @doc """
+  # Deletes a StopTime.
 
-  ## Examples
+  # ## Examples
 
-      iex> delete_stop_time(stop_time)
-      {:ok, %StopTime{}}
+  #     iex> delete_stop_time(stop_time)
+  #     {:ok, %StopTime{}}
 
-      iex> delete_stop_time(stop_time)
-      {:error, %Ecto.Changeset{}}
+  #     iex> delete_stop_time(stop_time)
+  #     {:error, %Ecto.Changeset{}}
 
-  """
-  def delete_stop_time(%StopTime{} = stop_time) do
-    Repo.delete(stop_time)
-  end
+  # """
+  # def delete_stop_time(%StopTime{} = stop_time) do
+  #   Repo.delete(stop_time)
+  # end
 
-  @doc """
-  Returns an `%Ecto.Changeset{}` for tracking stop_time changes.
+  # @doc """
+  # Returns an `%Ecto.Changeset{}` for tracking stop_time changes.
 
-  ## Examples
+  # ## Examples
 
-      iex> change_stop_time(stop_time)
-      %Ecto.Changeset{source: %StopTime{}}
+  #     iex> change_stop_time(stop_time)
+  #     %Ecto.Changeset{source: %StopTime{}}
 
-  """
-  def change_stop_time(%StopTime{} = stop_time) do
-    StopTime.changeset(stop_time, %{})
-  end
+  # """
+  # def change_stop_time(%StopTime{} = stop_time) do
+  #   StopTime.changeset(stop_time, %{})
+  # end
 end

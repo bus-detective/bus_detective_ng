@@ -38,7 +38,8 @@ defmodule Importer.Mixfile do
     [
       {:briefly, "~> 0.3"},
       {:bus_detective, in_umbrella: true},
-      {:csv, "~> 2.0.0"}
+      {:csv, "~> 2.0.0"},
+      {:timex, "~> 3.1"}
     ]
   end
 
