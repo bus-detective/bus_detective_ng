@@ -12,8 +12,12 @@ defmodule BusDetective.Application do
   def start(_type, _args) do
     import Supervisor.Spec, warn: false
 
-    Supervisor.start_link([
-      supervisor(BusDetective.Repo, []),
-    ], strategy: :one_for_one, name: BusDetective.Supervisor)
+    Supervisor.start_link(
+      [
+        supervisor(BusDetective.Repo, [])
+      ],
+      strategy: :one_for_one,
+      name: BusDetective.Supervisor
+    )
   end
 end

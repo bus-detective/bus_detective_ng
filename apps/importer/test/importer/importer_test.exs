@@ -12,16 +12,16 @@ defmodule Importer.ImporterTest do
   test "it imports the agency", %{gtfs_file: gtfs_file} do
     Importer.import(gtfs_file)
 
-    agency = GTFS.list_agencies() |> List.first
+    agency = GTFS.list_agencies() |> List.first()
 
     assert %Agency{
-      fare_url: "http://www.go-metro.com/fares-passes",
-      remote_id: "SORTA",
-      language: "en",
-      name: "Southwest Ohio Regional Transit Authority",
-      phone: "513-621-4455",
-      timezone: "America/Detroit",
-      url: "http://www.go-metro.com"
-    } = agency
+             fare_url: "http://www.go-metro.com/fares-passes",
+             remote_id: "SORTA",
+             language: "en",
+             name: "Southwest Ohio Regional Transit Authority",
+             phone: "513-621-4455",
+             timezone: "America/Detroit",
+             url: "http://www.go-metro.com"
+           } = agency
   end
 end

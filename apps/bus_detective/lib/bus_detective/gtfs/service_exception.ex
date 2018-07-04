@@ -2,12 +2,11 @@ defmodule BusDetective.GTFS.ServiceException do
   use Ecto.Schema
   import Ecto.Changeset
 
-
   schema "service_exceptions" do
-    field :agency_id, :integer
-    field :date, :date
-    field :exception, :integer
-    field :service_id, :integer
+    field(:agency_id, :integer)
+    field(:date, :date)
+    field(:exception, :integer)
+    field(:service_id, :integer)
 
     timestamps()
   end

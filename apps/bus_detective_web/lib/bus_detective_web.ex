@@ -28,8 +28,9 @@ defmodule BusDetectiveWeb do
 
   def view do
     quote do
-      use Phoenix.View, root: "lib/bus_detective_web/templates",
-                        namespace: BusDetectiveWeb
+      use Phoenix.View,
+        root: "lib/bus_detective_web/templates",
+        namespace: BusDetectiveWeb
 
       # Import convenience functions from controllers
       import Phoenix.Controller, only: [get_flash: 2, view_module: 1]

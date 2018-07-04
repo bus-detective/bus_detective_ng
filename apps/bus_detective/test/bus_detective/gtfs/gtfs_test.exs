@@ -6,9 +6,48 @@ defmodule BusDetective.GTFSTest do
   describe "agencies" do
     alias BusDetective.GTFS.Agency
 
-    @valid_attrs %{display_name: "some display_name", fare_url: "some fare_url", gtfs_endpoint: "some gtfs_endpoint", gtfs_service_alerts_url: "some gtfs_service_alerts_url", gtfs_trip_updates_url: "some gtfs_trip_updates_url", gtfs_vehicle_positions_url: "some gtfs_vehicle_positions_url", language: "some language", name: "some name", phone: "some phone", remote_id: "some remote_id", timezone: "some timezone", url: "some url"}
-    @update_attrs %{display_name: "some updated display_name", fare_url: "some updated fare_url", gtfs_endpoint: "some updated gtfs_endpoint", gtfs_service_alerts_url: "some updated gtfs_service_alerts_url", gtfs_trip_updates_url: "some updated gtfs_trip_updates_url", gtfs_vehicle_positions_url: "some updated gtfs_vehicle_positions_url", language: "some updated language", name: "some updated name", phone: "some updated phone", remote_id: "some updated remote_id", timezone: "some updated timezone", url: "some updated url"}
-    @invalid_attrs %{display_name: nil, fare_url: nil, gtfs_endpoint: nil, gtfs_service_alerts_url: nil, gtfs_trip_updates_url: nil, gtfs_vehicle_positions_url: nil, language: nil, name: nil, phone: nil, remote_id: nil, timezone: nil, url: nil}
+    @valid_attrs %{
+      display_name: "some display_name",
+      fare_url: "some fare_url",
+      gtfs_endpoint: "some gtfs_endpoint",
+      gtfs_service_alerts_url: "some gtfs_service_alerts_url",
+      gtfs_trip_updates_url: "some gtfs_trip_updates_url",
+      gtfs_vehicle_positions_url: "some gtfs_vehicle_positions_url",
+      language: "some language",
+      name: "some name",
+      phone: "some phone",
+      remote_id: "some remote_id",
+      timezone: "some timezone",
+      url: "some url"
+    }
+    @update_attrs %{
+      display_name: "some updated display_name",
+      fare_url: "some updated fare_url",
+      gtfs_endpoint: "some updated gtfs_endpoint",
+      gtfs_service_alerts_url: "some updated gtfs_service_alerts_url",
+      gtfs_trip_updates_url: "some updated gtfs_trip_updates_url",
+      gtfs_vehicle_positions_url: "some updated gtfs_vehicle_positions_url",
+      language: "some updated language",
+      name: "some updated name",
+      phone: "some updated phone",
+      remote_id: "some updated remote_id",
+      timezone: "some updated timezone",
+      url: "some updated url"
+    }
+    @invalid_attrs %{
+      display_name: nil,
+      fare_url: nil,
+      gtfs_endpoint: nil,
+      gtfs_service_alerts_url: nil,
+      gtfs_trip_updates_url: nil,
+      gtfs_vehicle_positions_url: nil,
+      language: nil,
+      name: nil,
+      phone: nil,
+      remote_id: nil,
+      timezone: nil,
+      url: nil
+    }
 
     def agency_fixture(attrs \\ %{}) do
       {:ok, agency} =
@@ -88,9 +127,45 @@ defmodule BusDetective.GTFSTest do
   describe "services" do
     alias BusDetective.GTFS.Service
 
-    @valid_attrs %{agency_id: 42, end_date: ~D[2010-04-17], friday: true, monday: true, remote_id: "some remote_id", saturday: true, start_date: ~D[2010-04-17], sunday: true, thursday: true, tuesday: true, wednesday: true}
-    @update_attrs %{agency_id: 43, end_date: ~D[2011-05-18], friday: false, monday: false, remote_id: "some updated remote_id", saturday: false, start_date: ~D[2011-05-18], sunday: false, thursday: false, tuesday: false, wednesday: false}
-    @invalid_attrs %{agency_id: nil, end_date: nil, friday: nil, monday: nil, remote_id: nil, saturday: nil, start_date: nil, sunday: nil, thursday: nil, tuesday: nil, wednesday: nil}
+    @valid_attrs %{
+      agency_id: 42,
+      end_date: ~D[2010-04-17],
+      friday: true,
+      monday: true,
+      remote_id: "some remote_id",
+      saturday: true,
+      start_date: ~D[2010-04-17],
+      sunday: true,
+      thursday: true,
+      tuesday: true,
+      wednesday: true
+    }
+    @update_attrs %{
+      agency_id: 43,
+      end_date: ~D[2011-05-18],
+      friday: false,
+      monday: false,
+      remote_id: "some updated remote_id",
+      saturday: false,
+      start_date: ~D[2011-05-18],
+      sunday: false,
+      thursday: false,
+      tuesday: false,
+      wednesday: false
+    }
+    @invalid_attrs %{
+      agency_id: nil,
+      end_date: nil,
+      friday: nil,
+      monday: nil,
+      remote_id: nil,
+      saturday: nil,
+      start_date: nil,
+      sunday: nil,
+      thursday: nil,
+      tuesday: nil,
+      wednesday: nil
+    }
 
     def service_fixture(attrs \\ %{}) do
       {:ok, service} =
@@ -234,9 +309,39 @@ defmodule BusDetective.GTFSTest do
   describe "routes" do
     alias BusDetective.GTFS.Route
 
-    @valid_attrs %{agency_id: 42, color: "some color", description: "some description", long_name: "some long_name", remote_id: "some remote_id", route_type: "some route_type", short_name: "some short_name", text_color: "some text_color", url: "some url"}
-    @update_attrs %{agency_id: 43, color: "some updated color", description: "some updated description", long_name: "some updated long_name", remote_id: "some updated remote_id", route_type: "some updated route_type", short_name: "some updated short_name", text_color: "some updated text_color", url: "some updated url"}
-    @invalid_attrs %{agency_id: nil, color: nil, description: nil, long_name: nil, remote_id: nil, route_type: nil, short_name: nil, text_color: nil, url: nil}
+    @valid_attrs %{
+      agency_id: 42,
+      color: "some color",
+      description: "some description",
+      long_name: "some long_name",
+      remote_id: "some remote_id",
+      route_type: "some route_type",
+      short_name: "some short_name",
+      text_color: "some text_color",
+      url: "some url"
+    }
+    @update_attrs %{
+      agency_id: 43,
+      color: "some updated color",
+      description: "some updated description",
+      long_name: "some updated long_name",
+      remote_id: "some updated remote_id",
+      route_type: "some updated route_type",
+      short_name: "some updated short_name",
+      text_color: "some updated text_color",
+      url: "some updated url"
+    }
+    @invalid_attrs %{
+      agency_id: nil,
+      color: nil,
+      description: nil,
+      long_name: nil,
+      remote_id: nil,
+      route_type: nil,
+      short_name: nil,
+      text_color: nil,
+      url: nil
+    }
 
     def route_fixture(attrs \\ %{}) do
       {:ok, route} =
@@ -310,9 +415,45 @@ defmodule BusDetective.GTFSTest do
   describe "stops" do
     alias BusDetective.GTFS.Stop
 
-    @valid_attrs %{agency_id: 42, code: 42, description: "some description", latitude: 120.5, location_type: 42, longitude: 120.5, name: "some name", parent_station: "some parent_station", remote_id: "some remote_id", url: "some url", zone_id: 42}
-    @update_attrs %{agency_id: 43, code: 43, description: "some updated description", latitude: 456.7, location_type: 43, longitude: 456.7, name: "some updated name", parent_station: "some updated parent_station", remote_id: "some updated remote_id", url: "some updated url", zone_id: 43}
-    @invalid_attrs %{agency_id: nil, code: nil, description: nil, latitude: nil, location_type: nil, longitude: nil, name: nil, parent_station: nil, remote_id: nil, url: nil, zone_id: nil}
+    @valid_attrs %{
+      agency_id: 42,
+      code: 42,
+      description: "some description",
+      latitude: 120.5,
+      location_type: 42,
+      longitude: 120.5,
+      name: "some name",
+      parent_station: "some parent_station",
+      remote_id: "some remote_id",
+      url: "some url",
+      zone_id: 42
+    }
+    @update_attrs %{
+      agency_id: 43,
+      code: 43,
+      description: "some updated description",
+      latitude: 456.7,
+      location_type: 43,
+      longitude: 456.7,
+      name: "some updated name",
+      parent_station: "some updated parent_station",
+      remote_id: "some updated remote_id",
+      url: "some updated url",
+      zone_id: 43
+    }
+    @invalid_attrs %{
+      agency_id: nil,
+      code: nil,
+      description: nil,
+      latitude: nil,
+      location_type: nil,
+      longitude: nil,
+      name: nil,
+      parent_station: nil,
+      remote_id: nil,
+      url: nil,
+      zone_id: nil
+    }
 
     def stop_fixture(attrs \\ %{}) do
       {:ok, stop} =
@@ -390,9 +531,51 @@ defmodule BusDetective.GTFSTest do
   describe "stops" do
     alias BusDetective.GTFS.Stop
 
-    @valid_attrs %{agency_id: 42, code: 42, description: "some description", latitude: 120.5, location_type: 42, longitude: 120.5, name: "some name", parent_station: "some parent_station", remote_id: "some remote_id", timezone: "some timezone", url: "some url", wheelchair_boarding: 42, zone_id: 42}
-    @update_attrs %{agency_id: 43, code: 43, description: "some updated description", latitude: 456.7, location_type: 43, longitude: 456.7, name: "some updated name", parent_station: "some updated parent_station", remote_id: "some updated remote_id", timezone: "some updated timezone", url: "some updated url", wheelchair_boarding: 43, zone_id: 43}
-    @invalid_attrs %{agency_id: nil, code: nil, description: nil, latitude: nil, location_type: nil, longitude: nil, name: nil, parent_station: nil, remote_id: nil, timezone: nil, url: nil, wheelchair_boarding: nil, zone_id: nil}
+    @valid_attrs %{
+      agency_id: 42,
+      code: 42,
+      description: "some description",
+      latitude: 120.5,
+      location_type: 42,
+      longitude: 120.5,
+      name: "some name",
+      parent_station: "some parent_station",
+      remote_id: "some remote_id",
+      timezone: "some timezone",
+      url: "some url",
+      wheelchair_boarding: 42,
+      zone_id: 42
+    }
+    @update_attrs %{
+      agency_id: 43,
+      code: 43,
+      description: "some updated description",
+      latitude: 456.7,
+      location_type: 43,
+      longitude: 456.7,
+      name: "some updated name",
+      parent_station: "some updated parent_station",
+      remote_id: "some updated remote_id",
+      timezone: "some updated timezone",
+      url: "some updated url",
+      wheelchair_boarding: 43,
+      zone_id: 43
+    }
+    @invalid_attrs %{
+      agency_id: nil,
+      code: nil,
+      description: nil,
+      latitude: nil,
+      location_type: nil,
+      longitude: nil,
+      name: nil,
+      parent_station: nil,
+      remote_id: nil,
+      timezone: nil,
+      url: nil,
+      wheelchair_boarding: nil,
+      zone_id: nil
+    }
 
     def stop_fixture(attrs \\ %{}) do
       {:ok, stop} =
@@ -538,9 +721,45 @@ defmodule BusDetective.GTFSTest do
   describe "trips" do
     alias BusDetective.GTFS.Trip
 
-    @valid_attrs %{agency_id: 42, bikes_allowed: 42, block_id: 42, direction_id: 42, headsign: "some headsign", remote_id: "some remote_id", route_id: 42, service_id: 42, shape_id: 42, short_name: "some short_name", wheelchair_accessible: 42}
-    @update_attrs %{agency_id: 43, bikes_allowed: 43, block_id: 43, direction_id: 43, headsign: "some updated headsign", remote_id: "some updated remote_id", route_id: 43, service_id: 43, shape_id: 43, short_name: "some updated short_name", wheelchair_accessible: 43}
-    @invalid_attrs %{agency_id: nil, bikes_allowed: nil, block_id: nil, direction_id: nil, headsign: nil, remote_id: nil, route_id: nil, service_id: nil, shape_id: nil, short_name: nil, wheelchair_accessible: nil}
+    @valid_attrs %{
+      agency_id: 42,
+      bikes_allowed: 42,
+      block_id: 42,
+      direction_id: 42,
+      headsign: "some headsign",
+      remote_id: "some remote_id",
+      route_id: 42,
+      service_id: 42,
+      shape_id: 42,
+      short_name: "some short_name",
+      wheelchair_accessible: 42
+    }
+    @update_attrs %{
+      agency_id: 43,
+      bikes_allowed: 43,
+      block_id: 43,
+      direction_id: 43,
+      headsign: "some updated headsign",
+      remote_id: "some updated remote_id",
+      route_id: 43,
+      service_id: 43,
+      shape_id: 43,
+      short_name: "some updated short_name",
+      wheelchair_accessible: 43
+    }
+    @invalid_attrs %{
+      agency_id: nil,
+      bikes_allowed: nil,
+      block_id: nil,
+      direction_id: nil,
+      headsign: nil,
+      remote_id: nil,
+      route_id: nil,
+      service_id: nil,
+      shape_id: nil,
+      short_name: nil,
+      wheelchair_accessible: nil
+    }
 
     def trip_fixture(attrs \\ %{}) do
       {:ok, trip} =
@@ -618,9 +837,42 @@ defmodule BusDetective.GTFSTest do
   describe "stop_times" do
     alias BusDetective.GTFS.StopTime
 
-    @valid_attrs %{agency_id: 42, arrival_time: 42, departure_time: 42, drop_off_type: 42, pickup_type: 42, shape_dist_traveled: 120.5, stop_headsign: "some stop_headsign", stop_id: 42, stop_sequence: 42, trip_id: 42}
-    @update_attrs %{agency_id: 43, arrival_time: 43, departure_time: 43, drop_off_type: 43, pickup_type: 43, shape_dist_traveled: 456.7, stop_headsign: "some updated stop_headsign", stop_id: 43, stop_sequence: 43, trip_id: 43}
-    @invalid_attrs %{agency_id: nil, arrival_time: nil, departure_time: nil, drop_off_type: nil, pickup_type: nil, shape_dist_traveled: nil, stop_headsign: nil, stop_id: nil, stop_sequence: nil, trip_id: nil}
+    @valid_attrs %{
+      agency_id: 42,
+      arrival_time: 42,
+      departure_time: 42,
+      drop_off_type: 42,
+      pickup_type: 42,
+      shape_dist_traveled: 120.5,
+      stop_headsign: "some stop_headsign",
+      stop_id: 42,
+      stop_sequence: 42,
+      trip_id: 42
+    }
+    @update_attrs %{
+      agency_id: 43,
+      arrival_time: 43,
+      departure_time: 43,
+      drop_off_type: 43,
+      pickup_type: 43,
+      shape_dist_traveled: 456.7,
+      stop_headsign: "some updated stop_headsign",
+      stop_id: 43,
+      stop_sequence: 43,
+      trip_id: 43
+    }
+    @invalid_attrs %{
+      agency_id: nil,
+      arrival_time: nil,
+      departure_time: nil,
+      drop_off_type: nil,
+      pickup_type: nil,
+      shape_dist_traveled: nil,
+      stop_headsign: nil,
+      stop_id: nil,
+      stop_sequence: nil,
+      trip_id: nil
+    }
 
     def stop_time_fixture(attrs \\ %{}) do
       {:ok, stop_time} =
