@@ -2,7 +2,7 @@ defmodule BusDetective.GTFSTest do
   use BusDetective.DataCase
 
   alias BusDetective.GTFS
-  alias BusDetective.GTFS.{Agency, Service, ServiceException}
+  alias BusDetective.GTFS.{Agency, Service, Route, ServiceException}
 
   test "create_agency/1" do
     params = %{name: name} = params_for(:agency)
@@ -45,5 +45,20 @@ defmodule BusDetective.GTFSTest do
     service_exception = GTFS.get_service_exception!(insert(:service_exception, agency: agency, service: service).id)
 
     assert [service_exception] == GTFS.list_service_exceptions(agency: agency, service: service)
+  end
+
+  test "create_route/1" do
+    agency = insert(:agency)
+    params = %{long_name: long_name} = params_for(:route, agency_id: agency.id)
+
+    assert {:ok, %Route{long_name: ^long_name}} = GTFS.create_route(params)
+  end
+
+  test "list_route/1" do
+    agency = insert(:agency)
+    %Route{remote_id: remote_id} = insert(:route, agency: agency)
+    route = GTFS.get_route(agency: agency, remote_id: remote_id)
+
+    assert [route] == GTFS.list_routes(agency: agency)
   end
 end

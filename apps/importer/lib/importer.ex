@@ -4,7 +4,7 @@ defmodule Importer do
   """
 
   alias BusDetective.GTFS
-  alias BusDetective.GTFS.{Agency, Service, ServiceException}
+  alias BusDetective.GTFS.{Agency, Route, Service, ServiceException}
 
   def import(gtfs_file) do
     with {:ok, tmp_path} <- Briefly.create(directory: true),
@@ -12,6 +12,7 @@ defmodule Importer do
       [agency] = import_agencies(file_map["agency"])
       import_services(file_map["calendar"], agency: agency)
       import_service_exceptions(file_map["calendar_dates"], agency: agency)
+      import_routes(file_map["routes"], agency: agency)
     else
       error -> error
     end
@@ -103,6 +104,27 @@ defmodule Importer do
       }
 
       {:ok, %ServiceException{}} = GTFS.create_service_exception(service_exception)
+    end)
+  end
+
+  def import_routes(file, agency: %Agency{id: agency_id}) do
+    file
+    |> File.stream!()
+    |> CSV.decode(headers: true)
+    |> Enum.each(fn {:ok, raw_route} ->
+      route = %{
+        agency_id: agency_id,
+        remote_id: raw_route["route_id"],
+        short_name: raw_route["route_short_name"],
+        long_name: raw_route["route_long_name"],
+        route_desc: raw_route["description"],
+        route_type: raw_route["route_type"],
+        url: raw_route["route_url"],
+        color: raw_route["route_color"],
+        text_color: raw_route["route_text_color"]
+      }
+
+      {:ok, %Route{}} = GTFS.create_route(route)
     end)
   end
 end

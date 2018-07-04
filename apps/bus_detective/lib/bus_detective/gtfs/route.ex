@@ -2,8 +2,10 @@ defmodule BusDetective.GTFS.Route do
   use Ecto.Schema
   import Ecto.Changeset
 
+  alias BusDetective.GTFS.Agency
+
   schema "routes" do
-    field(:agency_id, :integer)
+    belongs_to(:agency, Agency)
     field(:color, :string)
     field(:description, :string)
     field(:long_name, :string)
@@ -35,11 +37,7 @@ defmodule BusDetective.GTFS.Route do
       :remote_id,
       :short_name,
       :long_name,
-      :description,
-      :route_type,
-      :url,
-      :color,
-      :text_color
+      :route_type
     ])
   end
 end

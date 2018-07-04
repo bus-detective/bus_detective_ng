@@ -6,7 +6,7 @@ defmodule BusDetective.GTFS do
   import Ecto.Query, warn: false
   alias BusDetective.Repo
 
-  alias BusDetective.GTFS.{Agency, Service, ServiceException}
+  alias BusDetective.GTFS.{Agency, Route, Service, ServiceException}
 
   @doc """
   Returns the list of agencies.
@@ -292,54 +292,54 @@ defmodule BusDetective.GTFS do
   #   ServiceException.changeset(service_exception, %{})
   # end
 
-  # alias BusDetective.GTFS.Route
+  @doc """
+  Returns the list of routes.
 
-  # @doc """
-  # Returns the list of routes.
+  ## Examples
 
-  # ## Examples
+      iex> list_routes()
+      [%Route{}, ...]
 
-  #     iex> list_routes()
-  #     [%Route{}, ...]
+  """
+  def list_routes(agency: %Agency{id: agency_id}) do
+    Repo.all(from(r in Route, where: r.agency_id == ^agency_id))
+  end
 
-  # """
-  # def list_routes do
-  #   Repo.all(Route)
-  # end
+  @doc """
+  Gets a single route.
 
-  # @doc """
-  # Gets a single route.
+  Raises `Ecto.NoResultsError` if the Route does not exist.
 
-  # Raises `Ecto.NoResultsError` if the Route does not exist.
+  ## Examples
 
-  # ## Examples
+      iex> get_route!(123)
+      %Route{}
 
-  #     iex> get_route!(123)
-  #     %Route{}
+      iex> get_route!(456)
+      ** (Ecto.NoResultsError)
 
-  #     iex> get_route!(456)
-  #     ** (Ecto.NoResultsError)
+  """
+  def get_route(agency: %Agency{id: agency_id}, remote_id: remote_id) do
+    Repo.one(from(r in Route, where: r.agency_id == ^agency_id and r.remote_id == ^remote_id))
+  end
 
-  # """
-  # def get_route!(id), do: Repo.get!(Route, id)
+  @doc """
+  Creates a route.
 
-  # @doc """
-  # Creates a route.
+  ## Examples
 
-  # ## Examples
+      iex> create_route(%{field: value})
+      {:ok, %Route{}}
 
-  #     iex> create_route(%{field: value})
-  #     {:ok, %Route{}}
+      iex> create_route(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
 
-  #     iex> create_route(%{field: bad_value})
-  #     {:error, %Ecto.Changeset{}}
-
-  # """
-  # def create_route(attrs \\ %{}) do
-  #   %Route{}
-  #   |> Route.changeset(attrs)
-  #   |> Repo.insert()
-  # end
+  """
+  def create_route(attrs \\ %{}) do
+    %Route{}
+    |> Route.changeset(attrs)
+    |> Repo.insert()
+  end
 
   # @doc """
   # Updates a route.
