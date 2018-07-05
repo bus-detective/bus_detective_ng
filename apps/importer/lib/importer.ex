@@ -9,14 +9,22 @@ defmodule Importer do
   def import(gtfs_file) do
     with {:ok, tmp_path} <- Briefly.create(directory: true),
          {:ok, file_map} <- unzip_gtfs_file(gtfs_file, tmp_path) do
-      [agency] = import_agencies(file_map["agency"])
 
+      IO.puts "Importing agencies"
+      [agency] = import_agencies(file_map["agency"])
+      IO.puts "Importing services"
       import_services(file_map["calendar"], agency: agency)
+      IO.puts "Importing service exceptions"
       import_service_exceptions(file_map["calendar_dates"], agency: agency)
+      IO.puts "Importing routes"
       import_routes(file_map["routes"], agency: agency)
+      IO.puts "Importing stops"
       import_stops(file_map["stops"], agency: agency)
+      IO.puts "Importing shapes"
       import_shapes(file_map["shapes"], agency: agency)
+      IO.puts "Importing trips"
       import_trips(file_map["trips"], agency: agency)
+      IO.puts "Importing stop times"
       import_stop_times(file_map["stop_times"], agency: agency)
     else
       error -> error
@@ -50,7 +58,7 @@ defmodule Importer do
   defp import_agencies(file) do
     file
     |> File.stream!()
-    |> CSV.decode(headers: true)
+    |> CSV.decode(headers: true, strip_fields: true)
     |> Enum.map(fn {:ok, raw_agency} ->
       agency = %{
         fare_url: raw_agency["agency_fare_url"],
@@ -70,7 +78,7 @@ defmodule Importer do
   defp import_services(file, agency: %Agency{id: agency_id}) do
     file
     |> File.stream!()
-    |> CSV.decode(headers: true)
+    |> CSV.decode(headers: true, strip_fields: true)
     |> Enum.each(fn {:ok, raw_service_exception} ->
       start_date = Timex.parse!(raw_service_exception["start_date"], "%Y%m%d", :strftime) |> Timex.to_date()
       end_date = Timex.parse!(raw_service_exception["end_date"], "%Y%m%d", :strftime) |> Timex.to_date()
@@ -96,7 +104,7 @@ defmodule Importer do
   defp import_service_exceptions(file, agency: agency = %Agency{id: agency_id}) do
     file
     |> File.stream!()
-    |> CSV.decode(headers: true)
+    |> CSV.decode(headers: true, strip_fields: true)
     |> Enum.each(fn {:ok, raw_service_exception} ->
       %Service{id: service_id} = GTFS.get_service(agency: agency, remote_id: raw_service_exception["service_id"])
       date = Timex.parse!(raw_service_exception["date"], "%Y%m%d", :strftime) |> Timex.to_date()
@@ -115,7 +123,7 @@ defmodule Importer do
   def import_routes(file, agency: %Agency{id: agency_id}) do
     file
     |> File.stream!()
-    |> CSV.decode(headers: true)
+    |> CSV.decode(headers: true, strip_fields: true)
     |> Enum.each(fn {:ok, raw_route} ->
       route = %{
         agency_id: agency_id,
@@ -136,7 +144,7 @@ defmodule Importer do
   def import_stops(file, agency: %Agency{id: agency_id}) do
     file
     |> File.stream!()
-    |> CSV.decode(headers: true)
+    |> CSV.decode(headers: true, strip_fields: true)
     |> Enum.each(fn {:ok, raw_stop} ->
       stop = %{
         agency_id: agency_id,
@@ -161,7 +169,7 @@ defmodule Importer do
   def import_shapes(file, agency: %Agency{id: agency_id}) do
     file
     |> File.stream!()
-    |> CSV.decode(headers: true)
+    |> CSV.decode(headers: true, strip_fields: true)
     |> Enum.reduce(%{}, fn {:ok, shape}, acc ->
       {_, new_acc} =
         Map.get_and_update(acc, shape["shape_id"], fn current_value ->
@@ -189,7 +197,7 @@ defmodule Importer do
   def import_trips(file, agency: agency = %Agency{id: agency_id}) do
     file
     |> File.stream!()
-    |> CSV.decode(headers: true)
+    |> CSV.decode(headers: true, strip_fields: true)
     |> Enum.each(fn {:ok, raw_trip} ->
       route = GTFS.get_route(agency: agency, remote_id: raw_trip["route_id"])
       service = GTFS.get_service(agency: agency, remote_id: raw_trip["service_id"])
@@ -216,7 +224,7 @@ defmodule Importer do
   def import_stop_times(file, agency: agency = %Agency{id: agency_id}) do
     file
     |> File.stream!()
-    |> CSV.decode(headers: true)
+    |> CSV.decode(headers: true, strip_fields: true)
     |> Enum.each(fn {:ok, raw_stop_time} ->
       trip = GTFS.get_trip(agency: agency, remote_id: raw_stop_time["trip_id"])
       stop = GTFS.get_stop(agency: agency, remote_id: raw_stop_time["stop_id"])
