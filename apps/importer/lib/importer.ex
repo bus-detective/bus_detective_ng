@@ -4,7 +4,7 @@ defmodule Importer do
   """
 
   alias BusDetective.GTFS
-  alias BusDetective.GTFS.{Agency, Route, Service, ServiceException, Shape, Stop, Trip}
+  alias BusDetective.GTFS.{Agency, Route, Service, ServiceException, Shape, Stop, StopTime, Trip}
 
   def import(gtfs_file) do
     with {:ok, tmp_path} <- Briefly.create(directory: true),
@@ -13,14 +13,11 @@ defmodule Importer do
 
       import_services(file_map["calendar"], agency: agency)
       import_service_exceptions(file_map["calendar_dates"], agency: agency)
-
       import_routes(file_map["routes"], agency: agency)
-
       import_stops(file_map["stops"], agency: agency)
-
       import_shapes(file_map["shapes"], agency: agency)
-
       import_trips(file_map["trips"], agency: agency)
+      import_stop_times(file_map["stop_times"], agency: agency)
     else
       error -> error
     end
@@ -213,6 +210,42 @@ defmodule Importer do
       }
 
       {:ok, %Trip{}} = GTFS.create_trip(trip)
+    end)
+  end
+
+  def import_stop_times(file, agency: agency = %Agency{id: agency_id}) do
+    file
+    |> File.stream!()
+    |> CSV.decode(headers: true)
+    |> Enum.each(fn {:ok, raw_stop_time} ->
+      trip = GTFS.get_trip(agency: agency, remote_id: raw_stop_time["trip_id"])
+      stop = GTFS.get_stop(agency: agency, remote_id: raw_stop_time["stop_id"])
+
+      [arr_hours, arr_minutes, arr_seconds] =
+        raw_stop_time["arrival_time"]
+        |> String.split(":")
+        |> Enum.map(&String.to_integer/1)
+
+      arrival_time = arr_hours * 60 * 60 + arr_minutes * 60 + arr_seconds
+
+      [dep_hours, dep_minutes, dep_seconds] =
+        raw_stop_time["departure_time"]
+        |> String.split(":")
+        |> Enum.map(&String.to_integer/1)
+
+      departure_time = dep_hours * 60 * 60 + dep_minutes * 60 + dep_seconds
+
+      stop_time = %{
+        agency_id: agency_id,
+        stop_id: stop.id,
+        trip_id: trip.id,
+        stop_sequence: raw_stop_time["stop_sequence"],
+        shape_dist_traveled: raw_stop_time["shape_dist_traveled"],
+        arrival_time: arrival_time,
+        departure_time: departure_time
+      }
+
+      {:ok, %StopTime{}} = GTFS.create_stop_time(stop_time)
     end)
   end
 end

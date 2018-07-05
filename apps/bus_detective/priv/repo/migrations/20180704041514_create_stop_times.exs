@@ -10,8 +10,8 @@ defmodule BusDetective.Repo.Migrations.CreateStopTimes do
       add(:pickup_type, :integer)
       add(:drop_off_type, :integer)
       add(:shape_dist_traveled, :float)
-      add(:arrival_time, :interval)
-      add(:departure_time, :interval)
+      add(:arrival_time, :integer)
+      add(:departure_time, :integer)
       add(:stop_sequence, :integer)
 
       timestamps()

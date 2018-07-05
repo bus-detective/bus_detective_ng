@@ -2,7 +2,7 @@ defmodule BusDetective.GTFSTest do
   use BusDetective.DataCase
 
   alias BusDetective.GTFS
-  alias BusDetective.GTFS.{Agency, Service, Route, ServiceException, Shape, Stop}
+  alias BusDetective.GTFS.{Agency, Service, Route, ServiceException, Shape, Stop, StopTime, Trip}
 
   test "create_agency/1" do
     params = %{name: name} = params_for(:agency)
@@ -90,5 +90,57 @@ defmodule BusDetective.GTFSTest do
     shape = GTFS.get_shape(agency: agency, remote_id: remote_id)
 
     assert [shape] == GTFS.list_shapes(agency: agency)
+  end
+
+  test "create_trip/1" do
+    agency = insert(:agency)
+    service = insert(:service, agency: agency)
+    route = insert(:route, agency: agency)
+
+    params =
+      %{remote_id: remote_id} = params_for(:trip, agency_id: agency.id, service_id: service.id, route_id: route.id)
+
+    assert {:ok, %Trip{remote_id: ^remote_id}} = GTFS.create_trip(params)
+  end
+
+  test "list_trips/1" do
+    agency = insert(:agency)
+    service = insert(:service, agency: agency)
+    route = insert(:route, agency: agency)
+
+    %Trip{remote_id: remote_id} = insert(:trip, agency: agency, service: service, route: route)
+    trip = GTFS.get_trip(agency: agency, remote_id: remote_id)
+
+    assert [trip] == GTFS.list_trips(agency: agency)
+  end
+
+  test "create_stop_time/1" do
+    agency = insert(:agency)
+    stop = insert(:stop, agency: agency)
+    trip = insert(:trip, agency: agency)
+
+    params =
+      %{stop_sequence: stop_sequence} = params_for(:stop_time, agency_id: agency.id, stop_id: stop.id, trip_id: trip.id)
+
+    assert {:ok, %StopTime{stop_sequence: ^stop_sequence}} = GTFS.create_stop_time(params)
+  end
+
+  test "list_stop_times/1" do
+    agency = insert(:agency)
+    stop = insert(:stop, agency: agency)
+    trip = insert(:trip, agency: agency)
+
+    %StopTime{stop_sequence: stop_sequence} = insert(:stop_time, agency: agency, stop: stop, trip: trip)
+
+    stop_time =
+      GTFS.get_stop_time(
+        agency: agency,
+        stop: stop,
+        stop_sequence: stop_sequence,
+        trip: trip
+      )
+
+    assert 1 == length(GTFS.list_stop_times(agency: agency))
+    assert stop_time.id == List.first(GTFS.list_stop_times(agency: agency)).id
   end
 end

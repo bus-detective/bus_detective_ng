@@ -6,7 +6,7 @@ defmodule BusDetective.GTFS do
   import Ecto.Query, warn: false
   alias BusDetective.Repo
 
-  alias BusDetective.GTFS.{Agency, Route, Service, ServiceException, Shape, Stop, Trip}
+  alias BusDetective.GTFS.{Agency, Route, Service, ServiceException, Shape, Stop, StopTime, Trip}
 
   @doc """
   Returns the list of agencies.
@@ -614,9 +614,7 @@ defmodule BusDetective.GTFS do
 
   """
   def get_trip(agency: %Agency{id: agency_id}, remote_id: remote_id) do
-    Repo.one(
-      from t in Trip, where: t.agency_id == ^agency_id and t.remote_id == ^remote_id
-    )
+    Repo.one(from(t in Trip, where: t.agency_id == ^agency_id and t.remote_id == ^remote_id))
   end
 
   @doc """
@@ -686,52 +684,66 @@ defmodule BusDetective.GTFS do
 
   # alias BusDetective.GTFS.StopTime
 
-  # @doc """
-  # Returns the list of stop_times.
+  @doc """
+  Returns the list of stop_times.
 
-  # ## Examples
+  ## Examples
 
-  #     iex> list_stop_times()
-  #     [%StopTime{}, ...]
+      iex> list_stop_times()
+      [%StopTime{}, ...]
 
-  # """
-  # def list_stop_times do
-  #   Repo.all(StopTime)
-  # end
+  """
+  def list_stop_times(agency: %Agency{id: agency_id}) do
+    Repo.all(from(st in StopTime, where: st.agency_id == ^agency_id))
+  end
 
-  # @doc """
-  # Gets a single stop_time.
+  @doc """
+  Gets a single stop_time.
 
-  # Raises `Ecto.NoResultsError` if the Stop time does not exist.
+  Raises `Ecto.NoResultsError` if the Stop time does not exist.
 
-  # ## Examples
+  ## Examples
 
-  #     iex> get_stop_time!(123)
-  #     %StopTime{}
+      iex> get_stop_time!(123)
+      %StopTime{}
 
-  #     iex> get_stop_time!(456)
-  #     ** (Ecto.NoResultsError)
+      iex> get_stop_time!(456)
+      ** (Ecto.NoResultsError)
 
-  # """
-  # def get_stop_time!(id), do: Repo.get!(StopTime, id)
+  """
+  def get_stop_time(args) do
+    %Agency{id: agency_id} = Keyword.get(args, :agency)
+    %Stop{id: stop_id} = Keyword.get(args, :stop)
+    %Trip{id: trip_id} = Keyword.get(args, :trip)
+    stop_sequence = Keyword.get(args, :stop_sequence)
 
-  # @doc """
-  # Creates a stop_time.
+    Repo.one(
+      from(
+        st in StopTime,
+        where:
+          st.agency_id == ^agency_id and st.trip_id == ^trip_id and st.stop_id == ^stop_id and
+            st.stop_sequence == ^stop_sequence
+      )
+    )
+  end
 
-  # ## Examples
+  @doc """
+  Creates a stop_time.
 
-  #     iex> create_stop_time(%{field: value})
-  #     {:ok, %StopTime{}}
+  ## Examples
 
-  #     iex> create_stop_time(%{field: bad_value})
-  #     {:error, %Ecto.Changeset{}}
+      iex> create_stop_time(%{field: value})
+      {:ok, %StopTime{}}
 
-  # """
-  # def create_stop_time(attrs \\ %{}) do
-  #   %StopTime{}
-  #   |> StopTime.changeset(attrs)
-  #   |> Repo.insert()
-  # end
+      iex> create_stop_time(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def create_stop_time(attrs \\ %{}) do
+    %StopTime{}
+    |> StopTime.changeset(attrs)
+    |> Repo.insert()
+  end
 
   # @doc """
   # Updates a stop_time.

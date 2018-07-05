@@ -2,7 +2,7 @@ defmodule Importer.ImporterTest do
   use BusDetective.DataCase
 
   alias BusDetective.GTFS
-  alias BusDetective.GTFS.{Agency, Route, Service, ServiceException, Shape, Stop, Trip}
+  alias BusDetective.GTFS.{Agency, Route, Service, ServiceException, Shape, Stop, StopTime, Trip}
 
   setup do
     gtfs_file = Path.join(File.cwd!(), "test/fixtures/google_transit_info.zip")
@@ -171,11 +171,34 @@ defmodule Importer.ImporterTest do
     trip = GTFS.get_trip(agency: agency, remote_id: "955305")
 
     assert %Trip{
-      route_id: ^route_id,
-      service_id: ^service_id,
-      shape_id: ^shape_id,
-      headsign: "1 MT ADAMS - EDEN PARK",
-      block_id: 125647
-    } = trip
+             route_id: ^route_id,
+             service_id: ^service_id,
+             shape_id: ^shape_id,
+             headsign: "1 MT ADAMS - EDEN PARK",
+             block_id: 125_647
+           } = trip
+  end
+
+  test "it imports the correct number of stop times", %{gtfs_file: gtfs_file} do
+    Importer.import(gtfs_file)
+    [agency] = GTFS.list_agencies()
+
+    assert 10 == length(GTFS.list_stop_times(agency: agency))
+  end
+
+  test "it imports a stop time correctly", %{gtfs_file: gtfs_file} do
+    Importer.import(gtfs_file)
+
+    [agency] = GTFS.list_agencies()
+    stop = GTFS.get_stop(agency: agency, remote_id: "EZZLINw")
+    trip = GTFS.get_trip(agency: agency, remote_id: "955305")
+
+    stop_time = GTFS.get_stop_time(agency: agency, trip: trip, stop: stop, stop_sequence: 2)
+
+    assert %StopTime{
+             shape_dist_traveled: 0.3616,
+             arrival_time: 79857,
+             departure_time: 79857
+           } = stop_time
   end
 end

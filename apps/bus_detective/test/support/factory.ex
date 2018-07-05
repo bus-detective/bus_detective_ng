@@ -1,7 +1,7 @@
 defmodule BusDetective.Factory do
   use ExMachina.Ecto, repo: BusDetective.Repo
 
-  alias BusDetective.GTFS.{Agency, Route, Service, ServiceException, Shape, Stop}
+  alias BusDetective.GTFS.{Agency, Route, Service, ServiceException, Shape, Stop, StopTime, Trip}
 
   def agency_factory do
     %Agency{
@@ -31,10 +31,11 @@ defmodule BusDetective.Factory do
 
   def service_exception_factory do
     date = Timex.to_date(Timex.now())
+    agency = build(:agency)
 
     %ServiceException{
-      agency: build(:agency),
-      service: build(:service),
+      agency: agency,
+      service: build(:service, agency: agency),
       date: date,
       exception: Enum.random(0..10)
     }
@@ -71,6 +72,34 @@ defmodule BusDetective.Factory do
           {39.109431, -84.536437}
         ]
       }
+    }
+  end
+
+  def stop_time_factory do
+    stop_time_sequence = sequence(:stop_time_sequence, & &1)
+    agency = build(:agency)
+
+    %StopTime{
+      agency: build(:agency),
+      stop: build(:stop, agency: agency),
+      trip: build(:trip, agency: agency),
+      stop_sequence: stop_time_sequence,
+      shape_dist_traveled: stop_time_sequence * 0.5,
+      arrival_time: 56_000 + stop_time_sequence * 2,
+      departure_time: 56_000 + stop_time_sequence * 2 + 1
+    }
+  end
+
+  def trip_factory do
+    agency = build(:agency)
+
+    %Trip{
+      agency: agency,
+      remote_id: sequence(:trip_remote_id, &"Trip#{&1}"),
+      route: build(:route, agency: agency),
+      service: build(:service, agency: agency),
+      shape: build(:shape, agency: agency),
+      block_id: sequence(:trip_block_id, & &1)
     }
   end
 end
