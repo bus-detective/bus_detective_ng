@@ -6,7 +6,7 @@ defmodule BusDetective.GTFS do
   import Ecto.Query, warn: false
   alias BusDetective.Repo
 
-  alias BusDetective.GTFS.{Agency, Route, Service, ServiceException}
+  alias BusDetective.GTFS.{Agency, Route, Service, ServiceException, Stop}
 
   @doc """
   Returns the list of agencies.
@@ -390,52 +390,58 @@ defmodule BusDetective.GTFS do
 
   # alias BusDetective.GTFS.Stop
 
-  # @doc """
-  # Returns the list of stops.
+  @doc """
+  Returns the list of stops.
 
-  # ## Examples
+  ## Examples
 
-  #     iex> list_stops()
-  #     [%Stop{}, ...]
+      iex> list_stops()
+      [%Stop{}, ...]
 
-  # """
-  # def list_stops do
-  #   Repo.all(Stop)
-  # end
+  """
+  def list_stops(agency: %Agency{id: agency_id}) do
+    Repo.all(
+      from s in Stop, where: s.agency_id == ^agency_id
+    )
+  end
 
-  # @doc """
-  # Gets a single stop.
+  @doc """
+  Gets a single stop.
 
-  # Raises `Ecto.NoResultsError` if the Stop does not exist.
+  Raises `Ecto.NoResultsError` if the Stop does not exist.
 
-  # ## Examples
+  ## Examples
 
-  #     iex> get_stop!(123)
-  #     %Stop{}
+      iex> get_stop!(123)
+      %Stop{}
 
-  #     iex> get_stop!(456)
-  #     ** (Ecto.NoResultsError)
+      iex> get_stop!(456)
+      ** (Ecto.NoResultsError)
 
-  # """
-  # def get_stop!(id), do: Repo.get!(Stop, id)
+  """
+  def get_stop(agency: %Agency{id: agency_id}, remote_id: remote_id) do
+    Repo.one(
+      from s in Stop, where: s.agency_id == ^agency_id and s.remote_id == ^remote_id
+    )
+  end
 
-  # @doc """
-  # Creates a stop.
+  @doc """
+  Creates a stop.
 
-  # ## Examples
+  ## Examples
 
-  #     iex> create_stop(%{field: value})
-  #     {:ok, %Stop{}}
+      iex> create_stop(%{field: value})
+      {:ok, %Stop{}}
 
-  #     iex> create_stop(%{field: bad_value})
-  #     {:error, %Ecto.Changeset{}}
+      iex> create_stop(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
 
-  # """
-  # def create_stop(attrs \\ %{}) do
-  #   %Stop{}
-  #   |> Stop.changeset(attrs)
-  #   |> Repo.insert()
-  # end
+  """
+  def create_stop(attrs \\ %{}) do
+    %Stop{}
+    |> Stop.changeset(attrs)
+    |> Repo.insert()
+  end
 
   # @doc """
   # Updates a stop.

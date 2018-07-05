@@ -4,7 +4,7 @@ defmodule Importer do
   """
 
   alias BusDetective.GTFS
-  alias BusDetective.GTFS.{Agency, Route, Service, ServiceException}
+  alias BusDetective.GTFS.{Agency, Route, Service, ServiceException, Stop}
 
   def import(gtfs_file) do
     with {:ok, tmp_path} <- Briefly.create(directory: true),
@@ -13,6 +13,7 @@ defmodule Importer do
       import_services(file_map["calendar"], agency: agency)
       import_service_exceptions(file_map["calendar_dates"], agency: agency)
       import_routes(file_map["routes"], agency: agency)
+      import_stops(file_map["stops"], agency: agency)
     else
       error -> error
     end
@@ -113,18 +114,43 @@ defmodule Importer do
     |> CSV.decode(headers: true)
     |> Enum.each(fn {:ok, raw_route} ->
       route = %{
-        agency_id: agency_id,
-        remote_id: raw_route["route_id"],
-        short_name: raw_route["route_short_name"],
-        long_name: raw_route["route_long_name"],
-        route_desc: raw_route["description"],
-        route_type: raw_route["route_type"],
-        url: raw_route["route_url"],
-        color: raw_route["route_color"],
-        text_color: raw_route["route_text_color"]
-      }
+      agency_id: agency_id,
+      remote_id: raw_route["route_id"],
+      short_name: raw_route["route_short_name"],
+      long_name: raw_route["route_long_name"],
+      route_desc: raw_route["description"],
+      route_type: raw_route["route_type"],
+      url: raw_route["route_url"],
+      color: raw_route["route_color"],
+      text_color: raw_route["route_text_color"]
+    }
 
       {:ok, %Route{}} = GTFS.create_route(route)
+    end)
+  end
+
+  def import_stops(file, agency: %Agency{id: agency_id}) do
+    file
+    |> File.stream!()
+    |> CSV.decode(headers: true)
+    |> Enum.each(fn {:ok, raw_stop} ->
+      stop = %{
+        agency_id: agency_id,
+        remote_id: raw_stop["stop_id"],
+        code: raw_stop["stop_code"],
+        name: raw_stop["stop_name"],
+        description: raw_stop["stop_desc"],
+        latitude: raw_stop["stop_lat"],
+        longitude: raw_stop["stop_lon"],
+        zone_id: raw_stop["zone_id"],
+        url: raw_stop["stop_url"],
+        location_type: raw_stop["location_type"],
+        parent_station: raw_stop["parent_station"],
+        timezone: raw_stop["stop_timezone"],
+        wheelchair_boarding: raw_stop["wheelchair_boarding"],
+      }
+
+      {:ok, %Stop{}} = GTFS.create_stop(stop)
     end)
   end
 end

@@ -1,7 +1,7 @@
 defmodule BusDetective.Factory do
   use ExMachina.Ecto, repo: BusDetective.Repo
 
-  alias BusDetective.GTFS.{Agency, Route, Service, ServiceException}
+  alias BusDetective.GTFS.{Agency, Route, Service, ServiceException, Stop}
 
   def agency_factory do
     %Agency{
@@ -47,6 +47,16 @@ defmodule BusDetective.Factory do
       short_name: sequence(:route_short_name, &"#{&1}"),
       long_name: sequence(:route_long_name, &"Route #{&1}"),
       route_type: Enum.random(0..7) |> Integer.to_string()
+    }
+  end
+
+  def stop_factory do
+    %Stop{
+      agency: build(:agency),
+      remote_id: sequence(:stop_remote_id, &"STOP#{&1}"),
+      name: sequence(:stop_remote_id, &"5th and Walnut & #{&1} North St"),
+      latitude: Float.round(39 + :rand.uniform(), 6),
+      longitude: Float.round(-84 - :rand.uniform(), 6)
     }
   end
 end

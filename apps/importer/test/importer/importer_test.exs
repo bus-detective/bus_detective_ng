@@ -2,7 +2,7 @@ defmodule Importer.ImporterTest do
   use BusDetective.DataCase
 
   alias BusDetective.GTFS
-  alias BusDetective.GTFS.{Agency, Route, Service, ServiceException}
+  alias BusDetective.GTFS.{Agency, Route, Service, ServiceException, Stop}
 
   setup do
     gtfs_file = Path.join(File.cwd!(), "test/fixtures/google_transit_info.zip")
@@ -98,5 +98,26 @@ defmodule Importer.ImporterTest do
              color: "FF4AFF",
              text_color: "000000"
            } = route
+  end
+
+  test "it imports the correct number of stops", %{gtfs_file: gtfs_file} do
+    Importer.import(gtfs_file)
+    [agency] = GTFS.list_agencies()
+
+    assert 10 == length(GTFS.list_stops(agency: agency))
+  end
+
+  test "it imports a stop correctly", %{gtfs_file: gtfs_file} do
+    Importer.import(gtfs_file)
+
+    [agency] = GTFS.list_agencies()
+    stop = GTFS.get_stop(agency: agency, remote_id: "EZZLINe")
+
+    assert %Stop{
+      code: 4451,
+      name: "EZZARD CHARLES DR & LINN ST",
+      latitude: 39.109286,
+      longitude: -84.527882
+    } = stop
   end
 end

@@ -2,8 +2,10 @@ defmodule BusDetective.GTFS.Stop do
   use Ecto.Schema
   import Ecto.Changeset
 
+  alias BusDetective.GTFS.Agency
+
   schema "stops" do
-    field(:agency_id, :integer)
+    belongs_to(:agency, Agency)
     field(:code, :integer)
     field(:description, :string)
     field(:latitude, :float)
@@ -41,17 +43,9 @@ defmodule BusDetective.GTFS.Stop do
     |> validate_required([
       :agency_id,
       :remote_id,
-      :code,
       :name,
-      :description,
       :latitude,
-      :longitude,
-      :zone_id,
-      :url,
-      :location_type,
-      :parent_station,
-      :timezone,
-      :wheelchair_boarding
+      :longitude
     ])
   end
 end
