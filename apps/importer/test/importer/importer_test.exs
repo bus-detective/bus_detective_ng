@@ -2,7 +2,7 @@ defmodule Importer.ImporterTest do
   use BusDetective.DataCase
 
   alias BusDetective.GTFS
-  alias BusDetective.GTFS.{Agency, Route, Service, ServiceException, Stop}
+  alias BusDetective.GTFS.{Agency, Route, Service, ServiceException, Shape, Stop}
 
   setup do
     gtfs_file = Path.join(File.cwd!(), "test/fixtures/google_transit_info.zip")
@@ -114,10 +114,42 @@ defmodule Importer.ImporterTest do
     stop = GTFS.get_stop(agency: agency, remote_id: "EZZLINe")
 
     assert %Stop{
-      code: 4451,
-      name: "EZZARD CHARLES DR & LINN ST",
-      latitude: 39.109286,
-      longitude: -84.527882
-    } = stop
+             code: 4451,
+             name: "EZZARD CHARLES DR & LINN ST",
+             latitude: 39.109286,
+             longitude: -84.527882
+           } = stop
+  end
+
+  test "it imports the correct number of shapes", %{gtfs_file: gtfs_file} do
+    Importer.import(gtfs_file)
+    [agency] = GTFS.list_agencies()
+
+    assert 1 == length(GTFS.list_shapes(agency: agency))
+  end
+
+  test "it imports a shape correctly", %{gtfs_file: gtfs_file} do
+    Importer.import(gtfs_file)
+
+    [agency] = GTFS.list_agencies()
+    shape = GTFS.get_shape(agency: agency, remote_id: "83146")
+
+    assert %Shape{
+             geometry: %Geo.LineString{
+               srid: 4326,
+               coordinates: [
+                 {39.109414, -84.536507},
+                 {39.109431, -84.536437},
+                 {39.109467, -84.536356},
+                 {39.109530, -84.536274},
+                 {39.109583, -84.536181},
+                 {39.109610, -84.536088},
+                 {39.109628, -84.535959},
+                 {39.109628, -84.535807},
+                 {39.109455, -84.532203},
+                 {39.109423, -84.531868}
+               ]
+             }
+           } = shape
   end
 end

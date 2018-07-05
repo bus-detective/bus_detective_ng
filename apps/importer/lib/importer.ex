@@ -4,16 +4,21 @@ defmodule Importer do
   """
 
   alias BusDetective.GTFS
-  alias BusDetective.GTFS.{Agency, Route, Service, ServiceException, Stop}
+  alias BusDetective.GTFS.{Agency, Route, Service, ServiceException, Shape, Stop}
 
   def import(gtfs_file) do
     with {:ok, tmp_path} <- Briefly.create(directory: true),
          {:ok, file_map} <- unzip_gtfs_file(gtfs_file, tmp_path) do
       [agency] = import_agencies(file_map["agency"])
+
       import_services(file_map["calendar"], agency: agency)
       import_service_exceptions(file_map["calendar_dates"], agency: agency)
+
       import_routes(file_map["routes"], agency: agency)
+
       import_stops(file_map["stops"], agency: agency)
+
+      import_shapes(file_map["shapes"], agency: agency)
     else
       error -> error
     end
@@ -114,16 +119,16 @@ defmodule Importer do
     |> CSV.decode(headers: true)
     |> Enum.each(fn {:ok, raw_route} ->
       route = %{
-      agency_id: agency_id,
-      remote_id: raw_route["route_id"],
-      short_name: raw_route["route_short_name"],
-      long_name: raw_route["route_long_name"],
-      route_desc: raw_route["description"],
-      route_type: raw_route["route_type"],
-      url: raw_route["route_url"],
-      color: raw_route["route_color"],
-      text_color: raw_route["route_text_color"]
-    }
+        agency_id: agency_id,
+        remote_id: raw_route["route_id"],
+        short_name: raw_route["route_short_name"],
+        long_name: raw_route["route_long_name"],
+        route_desc: raw_route["description"],
+        route_type: raw_route["route_type"],
+        url: raw_route["route_url"],
+        color: raw_route["route_color"],
+        text_color: raw_route["route_text_color"]
+      }
 
       {:ok, %Route{}} = GTFS.create_route(route)
     end)
@@ -147,10 +152,38 @@ defmodule Importer do
         location_type: raw_stop["location_type"],
         parent_station: raw_stop["parent_station"],
         timezone: raw_stop["stop_timezone"],
-        wheelchair_boarding: raw_stop["wheelchair_boarding"],
+        wheelchair_boarding: raw_stop["wheelchair_boarding"]
       }
 
       {:ok, %Stop{}} = GTFS.create_stop(stop)
+    end)
+  end
+
+  def import_shapes(file, agency: %Agency{id: agency_id}) do
+    file
+    |> File.stream!()
+    |> CSV.decode(headers: true)
+    |> Enum.reduce(%{}, fn {:ok, shape}, acc ->
+      {_, new_acc} =
+        Map.get_and_update(acc, shape["shape_id"], fn current_value ->
+          {current_value, [shape | current_value || []]}
+        end)
+
+      new_acc
+    end)
+    |> Enum.each(fn {shape_id, shapes} ->
+      coordinates =
+        shapes
+        |> Enum.sort_by(fn shape -> String.to_integer(shape["shape_pt_sequence"]) end)
+        |> Enum.map(fn point -> {point["shape_pt_lat"], point["shape_pt_lon"]} end)
+
+      shape = %{
+        agency_id: agency_id,
+        geometry: %Geo.LineString{srid: 4326, coordinates: coordinates},
+        remote_id: shape_id
+      }
+
+      {:ok, %Shape{}} = GTFS.create_shape(shape)
     end)
   end
 end

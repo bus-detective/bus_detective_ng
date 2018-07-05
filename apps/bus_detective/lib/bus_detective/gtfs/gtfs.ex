@@ -6,7 +6,7 @@ defmodule BusDetective.GTFS do
   import Ecto.Query, warn: false
   alias BusDetective.Repo
 
-  alias BusDetective.GTFS.{Agency, Route, Service, ServiceException, Stop}
+  alias BusDetective.GTFS.{Agency, Route, Service, ServiceException, Shape, Stop}
 
   @doc """
   Returns the list of agencies.
@@ -400,9 +400,7 @@ defmodule BusDetective.GTFS do
 
   """
   def list_stops(agency: %Agency{id: agency_id}) do
-    Repo.all(
-      from s in Stop, where: s.agency_id == ^agency_id
-    )
+    Repo.all(from(s in Stop, where: s.agency_id == ^agency_id))
   end
 
   @doc """
@@ -420,9 +418,7 @@ defmodule BusDetective.GTFS do
 
   """
   def get_stop(agency: %Agency{id: agency_id}, remote_id: remote_id) do
-    Repo.one(
-      from s in Stop, where: s.agency_id == ^agency_id and s.remote_id == ^remote_id
-    )
+    Repo.one(from(s in Stop, where: s.agency_id == ^agency_id and s.remote_id == ^remote_id))
   end
 
   @doc """
@@ -492,52 +488,54 @@ defmodule BusDetective.GTFS do
 
   # alias BusDetective.GTFS.Shape
 
-  # @doc """
-  # Returns the list of shapes.
+  @doc """
+  Returns the list of shapes.
 
-  # ## Examples
+  ## Examples
 
-  #     iex> list_shapes()
-  #     [%Shape{}, ...]
+      iex> list_shapes()
+      [%Shape{}, ...]
 
-  # """
-  # def list_shapes do
-  #   Repo.all(Shape)
-  # end
+  """
+  def list_shapes(agency: %Agency{id: agency_id}) do
+    Repo.all(from(s in Shape, where: s.agency_id == ^agency_id))
+  end
 
-  # @doc """
-  # Gets a single shape.
+  @doc """
+  Gets a single shape.
 
-  # Raises `Ecto.NoResultsError` if the Shape does not exist.
+  Raises `Ecto.NoResultsError` if the Shape does not exist.
 
-  # ## Examples
+  ## Examples
 
-  #     iex> get_shape!(123)
-  #     %Shape{}
+      iex> get_shape!(123)
+      %Shape{}
 
-  #     iex> get_shape!(456)
-  #     ** (Ecto.NoResultsError)
+      iex> get_shape!(456)
+      ** (Ecto.NoResultsError)
 
-  # """
-  # def get_shape!(id), do: Repo.get!(Shape, id)
+  """
+  def get_shape(agency: %Agency{id: agency_id}, remote_id: remote_id) do
+    Repo.one(from(s in Shape, where: s.agency_id == ^agency_id and s.remote_id == ^remote_id))
+  end
 
-  # @doc """
-  # Creates a shape.
+  @doc """
+  Creates a shape.
 
-  # ## Examples
+  ## Examples
 
-  #     iex> create_shape(%{field: value})
-  #     {:ok, %Shape{}}
+      iex> create_shape(%{field: value})
+      {:ok, %Shape{}}
 
-  #     iex> create_shape(%{field: bad_value})
-  #     {:error, %Ecto.Changeset{}}
+      iex> create_shape(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
 
-  # """
-  # def create_shape(attrs \\ %{}) do
-  #   %Shape{}
-  #   |> Shape.changeset(attrs)
-  #   |> Repo.insert()
-  # end
+  """
+  def create_shape(attrs \\ %{}) do
+    %Shape{}
+    |> Shape.changeset(attrs)
+    |> Repo.insert()
+  end
 
   # @doc """
   # Updates a shape.

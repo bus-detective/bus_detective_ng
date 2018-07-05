@@ -2,9 +2,11 @@ defmodule BusDetective.GTFS.Shape do
   use Ecto.Schema
   import Ecto.Changeset
 
+  alias BusDetective.GTFS.Agency
+
   schema "shapes" do
-    field(:agency_id, :integer)
-    field(:geometry, :string)
+    belongs_to(:agency, Agency)
+    field(:geometry, Geo.PostGIS.Geometry)
     field(:remote_id, :string)
 
     timestamps()

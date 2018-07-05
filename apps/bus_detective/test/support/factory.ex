@@ -1,7 +1,7 @@
 defmodule BusDetective.Factory do
   use ExMachina.Ecto, repo: BusDetective.Repo
 
-  alias BusDetective.GTFS.{Agency, Route, Service, ServiceException, Stop}
+  alias BusDetective.GTFS.{Agency, Route, Service, ServiceException, Shape, Stop}
 
   def agency_factory do
     %Agency{
@@ -57,6 +57,20 @@ defmodule BusDetective.Factory do
       name: sequence(:stop_remote_id, &"5th and Walnut & #{&1} North St"),
       latitude: Float.round(39 + :rand.uniform(), 6),
       longitude: Float.round(-84 - :rand.uniform(), 6)
+    }
+  end
+
+  def shape_factory do
+    %Shape{
+      agency: build(:agency),
+      remote_id: sequence(:shape_remote_id, &"#{&1}"),
+      geometry: %Geo.LineString{
+        srid: 4326,
+        coordinates: [
+          {39.109414, -84.536507},
+          {39.109431, -84.536437}
+        ]
+      }
     }
   end
 end
