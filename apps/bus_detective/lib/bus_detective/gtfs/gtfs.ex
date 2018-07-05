@@ -6,7 +6,7 @@ defmodule BusDetective.GTFS do
   import Ecto.Query, warn: false
   alias BusDetective.Repo
 
-  alias BusDetective.GTFS.{Agency, Route, Service, ServiceException, Shape, Stop}
+  alias BusDetective.GTFS.{Agency, Route, Service, ServiceException, Shape, Stop, Trip}
 
   @doc """
   Returns the list of agencies.
@@ -586,52 +586,56 @@ defmodule BusDetective.GTFS do
 
   # alias BusDetective.GTFS.Trip
 
-  # @doc """
-  # Returns the list of trips.
+  @doc """
+  Returns the list of trips.
 
-  # ## Examples
+  ## Examples
 
-  #     iex> list_trips()
-  #     [%Trip{}, ...]
+      iex> list_trips()
+      [%Trip{}, ...]
 
-  # """
-  # def list_trips do
-  #   Repo.all(Trip)
-  # end
+  """
+  def list_trips(agency: %Agency{id: agency_id}) do
+    Repo.all(from(t in Trip, where: t.agency_id == ^agency_id))
+  end
 
-  # @doc """
-  # Gets a single trip.
+  @doc """
+  Gets a single trip.
 
-  # Raises `Ecto.NoResultsError` if the Trip does not exist.
+  Raises `Ecto.NoResultsError` if the Trip does not exist.
 
-  # ## Examples
+  ## Examples
 
-  #     iex> get_trip!(123)
-  #     %Trip{}
+      iex> get_trip!(123)
+      %Trip{}
 
-  #     iex> get_trip!(456)
-  #     ** (Ecto.NoResultsError)
+      iex> get_trip!(456)
+      ** (Ecto.NoResultsError)
 
-  # """
-  # def get_trip!(id), do: Repo.get!(Trip, id)
+  """
+  def get_trip(agency: %Agency{id: agency_id}, remote_id: remote_id) do
+    Repo.one(
+      from t in Trip, where: t.agency_id == ^agency_id and t.remote_id == ^remote_id
+    )
+  end
 
-  # @doc """
-  # Creates a trip.
+  @doc """
+  Creates a trip.
 
-  # ## Examples
+  ## Examples
 
-  #     iex> create_trip(%{field: value})
-  #     {:ok, %Trip{}}
+      iex> create_trip(%{field: value})
+      {:ok, %Trip{}}
 
-  #     iex> create_trip(%{field: bad_value})
-  #     {:error, %Ecto.Changeset{}}
+      iex> create_trip(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
 
-  # """
-  # def create_trip(attrs \\ %{}) do
-  #   %Trip{}
-  #   |> Trip.changeset(attrs)
-  #   |> Repo.insert()
-  # end
+  """
+  def create_trip(attrs \\ %{}) do
+    %Trip{}
+    |> Trip.changeset(attrs)
+    |> Repo.insert()
+  end
 
   # @doc """
   # Updates a trip.

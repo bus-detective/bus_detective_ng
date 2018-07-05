@@ -4,7 +4,7 @@ defmodule Importer do
   """
 
   alias BusDetective.GTFS
-  alias BusDetective.GTFS.{Agency, Route, Service, ServiceException, Shape, Stop}
+  alias BusDetective.GTFS.{Agency, Route, Service, ServiceException, Shape, Stop, Trip}
 
   def import(gtfs_file) do
     with {:ok, tmp_path} <- Briefly.create(directory: true),
@@ -19,6 +19,8 @@ defmodule Importer do
       import_stops(file_map["stops"], agency: agency)
 
       import_shapes(file_map["shapes"], agency: agency)
+
+      import_trips(file_map["trips"], agency: agency)
     else
       error -> error
     end
@@ -184,6 +186,33 @@ defmodule Importer do
       }
 
       {:ok, %Shape{}} = GTFS.create_shape(shape)
+    end)
+  end
+
+  def import_trips(file, agency: agency = %Agency{id: agency_id}) do
+    file
+    |> File.stream!()
+    |> CSV.decode(headers: true)
+    |> Enum.each(fn {:ok, raw_trip} ->
+      route = GTFS.get_route(agency: agency, remote_id: raw_trip["route_id"])
+      service = GTFS.get_service(agency: agency, remote_id: raw_trip["service_id"])
+      shape = GTFS.get_shape(agency: agency, remote_id: raw_trip["shape_id"])
+
+      trip = %{
+        agency_id: agency_id,
+        route_id: route.id,
+        service_id: service.id,
+        shape_id: shape.id,
+        remote_id: raw_trip["trip_id"],
+        headsign: raw_trip["trip_headsign"],
+        short_name: raw_trip["trip_short_name"],
+        direction_id: raw_trip["direction_id"],
+        block_id: raw_trip["block_id"],
+        wheelchair_accessible: raw_trip["wheelchair_accessible"],
+        bikes_allowed: raw_trip["bikes_allowed"]
+      }
+
+      {:ok, %Trip{}} = GTFS.create_trip(trip)
     end)
   end
 end
