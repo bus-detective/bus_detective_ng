@@ -26,9 +26,9 @@ defmodule BusDetective.GTFSTest do
   test "list_services/1" do
     agency = insert(:agency)
     %Service{remote_id: remote_id} = insert(:service, agency: agency)
-    service = GTFS.get_service(agency: agency, remote_id: remote_id)
+    service = GTFS.get_service(agency, remote_id)
 
-    assert [service] == GTFS.list_services(agency: agency)
+    assert [service] == GTFS.list_services(agency)
   end
 
   test "create_service_exception/1" do
@@ -44,7 +44,7 @@ defmodule BusDetective.GTFSTest do
     service = insert(:service, agency: agency)
     service_exception = GTFS.get_service_exception!(insert(:service_exception, agency: agency, service: service).id)
 
-    assert [service_exception] == GTFS.list_service_exceptions(agency: agency, service: service)
+    assert [service_exception] == GTFS.list_service_exceptions(agency, service)
   end
 
   test "create_route/1" do
@@ -57,9 +57,9 @@ defmodule BusDetective.GTFSTest do
   test "list_routes/1" do
     agency = insert(:agency)
     %Route{remote_id: remote_id} = insert(:route, agency: agency)
-    route = GTFS.get_route(agency: agency, remote_id: remote_id)
+    route = GTFS.get_route(agency, remote_id)
 
-    assert [route] == GTFS.list_routes(agency: agency)
+    assert [route] == GTFS.list_routes(agency)
   end
 
   test "create_stop/1" do
@@ -72,9 +72,9 @@ defmodule BusDetective.GTFSTest do
   test "list_stops/1" do
     agency = insert(:agency)
     %Stop{remote_id: remote_id} = insert(:stop, agency: agency)
-    stop = GTFS.get_stop(agency: agency, remote_id: remote_id)
+    stop = GTFS.get_stop(agency, remote_id)
 
-    assert [stop] == GTFS.list_stops(agency: agency)
+    assert [stop] == GTFS.list_stops(agency)
   end
 
   test "create_shape/1" do
@@ -87,9 +87,9 @@ defmodule BusDetective.GTFSTest do
   test "list_shapes/1" do
     agency = insert(:agency)
     %Shape{remote_id: remote_id} = insert(:shape, agency: agency)
-    shape = GTFS.get_shape(agency: agency, remote_id: remote_id)
+    shape = GTFS.get_shape(agency, remote_id)
 
-    assert [shape] == GTFS.list_shapes(agency: agency)
+    assert [shape] == GTFS.list_shapes(agency)
   end
 
   test "create_trip/1" do
@@ -109,9 +109,9 @@ defmodule BusDetective.GTFSTest do
     route = insert(:route, agency: agency)
 
     %Trip{remote_id: remote_id} = insert(:trip, agency: agency, service: service, route: route)
-    trip = GTFS.get_trip(agency: agency, remote_id: remote_id)
+    trip = GTFS.get_trip(agency, remote_id)
 
-    assert [trip] == GTFS.list_trips(agency: agency)
+    assert [trip] == GTFS.list_trips(agency)
   end
 
   test "create_stop_time/1" do
@@ -132,15 +132,9 @@ defmodule BusDetective.GTFSTest do
 
     %StopTime{stop_sequence: stop_sequence} = insert(:stop_time, agency: agency, stop: stop, trip: trip)
 
-    stop_time =
-      GTFS.get_stop_time(
-        agency: agency,
-        stop: stop,
-        stop_sequence: stop_sequence,
-        trip: trip
-      )
+    stop_time = GTFS.get_stop_time(agency, stop, stop_sequence, trip)
 
-    assert 1 == length(GTFS.list_stop_times(agency: agency))
-    assert stop_time.id == List.first(GTFS.list_stop_times(agency: agency)).id
+    assert 1 == length(GTFS.list_stop_times(agency))
+    assert stop_time.id == List.first(GTFS.list_stop_times(agency)).id
   end
 end

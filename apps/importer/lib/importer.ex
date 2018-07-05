@@ -3,29 +3,30 @@ defmodule Importer do
   Importer keeps the GTFS import logic.
   """
 
+  require Logger
+
   alias BusDetective.GTFS
   alias BusDetective.GTFS.{Agency, Route, Service, ServiceException, Shape, Stop, StopTime, Trip}
 
   def import(gtfs_file) do
     with {:ok, tmp_path} <- Briefly.create(directory: true),
          {:ok, file_map} <- unzip_gtfs_file(gtfs_file, tmp_path) do
-
-      IO.puts "Importing agencies"
+      Logger.info("Importing agencies")
       [agency] = import_agencies(file_map["agency"])
-      IO.puts "Importing services"
-      import_services(file_map["calendar"], agency: agency)
-      IO.puts "Importing service exceptions"
-      import_service_exceptions(file_map["calendar_dates"], agency: agency)
-      IO.puts "Importing routes"
-      import_routes(file_map["routes"], agency: agency)
-      IO.puts "Importing stops"
-      import_stops(file_map["stops"], agency: agency)
-      IO.puts "Importing shapes"
-      import_shapes(file_map["shapes"], agency: agency)
-      IO.puts "Importing trips"
-      import_trips(file_map["trips"], agency: agency)
-      IO.puts "Importing stop times"
-      import_stop_times(file_map["stop_times"], agency: agency)
+      Logger.info("Importing services")
+      import_services(file_map["calendar"], agency)
+      Logger.info("Importing service exceptions")
+      import_service_exceptions(file_map["calendar_dates"], agency)
+      Logger.info("Importing routes")
+      import_routes(file_map["routes"], agency)
+      Logger.info("Importing stops")
+      import_stops(file_map["stops"], agency)
+      Logger.info("Importing shapes")
+      import_shapes(file_map["shapes"], agency)
+      Logger.info("Importing trips")
+      import_trips(file_map["trips"], agency)
+      Logger.info("Importing stop times")
+      import_stop_times(file_map["stop_times"], agency)
     else
       error -> error
     end
@@ -75,7 +76,7 @@ defmodule Importer do
     end)
   end
 
-  defp import_services(file, agency: %Agency{id: agency_id}) do
+  defp import_services(file, %Agency{id: agency_id}) do
     file
     |> File.stream!()
     |> CSV.decode(headers: true, strip_fields: true)
@@ -101,12 +102,12 @@ defmodule Importer do
     end)
   end
 
-  defp import_service_exceptions(file, agency: agency = %Agency{id: agency_id}) do
+  defp import_service_exceptions(file, agency = %Agency{id: agency_id}) do
     file
     |> File.stream!()
     |> CSV.decode(headers: true, strip_fields: true)
     |> Enum.each(fn {:ok, raw_service_exception} ->
-      %Service{id: service_id} = GTFS.get_service(agency: agency, remote_id: raw_service_exception["service_id"])
+      %Service{id: service_id} = GTFS.get_service(agency, raw_service_exception["service_id"])
       date = Timex.parse!(raw_service_exception["date"], "%Y%m%d", :strftime) |> Timex.to_date()
 
       service_exception = %{
@@ -120,7 +121,7 @@ defmodule Importer do
     end)
   end
 
-  def import_routes(file, agency: %Agency{id: agency_id}) do
+  def import_routes(file, %Agency{id: agency_id}) do
     file
     |> File.stream!()
     |> CSV.decode(headers: true, strip_fields: true)
@@ -141,7 +142,7 @@ defmodule Importer do
     end)
   end
 
-  def import_stops(file, agency: %Agency{id: agency_id}) do
+  def import_stops(file, %Agency{id: agency_id}) do
     file
     |> File.stream!()
     |> CSV.decode(headers: true, strip_fields: true)
@@ -166,7 +167,7 @@ defmodule Importer do
     end)
   end
 
-  def import_shapes(file, agency: %Agency{id: agency_id}) do
+  def import_shapes(file, %Agency{id: agency_id}) do
     file
     |> File.stream!()
     |> CSV.decode(headers: true, strip_fields: true)
@@ -194,14 +195,14 @@ defmodule Importer do
     end)
   end
 
-  def import_trips(file, agency: agency = %Agency{id: agency_id}) do
+  def import_trips(file, agency = %Agency{id: agency_id}) do
     file
     |> File.stream!()
     |> CSV.decode(headers: true, strip_fields: true)
     |> Enum.each(fn {:ok, raw_trip} ->
-      route = GTFS.get_route(agency: agency, remote_id: raw_trip["route_id"])
-      service = GTFS.get_service(agency: agency, remote_id: raw_trip["service_id"])
-      shape = GTFS.get_shape(agency: agency, remote_id: raw_trip["shape_id"])
+      route = GTFS.get_route(agency, raw_trip["route_id"])
+      service = GTFS.get_service(agency, raw_trip["service_id"])
+      shape = GTFS.get_shape(agency, raw_trip["shape_id"])
 
       trip = %{
         agency_id: agency_id,
@@ -221,13 +222,13 @@ defmodule Importer do
     end)
   end
 
-  def import_stop_times(file, agency: agency = %Agency{id: agency_id}) do
+  def import_stop_times(file, agency = %Agency{id: agency_id}) do
     file
     |> File.stream!()
     |> CSV.decode(headers: true, strip_fields: true)
     |> Enum.each(fn {:ok, raw_stop_time} ->
-      trip = GTFS.get_trip(agency: agency, remote_id: raw_stop_time["trip_id"])
-      stop = GTFS.get_stop(agency: agency, remote_id: raw_stop_time["stop_id"])
+      trip = GTFS.get_trip(agency, raw_stop_time["trip_id"])
+      stop = GTFS.get_stop(agency, raw_stop_time["stop_id"])
 
       [arr_hours, arr_minutes, arr_seconds] =
         raw_stop_time["arrival_time"]
