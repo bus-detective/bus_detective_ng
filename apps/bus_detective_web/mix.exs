@@ -13,7 +13,7 @@ defmodule BusDetectiveWeb.Mixfile do
       elixirc_paths: elixirc_paths(Mix.env()),
       compilers: [:phoenix, :gettext] ++ Mix.compilers(),
       start_permanent: Mix.env() == :prod,
-      aliases: aliases(),
+      aliases: aliases(Mix.env()),
       deps: deps()
     ]
   end
@@ -48,11 +48,12 @@ defmodule BusDetectiveWeb.Mixfile do
     ]
   end
 
-  # Aliases are shortcuts or tasks specific to the current project.
-  # For example, we extend the test task to create and migrate the database.
-  #
-  # See the documentation for `Mix` for more info on aliases.
-  defp aliases do
-    [test: ["ecto.create --quiet", "ecto.migrate", "test"]]
+  defp aliases(:dev), do: []
+
+  defp aliases(_) do
+    [
+      compile: "compile --warnings-as-errors",
+      test: ["ecto.create --quiet", "ecto.migrate", "test"]
+    ]
   end
 end

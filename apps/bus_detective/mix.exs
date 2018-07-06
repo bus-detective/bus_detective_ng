@@ -12,7 +12,7 @@ defmodule BusDetective.Mixfile do
       elixir: "~> 1.4",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
-      aliases: aliases(),
+      aliases: aliases(Mix.env()),
       deps: deps()
     ]
   end
@@ -40,21 +40,22 @@ defmodule BusDetective.Mixfile do
       {:ecto, "~> 2.1"},
       {:ex_machina, "~> 2.2", only: [:dev, :test]},
       {:geo_postgis, "~> 2.0"},
-      {:postgrex, ">= 0.0.0"}
+      {:postgrex, ">= 0.0.0"},
+      {:timex, "~> 3.1"}
     ]
   end
 
-  # Aliases are shortcuts or tasks specific to the current project.
-  # For example, to create, migrate and run the seeds file at once:
-  #
-  #     $ mix ecto.setup
-  #
-  # See the documentation for `Mix` for more info on aliases.
-  defp aliases do
+  defp aliases(env) do
     [
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
       test: ["ecto.create --quiet", "ecto.migrate", "test"]
-    ]
+    ] ++ env_aliases(env)
+  end
+
+  defp env_aliases(:dev), do: []
+
+  defp env_aliases(_) do
+    [compile: "compile --warnings-as-errors"]
   end
 end

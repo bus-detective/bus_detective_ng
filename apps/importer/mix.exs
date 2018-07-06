@@ -12,7 +12,7 @@ defmodule Importer.Mixfile do
       elixir: "~> 1.4",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
-      aliases: aliases(),
+      aliases: aliases(Mix.env()),
       deps: deps()
     ]
   end
@@ -43,13 +43,9 @@ defmodule Importer.Mixfile do
     ]
   end
 
-  # Aliases are shortcuts or tasks specific to the current project.
-  # For example, to create, migrate and run the seeds file at once:
-  #
-  #     $ mix ecto.setup
-  #
-  # See the documentation for `Mix` for more info on aliases.
-  defp aliases do
-    []
+  defp aliases(:dev), do: []
+
+  defp aliases(_) do
+    [compile: "compile --warnings-as-errors"]
   end
 end
