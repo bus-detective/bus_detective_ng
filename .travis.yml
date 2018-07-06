@@ -20,7 +20,5 @@ install:
   - mix deps.get
 
 script:
-  - MIX_ENV=test mix do ecto.create, ecto.migrate
-  - mix format --check-formatted
-  - mix credo --strict
-  - mix test
+  - mix format --check-formatted && mix credo --strict
+  - MIX_ENV=test mix do ecto.create, ecto.migrate && mix test
