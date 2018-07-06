@@ -7,6 +7,7 @@ defmodule Importer do
 
   alias BusDetective.GTFS
   alias BusDetective.GTFS.{Agency, Route, Service, Shape, Stop, Trip}
+  alias Ecto.Type
 
   def import(gtfs_file) do
     with {:ok, tmp_path} <- Briefly.create(directory: true),
@@ -78,8 +79,8 @@ defmodule Importer do
       |> File.stream!()
       |> CSV.decode(headers: true, strip_fields: true)
       |> Enum.map(fn {:ok, raw_service} ->
-        start_date = Timex.parse!(raw_service["start_date"], "%Y%m%d", :strftime) |> Timex.to_date()
-        end_date = Timex.parse!(raw_service["end_date"], "%Y%m%d", :strftime) |> Timex.to_date()
+        start_date = raw_service["start_date"] |> Timex.parse!("%Y%m%d", :strftime) |> Timex.to_date()
+        end_date = raw_service["end_date"] |> Timex.parse!("%Y%m%d", :strftime) |> Timex.to_date()
         {:ok, monday} = maybe_cast(:boolean, raw_service["monday"])
         {:ok, tuesday} = maybe_cast(:boolean, raw_service["tuesday"])
         {:ok, wednesday} = maybe_cast(:boolean, raw_service["wednesday"])
@@ -104,7 +105,7 @@ defmodule Importer do
           updated_at: Ecto.DateTime.utc()
         }
       end)
-      |> BusDetective.GTFS.bulk_create_services()
+      |> GTFS.bulk_create_services()
 
     Enum.reduce(services, %{}, fn %Service{id: id, remote_id: remote_id, agency_id: agency_id}, acc ->
       Map.put(acc, {agency_id, remote_id}, id)
@@ -119,7 +120,7 @@ defmodule Importer do
     |> CSV.decode(headers: true, strip_fields: true)
     |> Enum.map(fn {:ok, raw_service_exception} ->
       service_id = services_map[{agency_id, raw_service_exception["service_id"]}]
-      date = Timex.parse!(raw_service_exception["date"], "%Y%m%d", :strftime) |> Timex.to_date()
+      date = raw_service_exception["date"] |> Timex.parse!("%Y%m%d", :strftime) |> Timex.to_date()
       {:ok, exception} = maybe_cast(:integer, raw_service_exception["exception_type"])
 
       %{
@@ -131,7 +132,7 @@ defmodule Importer do
         updated_at: Ecto.DateTime.utc()
       }
     end)
-    |> BusDetective.GTFS.bulk_create_service_exceptions()
+    |> GTFS.bulk_create_service_exceptions()
   end
 
   def import_routes(file, %Agency{id: agency_id}) do
@@ -156,7 +157,7 @@ defmodule Importer do
           updated_at: Ecto.DateTime.utc()
         }
       end)
-      |> BusDetective.GTFS.bulk_create_routes()
+      |> GTFS.bulk_create_routes()
 
     Enum.reduce(routes, %{}, fn %Route{id: id, remote_id: remote_id, agency_id: agency_id}, acc ->
       Map.put(acc, {agency_id, remote_id}, id)
@@ -167,7 +168,7 @@ defmodule Importer do
     case value do
       nil -> {:ok, nil}
       "" -> {:ok, nil}
-      value -> Ecto.Type.cast(type, value)
+      value -> Type.cast(type, value)
     end
   end
 
@@ -206,7 +207,7 @@ defmodule Importer do
       end)
       |> Enum.chunk_every(1000)
       |> Enum.reduce({0, []}, fn batch, {count, inserted} ->
-        {added, stops} = BusDetective.GTFS.bulk_create_stops(batch)
+        {added, stops} = GTFS.bulk_create_stops(batch)
         {count + added, inserted ++ stops}
       end)
 
@@ -246,7 +247,7 @@ defmodule Importer do
       end)
       |> Enum.chunk_every(1000)
       |> Enum.reduce({0, []}, fn batch, {count, inserted} ->
-        {added, shapes} = BusDetective.GTFS.bulk_create_shapes(batch)
+        {added, shapes} = GTFS.bulk_create_shapes(batch)
         {count + added, inserted ++ shapes}
       end)
 
@@ -283,7 +284,7 @@ defmodule Importer do
           updated_at: Ecto.DateTime.utc()
         }
       end)
-      |> BusDetective.GTFS.bulk_create_trips()
+      |> GTFS.bulk_create_trips()
 
     Enum.reduce(trips, %{}, fn %Trip{id: id, agency_id: agency_id, remote_id: remote_id}, acc ->
       Map.put(acc, {agency_id, remote_id}, id)
@@ -331,7 +332,7 @@ defmodule Importer do
     end)
     |> Enum.chunk_every(1000)
     |> Enum.reduce({0, []}, fn batch, {count, inserted} ->
-      {added, stop_times} = BusDetective.GTFS.bulk_create_stop_times(batch)
+      {added, stop_times} = GTFS.bulk_create_stop_times(batch)
       {count + added, inserted ++ stop_times}
     end)
   end

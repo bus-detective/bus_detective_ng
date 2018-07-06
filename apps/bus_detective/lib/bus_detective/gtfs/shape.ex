@@ -1,4 +1,6 @@
 defmodule BusDetective.GTFS.Shape do
+  @moduledoc false
+
   use Ecto.Schema
   import Ecto.Changeset
 

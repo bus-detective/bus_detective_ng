@@ -21,4 +21,5 @@ install:
 
 script:
   - MIX_ENV=test mix do ecto.create, ecto.migrate
+  - mix credo --strict
   - mix test

@@ -36,6 +36,7 @@ defmodule BusDetective.Mixfile do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
+      {:credo, "~> 0.9.1", only: [:dev, :test], runtime: false},
       {:ecto, "~> 2.1"},
       {:ex_machina, "~> 2.2", only: [:dev, :test]},
       {:geo_postgis, "~> 2.0"},

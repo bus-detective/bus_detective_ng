@@ -1,4 +1,6 @@
 defmodule BusDetective.GTFS.StopTime do
+  @moduledoc false
+
   use Ecto.Schema
   import Ecto.Changeset
 
