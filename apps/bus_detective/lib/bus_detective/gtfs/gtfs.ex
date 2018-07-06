@@ -84,7 +84,15 @@ defmodule BusDetective.GTFS do
   Returns the list of routes.
   """
   def list_routes(%Agency{id: agency_id}) do
-    Repo.all(from(r in Route, where: r.agency_id == ^agency_id))
+    Repo.all(
+      from(
+        r in Route,
+        where: r.agency_id == ^agency_id,
+        join: a in assoc(r, :agency),
+        select_merge: %{agency_name: a.display_name},
+        order_by: [:short_name]
+      )
+    )
   end
 
   @doc """

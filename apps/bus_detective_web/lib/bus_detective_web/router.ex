@@ -14,14 +14,13 @@ defmodule BusDetectiveWeb.Router do
   end
 
   scope "/", BusDetectiveWeb do
-    # Use the default browser stack
     pipe_through(:browser)
 
     get("/", PageController, :index)
   end
 
-  # Other scopes may use custom stacks.
-  # scope "/api", BusDetectiveWeb do
-  #   pipe_through :api
-  # end
+  scope "/api", BusDetectiveWeb do
+    pipe_through(:api)
+    resources("/routes", RouteController, only: [:index])
+  end
 end

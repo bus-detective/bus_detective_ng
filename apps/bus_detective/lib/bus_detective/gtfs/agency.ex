@@ -3,6 +3,7 @@ defmodule BusDetective.GTFS.Agency do
   import Ecto.Changeset
 
   schema "agencies" do
+    field(:display_name, :string)
     field(:fare_url, :string)
     field(:gtfs_endpoint, :string)
     field(:gtfs_service_alerts_url, :string)
