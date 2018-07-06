@@ -49,6 +49,10 @@ defmodule BusDetective.GTFS do
     |> Repo.insert()
   end
 
+  def bulk_create_services(services) do
+    Repo.insert_all(Service, services, returning: [:id, :remote_id, :agency_id])
+  end
+
   @doc """
   Returns the list of service_exceptions.
   """
@@ -70,6 +74,10 @@ defmodule BusDetective.GTFS do
     %ServiceException{}
     |> ServiceException.changeset(attrs)
     |> Repo.insert()
+  end
+
+  def bulk_create_service_exceptions(service_exceptions) do
+    Repo.insert_all(ServiceException, service_exceptions, returning: [:id])
   end
 
   @doc """
@@ -95,6 +103,10 @@ defmodule BusDetective.GTFS do
     %Route{}
     |> Route.changeset(attrs)
     |> Repo.insert()
+  end
+
+  def bulk_create_routes(routes) do
+    Repo.insert_all(Route, routes, returning: [:id, :remote_id, :agency_id])
   end
 
   @doc """
@@ -124,6 +136,10 @@ defmodule BusDetective.GTFS do
     |> Repo.insert()
   end
 
+  def bulk_create_stops(stops) do
+    Repo.insert_all(Stop, stops, returning: [:id, :remote_id, :agency_id])
+  end
+
   @doc """
   Returns the list of shapes.
   """
@@ -149,6 +165,10 @@ defmodule BusDetective.GTFS do
     |> Repo.insert()
   end
 
+  def bulk_create_shapes(shapes) do
+    Repo.insert_all(Shape, shapes, returning: [:id, :remote_id, :agency_id])
+  end
+
   @doc """
   Returns the list of trips.
   """
@@ -172,6 +192,10 @@ defmodule BusDetective.GTFS do
     %Trip{}
     |> Trip.changeset(attrs)
     |> Repo.insert()
+  end
+
+  def bulk_create_trips(trips) do
+    Repo.insert_all(Trip, trips, returning: [:id, :agency_id, :remote_id])
   end
 
   @doc """
@@ -204,5 +228,9 @@ defmodule BusDetective.GTFS do
     %StopTime{}
     |> StopTime.changeset(attrs)
     |> Repo.insert()
+  end
+
+  def bulk_create_stop_times(stop_times) do
+    Repo.insert_all(StopTime, stop_times, returning: true)
   end
 end
