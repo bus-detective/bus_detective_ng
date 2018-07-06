@@ -2,7 +2,7 @@ defmodule BusDetectiveWeb.RouteController do
   use BusDetectiveWeb, :controller
 
   alias BusDetective.GTFS
-  alias BusDetective.GTFS.{Agency, Route}
+  alias BusDetective.GTFS.Agency
 
   action_fallback(BusDetectiveWeb.FallbackController)
 
