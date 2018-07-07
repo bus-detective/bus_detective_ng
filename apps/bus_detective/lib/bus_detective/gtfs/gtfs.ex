@@ -120,6 +120,16 @@ defmodule BusDetective.GTFS do
     Repo.all(from(s in Stop, where: s.agency_id == ^agency_id))
   end
 
+  def search_stops(options) do
+    query = Keyword.get(options, :query)
+
+    Repo.all(
+      from(
+        s in Stop, where: fragment("? ILIKE ?", s.name, ^"%#{query}%"), preload: [:routes, :agency]
+      )
+    )
+  end
+
   @doc """
   Gets a single stop.
 

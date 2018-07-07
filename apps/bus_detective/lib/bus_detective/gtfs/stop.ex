@@ -6,6 +6,15 @@ defmodule BusDetective.GTFS.Stop do
 
   alias BusDetective.GTFS.{Agency, RouteStop}
 
+  @direction_labels %{
+    "i" => "inbound",
+    "o" => "outbound",
+    "n" => "northbound",
+    "s" => "southbound",
+    "e" => "eastbound",
+    "w" => "westbound"
+  }
+
   schema "stops" do
     belongs_to(:agency, Agency)
     field(:code, :integer)
@@ -52,5 +61,9 @@ defmodule BusDetective.GTFS.Stop do
       :latitude,
       :longitude
     ])
+  end
+
+  def direction(%__MODULE__{remote_id: remote_id}) do
+    Map.get(@direction_labels, String.last(remote_id))
   end
 end
