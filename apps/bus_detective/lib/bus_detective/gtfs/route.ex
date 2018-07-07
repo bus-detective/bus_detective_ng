@@ -8,7 +8,6 @@ defmodule BusDetective.GTFS.Route do
 
   schema "routes" do
     belongs_to(:agency, Agency)
-    field(:agency_name, :string, virtual: true)
     field(:color, :string)
     field(:description, :string)
     field(:long_name, :string)

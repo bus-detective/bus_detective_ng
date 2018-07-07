@@ -21,6 +21,5 @@ defmodule BusDetectiveWeb.Router do
 
   scope "/api", BusDetectiveWeb do
     pipe_through(:api)
-    resources("/routes", RouteController, only: [:index])
   end
 end

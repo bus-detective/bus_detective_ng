@@ -12,8 +12,7 @@ defmodule BusDetectiveWeb.RouteView do
       short_name: route.short_name,
       long_name: route.long_name,
       color: route.color,
-      text_color: route.text_color,
-      agency_name: route.agency_name
+      text_color: route.text_color
     }
   end
 end
