@@ -3,7 +3,7 @@ defmodule BusDetective.Repo.Migrations.CreateStops do
 
   def change do
     create table(:stops) do
-      add(:agency_id, references(:agencies))
+      add(:agency_id, references(:agencies), null: false)
       add(:remote_id, :string)
       add(:code, :integer)
       add(:name, :string)

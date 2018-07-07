@@ -20,6 +20,7 @@ defmodule Importer do
       shapes_map = import_shapes(file_map["shapes"], agency)
       trips_map = import_trips(file_map["trips"], agency, routes_map, services_map, shapes_map)
       import_stop_times(file_map["stop_times"], agency, stops_map, trips_map)
+      GTFS.update_route_stops()
     else
       error -> error
     end

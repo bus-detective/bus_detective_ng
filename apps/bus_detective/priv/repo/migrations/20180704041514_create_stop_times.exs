@@ -3,9 +3,9 @@ defmodule BusDetective.Repo.Migrations.CreateStopTimes do
 
   def change do
     create table(:stop_times) do
-      add(:agency_id, references(:agencies))
-      add(:stop_id, references(:stops))
-      add(:trip_id, references(:trips))
+      add(:agency_id, references(:agencies), null: false)
+      add(:stop_id, references(:stops), null: false)
+      add(:trip_id, references(:trips), null: false)
       add(:stop_headsign, :string)
       add(:pickup_type, :integer)
       add(:drop_off_type, :integer)

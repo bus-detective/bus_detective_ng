@@ -4,7 +4,9 @@ defmodule BusDetective.GTFS do
   """
 
   import Ecto.Query, warn: false
+
   alias BusDetective.Repo
+  alias Ecto.Adapters.SQL
 
   alias BusDetective.GTFS.{Agency, Route, Service, ServiceException, Shape, Stop, StopTime, Trip}
 
@@ -240,5 +242,22 @@ defmodule BusDetective.GTFS do
 
   def bulk_create_stop_times(stop_times) do
     Repo.insert_all(StopTime, stop_times, returning: true)
+  end
+
+  def update_route_stops() do
+      {:ok, _} = SQL.query(Repo, "TRUNCATE TABLE routes_stops", [])
+      {:ok, _} = SQL.query(Repo, """
+      INSERT INTO routes_stops (route_id, stop_id)
+      SELECT DISTINCT
+      routes.id as route_id, stops.id as stop_id
+      FROM
+      routes
+      INNER JOIN
+      trips ON trips.route_id = routes.id
+      INNER JOIN
+      stop_times ON stop_times.trip_id = trips.id
+      INNER JOIN
+      stops ON stops.id = stop_times.stop_id
+      """, [])
   end
 end

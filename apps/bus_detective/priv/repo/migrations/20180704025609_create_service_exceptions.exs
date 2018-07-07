@@ -3,8 +3,8 @@ defmodule BusDetective.Repo.Migrations.CreateServiceExceptions do
 
   def change do
     create table(:service_exceptions) do
-      add(:agency_id, references(:agencies))
-      add(:service_id, references(:services))
+      add(:agency_id, references(:agencies), null: false)
+      add(:service_id, references(:services), null: false)
       add(:date, :date)
       add(:exception, :integer)
 

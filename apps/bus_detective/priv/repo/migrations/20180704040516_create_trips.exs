@@ -3,10 +3,10 @@ defmodule BusDetective.Repo.Migrations.CreateTrips do
 
   def change do
     create table(:trips) do
-      add(:agency_id, references(:agencies))
-      add(:service_id, references(:services))
-      add(:route_id, references(:routes))
-      add(:shape_id, references(:shapes))
+      add(:agency_id, references(:agencies), null: false)
+      add(:service_id, references(:services), null: false)
+      add(:route_id, references(:routes), null: false)
+      add(:shape_id, references(:shapes), null: false)
       add(:remote_id, :string)
       add(:headsign, :string)
       add(:short_name, :string)

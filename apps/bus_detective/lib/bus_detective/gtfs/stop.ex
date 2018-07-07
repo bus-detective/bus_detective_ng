@@ -4,7 +4,7 @@ defmodule BusDetective.GTFS.Stop do
   use Ecto.Schema
   import Ecto.Changeset
 
-  alias BusDetective.GTFS.Agency
+  alias BusDetective.GTFS.{Agency, RouteStop}
 
   schema "stops" do
     belongs_to(:agency, Agency)
@@ -20,6 +20,9 @@ defmodule BusDetective.GTFS.Stop do
     field(:url, :string)
     field(:wheelchair_boarding, :integer)
     field(:zone_id, :integer)
+
+    has_many(:stops_routes, RouteStop)
+    has_many(:routes, through: [:stops_routes, :route])
 
     timestamps()
   end

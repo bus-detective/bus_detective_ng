@@ -3,7 +3,7 @@ defmodule BusDetective.Repo.Migrations.CreateShapes do
 
   def change do
     create table(:shapes) do
-      add(:agency_id, references(:agencies))
+      add(:agency_id, references(:agencies), null: false)
       add(:remote_id, :string)
       add(:geometry, :"geography(LineString,4326)")
 
