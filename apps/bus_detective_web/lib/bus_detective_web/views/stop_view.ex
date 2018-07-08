@@ -4,8 +4,16 @@ defmodule BusDetectiveWeb.StopView do
   alias BusDetective.GTFS.Stop
   alias BusDetectiveWeb.{AgencyView, RouteView, StopView}
 
-  def render("index.json", %{stops: stops}) do
-    %{data: render_many(stops, StopView, "stop.json")}
+  def render("index.json", %{results: results}) do
+    %{ data:
+       %{
+         total_results: results.total_entries,
+         total_pages: results.total_pages,
+         page: results.page_number,
+         per_page: results.page_size,
+         results: render_many(results.entries, StopView, "stop.json")
+       }
+    }
   end
 
   def render("show.json", %{stop: stop}) do

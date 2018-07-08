@@ -6,9 +6,9 @@ defmodule BusDetectiveWeb.StopController do
 
   action_fallback BusDetectiveWeb.FallbackController
 
-  def index(conn, %{"query" => query}) do
-    stops = GTFS.search_stops(query: query)
-    render(conn, "index.json", stops: stops)
+  def index(conn, params = %{"query" => query}) do
+    results = GTFS.search_stops(Keyword.merge(paging_params(params), query: query))
+    render(conn, "index.json", results: results)
   end
 
   def index(conn, _) do
@@ -21,4 +21,11 @@ defmodule BusDetectiveWeb.StopController do
   #   stop = GTFS.get_stop!(id)
   #   render(conn, "show.json", stop: stop)
   # end
+
+  defp paging_params(params) do
+    paging_params = [
+      page: params["page"],
+      page_size: params["per_page"]
+    ]
+  end
 end

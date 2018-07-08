@@ -14,12 +14,25 @@ defmodule BusDetectiveWeb.StopControllerTest do
       {:ok, matching_stop: matching_stop}
     end
 
-    # test "with a query parameter it returns stops with the given street name", %{conn: conn, matching_stop: matching_stop} do
-    #   conn = get conn, stop_path(conn, :index, query: "8th")
-    #   json_response(conn, 200)["data"] |> IO.inspect
-    #   actual_ids = Enum.map(json_response(conn, 200)["data"]["results"], &(&1["id"]))
-    #   assert actual_ids == [matching_stop.id]
-    # end
+    test "with a query parameter it returns stops with the given street name", %{conn: conn, matching_stop: matching_stop} do
+      conn = get conn, stop_path(conn, :index, query: "8th")
+      actual_ids = Enum.map(json_response(conn, 200)["data"]["results"], &(&1["id"]))
+      assert actual_ids == [matching_stop.id]
+    end
+
+    test "with paging parameters it returns correctly paged results", %{conn: conn} do
+      for street <- ["Race", "Main", "Oak"] do
+        insert(:stop, name: "8th and #{street}")
+      end
+
+      conn = get conn, stop_path(conn, :index, query: "8th", per_page: 3, page: 2)
+
+      assert result = json_response(conn, 200)["data"]
+      assert 4 == result["total_results"]
+      assert 2 == result["total_pages"]
+      assert 3 == result["per_page"]
+      assert 2 == result["page"]
+    end
 
     test "with invalid parameters it returns a 400", %{conn: conn} do
       conn = get conn, stop_path(conn, :index, foo: "8th")

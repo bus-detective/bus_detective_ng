@@ -122,11 +122,14 @@ defmodule BusDetective.GTFS do
 
   def search_stops(options) do
     query = Keyword.get(options, :query)
+    pagination_options = options
 
-    Repo.all(
-      from(
-        s in Stop, where: fragment("? ILIKE ?", s.name, ^"%#{query}%"), preload: [:routes, :agency]
-      )
+    Repo.paginate(from(
+          s in Stop,
+          where: fragment("? ILIKE ?", s.name, ^"%#{query}%"),
+          preload: [:routes, :agency]
+        ),
+      pagination_options
     )
   end
 
