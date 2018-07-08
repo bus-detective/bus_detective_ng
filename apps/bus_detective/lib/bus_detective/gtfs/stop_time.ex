@@ -15,6 +15,8 @@ defmodule BusDetective.GTFS.StopTime do
     # keeping it in Interval format for the short term to maintain consistency with
     # Rails BD.
     field(:arrival_time, :integer)
+    field(:calculated_arrival_time, :utc_datetime, virtual: true)
+    field(:calculated_departure_time, :utc_datetime, virtual: true)
     field(:departure_time, :integer)
     field(:drop_off_type, :integer)
     field(:pickup_type, :integer)

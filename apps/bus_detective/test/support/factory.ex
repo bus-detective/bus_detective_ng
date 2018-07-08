@@ -12,8 +12,6 @@ defmodule BusDetective.Factory do
   end
 
   def service_factory do
-    date = Timex.to_date(Timex.now())
-
     %Service{
       agency: build(:agency),
       remote_id: sequence(:service_remote_id, &"Service-#{&1}"),
@@ -24,8 +22,8 @@ defmodule BusDetective.Factory do
       friday: Enum.random([true, false]),
       saturday: Enum.random([true, false]),
       sunday: Enum.random([true, false]),
-      start_date: Timex.shift(date, days: -30),
-      end_date: Timex.shift(date, days: 30)
+      start_date: Timex.parse!("2000-01-01 00:00:00-0000", "{ISO:Extended}"),
+      end_date: Timex.parse!("3000-01-01 00:00:00-0000", "{ISO:Extended}")
     }
   end
 
