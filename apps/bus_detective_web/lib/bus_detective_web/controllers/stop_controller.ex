@@ -17,10 +17,10 @@ defmodule BusDetectiveWeb.StopController do
     |> render(ErrorView, "400.json")
   end
 
-  # def show(conn, %{"id" => id}) do
-  #   stop = GTFS.get_stop!(id)
-  #   render(conn, "show.json", stop: stop)
-  # end
+  def show(conn, %{"id" => id}) do
+    stop = GTFS.get_stop!(id)
+    render(conn, "show.json", stop: stop)
+  end
 
   defp paging_params(params) do
     [

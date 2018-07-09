@@ -10,7 +10,17 @@ defmodule BusDetective.GTFS do
   alias Ecto.Adapters.SQL
   alias Timex.Timezone
 
-  def calculated_stop_times_between(%DateTime{} = start_time, %DateTime{} = end_time) do
+  @doc """
+  This is the trickiest of functions in the application. It uses some stored
+  procedures and all the SQL shenanigans you see here to calculate actual
+  scheduled stop times from the schedule data.
+
+  This function expects the start and end times to be specified in the
+  timezone of the agency. That ensures that `start_date` and `end_date` use
+  the day boundaries with the agency timezone instead of utc boundaries,
+  which could throw the data off around midnight.
+  """
+  def calculated_stop_times_between(%Stop{id: stop_id}, %DateTime{} = start_time, %DateTime{} = end_time) do
     start_date = Timex.to_date(start_time)
     end_date = Timex.to_date(end_time)
 
@@ -29,6 +39,7 @@ defmodule BusDetective.GTFS do
             ^end_date
           ),
         on: trip.service_id == effective_service.service_id,
+        where: st.stop_id == ^stop_id,
         where:
           fragment(
             "(start_time(?) + ?) BETWEEN (? AT TIME ZONE ?) AND (? AT TIME ZONE ?)",
@@ -60,7 +71,8 @@ defmodule BusDetective.GTFS do
               st.departure_time,
               agency.timezone
             )
-        }
+        },
+        preload: [trip: :route]
       )
     )
   end
@@ -196,6 +208,12 @@ defmodule BusDetective.GTFS do
   """
   def get_stop(%Agency{id: agency_id}, remote_id) do
     Repo.one(from(s in Stop, where: s.agency_id == ^agency_id and s.remote_id == ^remote_id))
+  end
+
+  def get_stop!(id) do
+    Stop
+    |> Repo.get!(id)
+    |> Repo.preload([:agency, :routes])
   end
 
   @doc """
