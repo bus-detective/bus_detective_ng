@@ -23,10 +23,10 @@ defmodule BusDetective.CalculatedStopTimeTest do
 
   describe "with stops on different days" do
     setup %{agency: agency, stop: stop, trip: trip} do
-      insert(:stop_time, agency: agency, stop: stop, trip: trip, departure_time: 79200)
-      insert(:stop_time, agency: agency, stop: stop, trip: trip, departure_time: 82800)
-      insert(:stop_time, agency: agency, stop: stop, trip: trip, departure_time: 1800)
-      insert(:stop_time, agency: agency, stop: stop, trip: trip, departure_time: 3600)
+      insert(:stop_time, agency: agency, stop: stop, trip: trip, departure_time: "22:00:00")
+      insert(:stop_time, agency: agency, stop: stop, trip: trip, departure_time: "23:00:00")
+      insert(:stop_time, agency: agency, stop: stop, trip: trip, departure_time: "00:30:00")
+      insert(:stop_time, agency: agency, stop: stop, trip: trip, departure_time: "01:00:00")
 
       :ok
     end
@@ -51,10 +51,10 @@ defmodule BusDetective.CalculatedStopTimeTest do
 
   describe "with stops on the same day" do
     setup %{agency: agency, stop: stop, trip: trip} do
-      insert(:stop_time, agency: agency, stop: stop, trip: trip, departure_time: 22 * 60 * 60)
-      insert(:stop_time, agency: agency, stop: stop, trip: trip, departure_time: 23 * 60 * 60)
-      insert(:stop_time, agency: agency, stop: stop, trip: trip, departure_time: 24 * 60 * 60 + 30 * 60)
-      insert(:stop_time, agency: agency, stop: stop, trip: trip, departure_time: 25 * 60 * 60)
+      insert(:stop_time, agency: agency, stop: stop, trip: trip, departure_time: "22:00:00")
+      insert(:stop_time, agency: agency, stop: stop, trip: trip, departure_time: "23:00:00")
+      insert(:stop_time, agency: agency, stop: stop, trip: trip, departure_time: "24:30:00")
+      insert(:stop_time, agency: agency, stop: stop, trip: trip, departure_time: "25:00:00")
 
       :ok
     end

@@ -4,7 +4,7 @@ defmodule BusDetective.GTFS.StopTime do
   use Ecto.Schema
   import Ecto.Changeset
 
-  alias BusDetective.GTFS.{Agency, Stop, Trip}
+  alias BusDetective.GTFS.{Agency, Interval, Stop, Trip}
 
   schema "stop_times" do
     belongs_to(:agency, Agency)
@@ -14,10 +14,10 @@ defmodule BusDetective.GTFS.StopTime do
     # we want hours, minutes, seconds
     # keeping it in Interval format for the short term to maintain consistency with
     # Rails BD.
-    field(:arrival_time, :integer)
+    field(:arrival_time, Interval)
     field(:calculated_arrival_time, :utc_datetime, virtual: true)
     field(:calculated_departure_time, :utc_datetime, virtual: true)
-    field(:departure_time, :integer)
+    field(:departure_time, Interval)
     field(:drop_off_type, :integer)
     field(:pickup_type, :integer)
     field(:shape_dist_traveled, :float)

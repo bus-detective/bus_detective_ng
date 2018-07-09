@@ -6,7 +6,7 @@ defmodule Importer do
   require Logger
 
   alias BusDetective.GTFS
-  alias BusDetective.GTFS.{Agency, Route, Service, Shape, Stop, Trip}
+  alias BusDetective.GTFS.{Agency, Interval, Route, Service, Shape, Stop, Trip}
   alias Ecto.Type
 
   def import(gtfs_file) do
@@ -302,20 +302,8 @@ defmodule Importer do
       stop_id = stops_map[{agency_id, raw_stop_time["stop_id"]}]
       trip_id = trips_map[{agency_id, raw_stop_time["trip_id"]}]
 
-      [arr_hours, arr_minutes, arr_seconds] =
-        raw_stop_time["arrival_time"]
-        |> String.split(":")
-        |> Enum.map(&String.to_integer/1)
-
-      arrival_time = arr_hours * 60 * 60 + arr_minutes * 60 + arr_seconds
-
-      [dep_hours, dep_minutes, dep_seconds] =
-        raw_stop_time["departure_time"]
-        |> String.split(":")
-        |> Enum.map(&String.to_integer/1)
-
-      departure_time = dep_hours * 60 * 60 + dep_minutes * 60 + dep_seconds
-
+      {:ok, arrival_time} = maybe_cast(Interval, raw_stop_time["arrival_time"])
+      {:ok, departure_time} = maybe_cast(Interval, raw_stop_time["departure_time"])
       {:ok, shape_dist_traveled} = maybe_cast(:float, raw_stop_time["shape_dist_traveled"])
       {:ok, stop_sequence} = maybe_cast(:integer, raw_stop_time["stop_sequence"])
 

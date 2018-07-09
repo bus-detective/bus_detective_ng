@@ -1,7 +1,7 @@
 defmodule BusDetective.Factory do
   use ExMachina.Ecto, repo: BusDetective.Repo
 
-  alias BusDetective.GTFS.{Agency, Route, Service, ServiceException, Shape, Stop, StopTime, Trip}
+  alias BusDetective.GTFS.{Agency, Interval, Route, Service, ServiceException, Shape, Stop, StopTime, Trip}
 
   def agency_factory do
     %Agency{
@@ -83,8 +83,8 @@ defmodule BusDetective.Factory do
       trip: build(:trip, agency: agency),
       stop_sequence: stop_time_sequence,
       shape_dist_traveled: stop_time_sequence * 0.5,
-      arrival_time: 56_000 + stop_time_sequence * 2,
-      departure_time: 56_000 + stop_time_sequence * 2 + 1
+      arrival_time: %Interval{seconds: 56_000 + stop_time_sequence * 2},
+      departure_time: %Interval{seconds: 56_000 + stop_time_sequence * 2 + 1}
     }
   end
 

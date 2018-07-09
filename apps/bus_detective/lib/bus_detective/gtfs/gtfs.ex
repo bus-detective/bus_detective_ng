@@ -31,7 +31,7 @@ defmodule BusDetective.GTFS do
         on: trip.service_id == effective_service.service_id,
         where:
           fragment(
-            "(start_time(?) + (? * INTERVAL '1 second')) BETWEEN (? AT TIME ZONE ?) AND (? AT TIME ZONE ?)",
+            "(start_time(?) + ?) BETWEEN (? AT TIME ZONE ?) AND (? AT TIME ZONE ?)",
             effective_service.date,
             st.departure_time,
             ^utc_start_time,
@@ -41,21 +41,21 @@ defmodule BusDetective.GTFS do
           ),
         order_by:
           fragment(
-            "start_time(?) + (? * INTERVAL '1 second')",
+            "start_time(?) + ?",
             effective_service.date,
             st.departure_time
           ),
         select_merge: %{
           calculated_arrival_time:
             fragment(
-              "((start_time(?) + (? * INTERVAL '1 second')) AT TIME ZONE ?) AS calculated_arrival_time",
+              "((start_time(?) + ?) AT TIME ZONE ?) AS calculated_arrival_time",
               effective_service.date,
               st.arrival_time,
               agency.timezone
             ),
           calculated_departure_time:
             fragment(
-              "((start_time(?) + (? * INTERVAL '1 second')) AT TIME ZONE ?) AS calculated_departure_time",
+              "((start_time(?) + ?) AT TIME ZONE ?) AS calculated_departure_time",
               effective_service.date,
               st.departure_time,
               agency.timezone
