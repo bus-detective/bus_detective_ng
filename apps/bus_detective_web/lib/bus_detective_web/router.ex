@@ -24,5 +24,6 @@ defmodule BusDetectiveWeb.Router do
 
     resources("/departures", DepartureController, only: [:index])
     resources("/stops", StopController, only: [:index, :show])
+    resources("/trips", TripController, only: [:index])
   end
 end

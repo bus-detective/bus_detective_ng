@@ -274,6 +274,16 @@ defmodule BusDetective.GTFS do
     Repo.one(from(t in Trip, where: t.agency_id == ^agency_id and t.remote_id == ^remote_id))
   end
 
+  def get_trips(ids) do
+    Repo.all(
+      from(
+        trip in Trip,
+        where: trip.id in ^ids,
+        preload: [:route, :shape]
+      )
+    )
+  end
+
   @doc """
   Creates a trip.
   """
