@@ -5,10 +5,77 @@ defmodule BusDetective.GTFS do
 
   import Ecto.Query, warn: false
 
+  alias BusDetective.GTFS.{Agency, Route, Service, ServiceException, Shape, Stop, StopTime, Trip}
   alias BusDetective.Repo
   alias Ecto.Adapters.SQL
+  alias Timex.Timezone
 
-  alias BusDetective.GTFS.{Agency, Route, Service, ServiceException, Shape, Stop, StopTime, Trip}
+  @doc """
+  This is the trickiest of functions in the application. It uses some stored
+  procedures and all the SQL shenanigans you see here to calculate actual
+  scheduled stop times from the schedule data.
+
+  This function expects the start and end times to be specified in the
+  timezone of the agency. That ensures that `start_date` and `end_date` use
+  the day boundaries with the agency timezone instead of utc boundaries,
+  which could throw the data off around midnight.
+  """
+  def calculated_stop_times_between(%Stop{id: stop_id}, %DateTime{} = start_time, %DateTime{} = end_time) do
+    start_date = Timex.to_date(start_time)
+    end_date = Timex.to_date(end_time)
+
+    utc_start_time = Timezone.convert(start_time, :utc)
+    utc_end_time = Timezone.convert(end_time, :utc)
+
+    Repo.all(
+      from(
+        st in StopTime,
+        join: agency in assoc(st, :agency),
+        join: trip in assoc(st, :trip),
+        join:
+          effective_service in fragment(
+            "SELECT * FROM effective_services(?, ?)",
+            ^start_date,
+            ^end_date
+          ),
+        on: trip.service_id == effective_service.service_id,
+        where: st.stop_id == ^stop_id,
+        where:
+          fragment(
+            "(start_time(?) + ?) BETWEEN (? AT TIME ZONE ?) AND (? AT TIME ZONE ?)",
+            effective_service.date,
+            st.departure_time,
+            ^utc_start_time,
+            agency.timezone,
+            ^utc_end_time,
+            agency.timezone
+          ),
+        order_by:
+          fragment(
+            "start_time(?) + ?",
+            effective_service.date,
+            st.departure_time
+          ),
+        select_merge: %{
+          calculated_arrival_time:
+            fragment(
+              "((start_time(?) + ?) AT TIME ZONE ?) AS calculated_arrival_time",
+              effective_service.date,
+              st.arrival_time,
+              agency.timezone
+            ),
+          calculated_departure_time:
+            fragment(
+              "((start_time(?) + ?) AT TIME ZONE ?) AS calculated_departure_time",
+              effective_service.date,
+              st.departure_time,
+              agency.timezone
+            )
+        },
+        preload: [trip: :route]
+      )
+    )
+  end
 
   @doc """
   Returns the list of agencies.
@@ -143,6 +210,12 @@ defmodule BusDetective.GTFS do
     Repo.one(from(s in Stop, where: s.agency_id == ^agency_id and s.remote_id == ^remote_id))
   end
 
+  def get_stop!(id) do
+    Stop
+    |> Repo.get!(id)
+    |> Repo.preload([:agency, :routes])
+  end
+
   @doc """
   Creates a stop.
   """
@@ -250,7 +323,7 @@ defmodule BusDetective.GTFS do
     Repo.insert_all(StopTime, stop_times, returning: true)
   end
 
-  def update_route_stops() do
+  def update_route_stops do
     {:ok, _} = SQL.query(Repo, "TRUNCATE TABLE routes_stops", [])
 
     {:ok, _} =

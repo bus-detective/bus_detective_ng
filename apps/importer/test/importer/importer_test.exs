@@ -2,7 +2,7 @@ defmodule Importer.ImporterTest do
   use BusDetective.DataCase
 
   alias BusDetective.GTFS
-  alias BusDetective.GTFS.{Agency, Route, Service, ServiceException, Shape, Stop, StopTime, Trip}
+  alias BusDetective.GTFS.{Agency, Interval, Route, Service, ServiceException, Shape, Stop, StopTime, Trip}
 
   setup do
     gtfs_file = Path.join(File.cwd!(), "test/fixtures/google_transit_info.zip")
@@ -197,8 +197,8 @@ defmodule Importer.ImporterTest do
 
     assert %StopTime{
              shape_dist_traveled: 0.3616,
-             arrival_time: 79857,
-             departure_time: 79857
+             arrival_time: %Interval{hours: 22, minutes: 10, seconds: 57},
+             departure_time: %Interval{hours: 22, minutes: 10, seconds: 57}
            } = stop_time
   end
 end
