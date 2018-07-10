@@ -99,7 +99,8 @@ defmodule BusDetective.GTFSTest do
     shape = insert(:shape, agency: agency)
 
     params =
-      %{remote_id: remote_id} = params_for(:trip, agency_id: agency.id, shape_id: shape.id, service_id: service.id, route_id: route.id)
+      %{remote_id: remote_id} =
+      params_for(:trip, agency_id: agency.id, shape_id: shape.id, service_id: service.id, route_id: route.id)
 
     assert {:ok, %Trip{remote_id: ^remote_id}} = GTFS.create_trip(params)
   end

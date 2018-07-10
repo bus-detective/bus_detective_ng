@@ -124,11 +124,12 @@ defmodule BusDetective.GTFS do
     query = Keyword.get(options, :query)
     pagination_options = options
 
-    Repo.paginate(from(
-          s in Stop,
-          where: fragment("? ILIKE ?", s.name, ^"%#{query}%"),
-          preload: [:routes, :agency]
-        ),
+    Repo.paginate(
+      from(
+        s in Stop,
+        where: fragment("? ILIKE ?", s.name, ^"%#{query}%"),
+        preload: [:routes, :agency]
+      ),
       pagination_options
     )
   end
@@ -250,19 +251,25 @@ defmodule BusDetective.GTFS do
   end
 
   def update_route_stops() do
-      {:ok, _} = SQL.query(Repo, "TRUNCATE TABLE routes_stops", [])
-      {:ok, _} = SQL.query(Repo, """
-      INSERT INTO routes_stops (route_id, stop_id)
-      SELECT DISTINCT
-      routes.id as route_id, stops.id as stop_id
-      FROM
-      routes
-      INNER JOIN
-      trips ON trips.route_id = routes.id
-      INNER JOIN
-      stop_times ON stop_times.trip_id = trips.id
-      INNER JOIN
-      stops ON stops.id = stop_times.stop_id
-      """, [])
+    {:ok, _} = SQL.query(Repo, "TRUNCATE TABLE routes_stops", [])
+
+    {:ok, _} =
+      SQL.query(
+        Repo,
+        """
+        INSERT INTO routes_stops (route_id, stop_id)
+        SELECT DISTINCT
+        routes.id as route_id, stops.id as stop_id
+        FROM
+        routes
+        INNER JOIN
+        trips ON trips.route_id = routes.id
+        INNER JOIN
+        stop_times ON stop_times.trip_id = trips.id
+        INNER JOIN
+        stops ON stops.id = stop_times.stop_id
+        """,
+        []
+      )
   end
 end

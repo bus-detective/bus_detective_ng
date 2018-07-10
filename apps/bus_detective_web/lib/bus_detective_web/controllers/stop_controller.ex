@@ -4,7 +4,7 @@ defmodule BusDetectiveWeb.StopController do
   alias BusDetective.GTFS
   alias BusDetectiveWeb.ErrorView
 
-  action_fallback BusDetectiveWeb.FallbackController
+  action_fallback(BusDetectiveWeb.FallbackController)
 
   def index(conn, params = %{"query" => query}) do
     results = GTFS.search_stops(Keyword.merge(paging_params(params), query: query))

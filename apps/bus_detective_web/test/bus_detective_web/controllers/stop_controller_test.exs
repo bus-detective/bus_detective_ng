@@ -5,18 +5,19 @@ defmodule BusDetectiveWeb.StopControllerTest do
     {:ok, conn: put_req_header(conn, "accept", "application/json")}
   end
 
-
   describe "index" do
-
     setup do
       matching_stop = insert(:stop, name: "8th and Walnut")
       _non_matching_stop = insert(:stop, name: "Somewhere else")
       {:ok, matching_stop: matching_stop}
     end
 
-    test "with a query parameter it returns stops with the given street name", %{conn: conn, matching_stop: matching_stop} do
-      conn = get conn, stop_path(conn, :index, query: "8th")
-      actual_ids = Enum.map(json_response(conn, 200)["data"]["results"], &(&1["id"]))
+    test "with a query parameter it returns stops with the given street name", %{
+      conn: conn,
+      matching_stop: matching_stop
+    } do
+      conn = get(conn, stop_path(conn, :index, query: "8th"))
+      actual_ids = Enum.map(json_response(conn, 200)["data"]["results"], & &1["id"])
       assert actual_ids == [matching_stop.id]
     end
 
@@ -25,7 +26,7 @@ defmodule BusDetectiveWeb.StopControllerTest do
         insert(:stop, name: "8th and #{street}")
       end
 
-      conn = get conn, stop_path(conn, :index, query: "8th", per_page: 3, page: 2)
+      conn = get(conn, stop_path(conn, :index, query: "8th", per_page: 3, page: 2))
 
       assert result = json_response(conn, 200)["data"]
       assert 4 == result["total_results"]
@@ -35,7 +36,7 @@ defmodule BusDetectiveWeb.StopControllerTest do
     end
 
     test "with invalid parameters it returns a 400", %{conn: conn} do
-      conn = get conn, stop_path(conn, :index, foo: "8th")
+      conn = get(conn, stop_path(conn, :index, foo: "8th"))
       assert 400 == conn.status
     end
   end

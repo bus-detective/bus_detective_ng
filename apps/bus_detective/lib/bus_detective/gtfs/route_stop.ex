@@ -5,8 +5,8 @@ defmodule BusDetective.GTFS.RouteStop do
   alias BusDetective.GTFS.{Route, Stop}
 
   schema "routes_stops" do
-    belongs_to :route, Route
-    belongs_to :stop, Stop
+    belongs_to(:route, Route)
+    belongs_to(:stop, Stop)
   end
 
   @doc false
