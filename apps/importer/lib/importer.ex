@@ -9,9 +9,14 @@ defmodule Importer do
   alias BusDetective.GTFS.{Agency, Interval, Route, Service, Shape, Stop, Trip}
   alias Ecto.Type
 
-  def import(gtfs_file) do
+  def import_from_url(url) do
+    {:ok, tmp_file} = download_gtfs_file(url)
+    import_from_file(tmp_file)
+  end
+
+  def import_from_file(file) do
     with {:ok, tmp_path} <- Briefly.create(directory: true),
-         {:ok, file_map} <- unzip_gtfs_file(gtfs_file, tmp_path) do
+         {:ok, file_map} <- unzip_gtfs_file(file, tmp_path) do
       [agency] = import_agencies(file_map["agency"])
       services_map = import_services(file_map["calendar"], agency)
       import_service_exceptions(file_map["calendar_dates"], agency, services_map)
@@ -24,6 +29,13 @@ defmodule Importer do
     else
       error -> error
     end
+  end
+
+  def download_gtfs_file(url) do
+    {:ok, tmp_file} = Briefly.create()
+    %HTTPoison.Response{body: body} = HTTPoison.get!(url)
+    File.write!(tmp_file, body)
+    {:ok, tmp_file}
   end
 
   def unzip_gtfs_file(gtfs_file, tmp_path) do

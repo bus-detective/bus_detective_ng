@@ -10,13 +10,13 @@ defmodule Importer.ImporterTest do
   end
 
   test "it imports the correct number of agencies", %{gtfs_file: gtfs_file} do
-    Importer.import(gtfs_file)
+    Importer.import_from_file(gtfs_file)
 
     assert 1 == length(GTFS.list_agencies())
   end
 
   test "it imports the agency correctly", %{gtfs_file: gtfs_file} do
-    Importer.import(gtfs_file)
+    Importer.import_from_file(gtfs_file)
 
     agency = GTFS.list_agencies() |> List.first()
 
@@ -32,14 +32,14 @@ defmodule Importer.ImporterTest do
   end
 
   test "it imports the correct number of services", %{gtfs_file: gtfs_file} do
-    Importer.import(gtfs_file)
+    Importer.import_from_file(gtfs_file)
     [agency] = GTFS.list_agencies()
 
     assert 3 == length(GTFS.list_services(agency))
   end
 
   test "it imports a service correctly", %{gtfs_file: gtfs_file} do
-    Importer.import(gtfs_file)
+    Importer.import_from_file(gtfs_file)
 
     [agency] = GTFS.list_agencies()
     service = GTFS.get_service(agency, "1")
@@ -58,7 +58,7 @@ defmodule Importer.ImporterTest do
   end
 
   test "it imports the correct number of service exceptions", %{gtfs_file: gtfs_file} do
-    Importer.import(gtfs_file)
+    Importer.import_from_file(gtfs_file)
     [agency] = GTFS.list_agencies()
     service = GTFS.get_service(agency, "2")
 
@@ -66,7 +66,7 @@ defmodule Importer.ImporterTest do
   end
 
   test "it imports a service exception correctly", %{gtfs_file: gtfs_file} do
-    Importer.import(gtfs_file)
+    Importer.import_from_file(gtfs_file)
 
     [agency] = GTFS.list_agencies()
     service = GTFS.get_service(agency, "2")
@@ -79,14 +79,14 @@ defmodule Importer.ImporterTest do
   end
 
   test "it imports the correct number of routes", %{gtfs_file: gtfs_file} do
-    Importer.import(gtfs_file)
+    Importer.import_from_file(gtfs_file)
     [agency] = GTFS.list_agencies()
 
     assert 10 == length(GTFS.list_routes(agency))
   end
 
   test "it imports a route correctly", %{gtfs_file: gtfs_file} do
-    Importer.import(gtfs_file)
+    Importer.import_from_file(gtfs_file)
 
     [agency] = GTFS.list_agencies()
     route = GTFS.get_route(agency, "1")
@@ -101,14 +101,14 @@ defmodule Importer.ImporterTest do
   end
 
   test "it imports the correct number of stops", %{gtfs_file: gtfs_file} do
-    Importer.import(gtfs_file)
+    Importer.import_from_file(gtfs_file)
     [agency] = GTFS.list_agencies()
 
     assert 10 == length(GTFS.list_stops(agency))
   end
 
   test "it imports a stop correctly", %{gtfs_file: gtfs_file} do
-    Importer.import(gtfs_file)
+    Importer.import_from_file(gtfs_file)
 
     [agency] = GTFS.list_agencies()
     stop = GTFS.get_stop(agency, "EZZLINe")
@@ -122,14 +122,14 @@ defmodule Importer.ImporterTest do
   end
 
   test "it imports the correct number of shapes", %{gtfs_file: gtfs_file} do
-    Importer.import(gtfs_file)
+    Importer.import_from_file(gtfs_file)
     [agency] = GTFS.list_agencies()
 
     assert 1 == length(GTFS.list_shapes(agency))
   end
 
   test "it imports a shape correctly", %{gtfs_file: gtfs_file} do
-    Importer.import(gtfs_file)
+    Importer.import_from_file(gtfs_file)
 
     [agency] = GTFS.list_agencies()
     shape = GTFS.get_shape(agency, "83146")
@@ -154,14 +154,14 @@ defmodule Importer.ImporterTest do
   end
 
   test "it imports the correct number of trips", %{gtfs_file: gtfs_file} do
-    Importer.import(gtfs_file)
+    Importer.import_from_file(gtfs_file)
     [agency] = GTFS.list_agencies()
 
     assert 10 == length(GTFS.list_trips(agency))
   end
 
   test "it imports a trip correctly", %{gtfs_file: gtfs_file} do
-    Importer.import(gtfs_file)
+    Importer.import_from_file(gtfs_file)
 
     [agency] = GTFS.list_agencies()
     %Route{id: route_id} = GTFS.get_route(agency, "1")
@@ -180,14 +180,14 @@ defmodule Importer.ImporterTest do
   end
 
   test "it imports the correct number of stop times", %{gtfs_file: gtfs_file} do
-    Importer.import(gtfs_file)
+    Importer.import_from_file(gtfs_file)
     [agency] = GTFS.list_agencies()
 
     assert 10 == length(GTFS.list_stop_times(agency))
   end
 
   test "it imports a stop time correctly", %{gtfs_file: gtfs_file} do
-    Importer.import(gtfs_file)
+    Importer.import_from_file(gtfs_file)
 
     [agency] = GTFS.list_agencies()
     stop = GTFS.get_stop(agency, "EZZLINw")
