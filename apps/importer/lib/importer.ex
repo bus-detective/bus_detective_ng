@@ -8,7 +8,7 @@ defmodule Importer do
   alias BusDetective.GTFS
   alias BusDetective.GTFS.{Agency, Interval, Route, Service, Shape, Stop, Trip}
   alias Ecto.Type
-  alias Importer.StringFunctions
+  alias Importer.{ColorFunctions, StringFunctions}
 
   def import_from_url(url) do
     {:ok, tmp_file} = download_gtfs_file(url)
@@ -166,7 +166,7 @@ defmodule Importer do
           route_type: raw_route["route_type"],
           url: raw_route["route_url"],
           color: raw_route["route_color"],
-          text_color: raw_route["route_text_color"],
+          text_color: ColorFunctions.text_color_for_bg_color(raw_route["route_text_color"]),
           inserted_at: Ecto.DateTime.utc(),
           updated_at: Ecto.DateTime.utc()
         }

@@ -96,7 +96,7 @@ defmodule Importer.ImporterTest do
              long_name: "Museum Center Mt. Adams Eden Park",
              route_type: "3",
              color: "FF4AFF",
-             text_color: "000000"
+             text_color: "FFFFFF"
            } = route
   end
 
