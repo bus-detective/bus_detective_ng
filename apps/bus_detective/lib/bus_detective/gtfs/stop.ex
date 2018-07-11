@@ -30,7 +30,7 @@ defmodule BusDetective.GTFS.Stop do
     field(:wheelchair_boarding, :integer)
     field(:zone_id, :integer)
 
-    has_many(:stops_routes, RouteStop)
+    has_many(:stops_routes, RouteStop, on_delete: :delete_all)
     has_many(:routes, through: [:stops_routes, :route])
 
     timestamps()

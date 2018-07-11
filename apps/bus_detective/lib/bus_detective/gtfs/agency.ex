@@ -4,6 +4,8 @@ defmodule BusDetective.GTFS.Agency do
   use Ecto.Schema
   import Ecto.Changeset
 
+  alias BusDetective.GTFS.{Route, Service, Shape}
+
   schema "agencies" do
     field(:display_name, :string)
     field(:fare_url, :string)
@@ -17,6 +19,10 @@ defmodule BusDetective.GTFS.Agency do
     field(:remote_id, :string)
     field(:timezone, :string)
     field(:url, :string)
+
+    has_many(:routes, Route, on_delete: :delete_all)
+    has_many(:services, Service, on_delete: :delete_all)
+    has_many(:shapes, Shape, on_delete: :delete_all)
 
     timestamps()
   end

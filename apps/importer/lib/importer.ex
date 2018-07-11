@@ -19,6 +19,7 @@ defmodule Importer do
     with {:ok, tmp_path} <- Briefly.create(directory: true),
          {:ok, file_map} <- unzip_gtfs_file(file, tmp_path) do
       [agency] = import_agencies(file_map["agency"])
+
       services_map = import_services(file_map["calendar"], agency)
       import_service_exceptions(file_map["calendar_dates"], agency, services_map)
       routes_map = import_routes(file_map["routes"], agency)
@@ -70,9 +71,13 @@ defmodule Importer do
     |> File.stream!()
     |> CSV.decode(headers: true, strip_fields: true)
     |> Enum.map(fn {:ok, raw_agency} ->
+      remote_id = raw_agency["agency_id"]
+
+      GTFS.destroy(remote_id)
+
       agency = %{
         fare_url: raw_agency["agency_fare_url"],
-        remote_id: raw_agency["agency_id"],
+        remote_id: remote_id,
         language: raw_agency["agency_lang"],
         name: raw_agency["agency_name"],
         phone: raw_agency["agency_phone"],

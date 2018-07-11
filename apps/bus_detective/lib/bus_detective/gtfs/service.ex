@@ -4,7 +4,7 @@ defmodule BusDetective.GTFS.Service do
   use Ecto.Schema
   import Ecto.Changeset
 
-  alias BusDetective.GTFS.Agency
+  alias BusDetective.GTFS.{Agency, ServiceException, Trip}
 
   schema "services" do
     belongs_to(:agency, Agency)
@@ -18,6 +18,9 @@ defmodule BusDetective.GTFS.Service do
     field(:thursday, :boolean, default: false)
     field(:tuesday, :boolean, default: false)
     field(:wednesday, :boolean, default: false)
+
+    has_many(:service_exceptions, ServiceException, on_delete: :delete_all)
+    has_many(:trips, Trip, on_delete: :delete_all)
 
     timestamps()
   end

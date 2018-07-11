@@ -3,7 +3,7 @@ defmodule BusDetective.Repo.Migrations.CreateServices do
 
   def change do
     create table(:services) do
-      add(:agency_id, references(:agencies), null: false)
+      add(:agency_id, references(:agencies, on_delete: :delete_all), null: false)
       add(:remote_id, :string)
       add(:monday, :boolean, default: false, null: false)
       add(:tuesday, :boolean, default: false, null: false)
