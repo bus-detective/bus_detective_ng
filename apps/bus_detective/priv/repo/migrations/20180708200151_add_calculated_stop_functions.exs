@@ -54,4 +54,10 @@ defmodule BusDetective.Repo.Migrations.AddCalculatedStopFunctions do
     $$;
     """)
   end
+
+  def down do
+    execute("DROP FUNCTION start_time(date)")
+    execute("DROP FUNCTION effective_services(date, date)")
+    execute("DROP VIEW service_days")
+  end
 end
