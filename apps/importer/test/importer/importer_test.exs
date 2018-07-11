@@ -115,7 +115,7 @@ defmodule Importer.ImporterTest do
 
     assert %Stop{
              code: 4451,
-             name: "EZZARD CHARLES DR & LINN ST",
+             name: "Ezzard Charles Dr & Linn St",
              latitude: 39.109286,
              longitude: -84.527882
            } = stop
@@ -174,7 +174,7 @@ defmodule Importer.ImporterTest do
              route_id: ^route_id,
              service_id: ^service_id,
              shape_id: ^shape_id,
-             headsign: "1 MT ADAMS - EDEN PARK",
+             headsign: "Mt Adams - Eden Park",
              block_id: 125_647
            } = trip
   end
