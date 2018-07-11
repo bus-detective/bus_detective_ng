@@ -8,6 +8,7 @@ defmodule Importer do
   alias BusDetective.GTFS
   alias BusDetective.GTFS.{Agency, Interval, Route, Service, Shape, Stop, Trip}
   alias Ecto.Type
+  alias Importer.StringFunctions
 
   def import_from_url(url) do
     {:ok, tmp_file} = download_gtfs_file(url)
@@ -161,7 +162,7 @@ defmodule Importer do
           remote_id: raw_route["route_id"],
           short_name: raw_route["route_short_name"],
           long_name: raw_route["route_long_name"],
-          description: raw_route["route_desc"],
+          description: StringFunctions.titleize(raw_route["route_desc"]),
           route_type: raw_route["route_type"],
           url: raw_route["route_url"],
           color: raw_route["route_color"],
@@ -204,8 +205,8 @@ defmodule Importer do
           agency_id: agency_id,
           remote_id: raw_stop["stop_id"],
           code: code,
-          name: raw_stop["stop_name"],
-          description: raw_stop["stop_desc"],
+          name: StringFunctions.titleize(raw_stop["stop_name"]),
+          description: StringFunctions.titleize(raw_stop["stop_desc"]),
           latitude: latitude,
           longitude: longitude,
           zone_id: zone_id,
@@ -287,7 +288,7 @@ defmodule Importer do
           service_id: service_id,
           shape_id: shape_id,
           remote_id: raw_trip["trip_id"],
-          headsign: raw_trip["trip_headsign"],
+          headsign: StringFunctions.titleize_headsign(raw_trip["trip_headsign"]),
           short_name: raw_trip["trip_short_name"],
           direction_id: raw_trip["direction_id"] |> String.to_integer(),
           block_id: raw_trip["block_id"] |> String.to_integer(),
