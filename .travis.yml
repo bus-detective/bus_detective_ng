@@ -1,24 +1,27 @@
 language: elixir
-
 elixir:
-  - 1.6.6
-
+- 1.6.6
 otp_release:
-  - 21.0.1
-
+- 21.0.1
 services:
-  - postgresql
-
+- postgresql
 addons:
-  postgresql: "9.5"
-
+  postgresql: '9.5'
 install:
-  - sudo apt-get install -y postgresql-9.5-postgis-2.3
-  - sudo service postgresql restart
-  - mix local.rebar --force
-  - mix local.hex --force
-  - mix deps.get
-
+- sudo apt-get install -y postgresql-9.5-postgis-2.3
+- sudo service postgresql restart
+- mix local.rebar --force
+- mix local.hex --force
+- mix deps.get
 script:
-  - mix format --check-formatted && mix credo --strict
-  - MIX_ENV=test mix do ecto.create, ecto.migrate && mix test
+- mix format --check-formatted && mix credo --strict
+- MIX_ENV=test mix do ecto.create, ecto.migrate && mix test
+deploy:
+  provider: heroku
+  api_key:
+    secure: L4VOk5zKydyPvTxnNR6MNGPHjC68jY3W6imTMRBeheWEhx/oqY38nrlrIX6OKyJgthRoxEs/n2rh07wuNnaVSzPvHx2VfsmfwCPcrmlC5CvHEU149MKY03ztWK+BxrcSXSjm1J9PDSeKbxQuZQqlgic/w77hjBwudHc4jgMqmZ98ywvtmIWgsf4dc4Zd7P3ppyaaGPXP3c0nevBlQn7SnvdXzBN2VbsWYGQy0V1artJN54jynrlgGWR0GGWEDOh3+P6JnUa3qg6k2oi4/z0Vvb1zUZTbyg01+YphszJMwEgigqK0ABSn8LtC0LNRQOvVZLGrleEC4/z+taXUy3uFvqi+IEyUkH0ofCOBvvlL8qpdgNyGmUXBFOZSBX0Bv9p+d9tRYAxIvPMfm/h23SjQstdfbTBaUUoQ9gxYEMUQ5SBXFQVoCJBfj7sa/jjsN+r7tGouapkUjE7kFh0wpgQIgaKQ+2dxAVPLSAgT3y9gM+uFKm12e88e24qo2g9ql6IJdbBk0K7DSgBbg65XdKzPizKfH89Yodd7KM43u/Z4z61AnEuNYsnNXD1VRrjCIGKyfPhN7Et9pBj94luEJ7ILoGEWfstCP99+p3dmjn0gYXIz2x4E2v5qqjxhbygIWa8edytpGAdJhJBDX75XQybTi+dWxxRHiPZQFlFYSFK/qmk=
+  app:
+    master: busdetective-ng-staging
+  on:
+    repo: bus-detective/bus_detective_ng
+  run: "mix ecto.migrate"
