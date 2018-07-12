@@ -1,0 +1,55 @@
+// -------------- \\
+// --- COLORS --- \\
+// -------------- \\
+
+$bd-blue: #48A0DC;
+$bd-green: #88C057;
+$bd-purple: #9B7CAB;
+$bd-red: #ED7161;
+
+$bd-dark-gray: #4D4D4D;
+$bd-gray: #9F9F9F;
+$bd-light-gray: #DFDFDF;
+$bd-lighter-gray: #EDF0F2;
+
+$primary-color: #0094BA;
+$secondary-color: #FF7B00;
+
+$link-color: $bd-dark-gray;
+
+
+// ------------------ \\
+// --- FONT SIZES --- \\
+// ------------------ \\
+
+// font sizes based on minor third ratio/golden ratio compound modular scale
+// golden ratio = 1.618
+// minor third ratio = 1.2
+// base font size = 16px
+
+$base-font-size: 16px;
+
+$ms4: 1.728rem;   // 27.648px
+$ms3: 1.618rem;   // 25.88px
+$ms2: 1.44rem;    // 23.04px
+$ms1: 1.2rem;     // 19.20px
+$ms0: 1rem;       // 16.00px
+$ms-1: 0.833rem;  // 13.328px
+$ms-2: 0.694rem;  // 11.104px
+$ms-3: 0.618rem;  // 9.888px
+
+
+// --------------- \\
+// --- DISPLAY --- \\
+// --------------- \\
+
+$padding: 10px;
+$border-radius: 2px;
+$box-shadow: 0px 1px 2px transparentize($bd-dark-gray, 0.75);
+
+
+// ------------------- \\
+// --- TRANSITIONS --- \\
+// ------------------- \\
+
+$ease: cubic-bezier(0.455, 0.030, 0.515, 0.955);

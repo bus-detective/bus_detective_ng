@@ -1,0 +1,26 @@
+.map {
+  position: relative;
+  width: 100%;
+  // based on the golden ratio
+  // 30.52% of the veiwport
+  height: 30.52vh;
+  // size of the action banner that overlays the map
+  min-height: 60px;
+  max-height: 195px;
+  background-color: $bd-light-gray;
+  overflow: hidden;
+}
+
+.map--expanded {
+  height: 100vh;
+  max-height: 999999px;
+}
+
+.map__toggle-expanded {
+  position: absolute;
+  display: block;
+  top: 100px;
+  right: 10px;
+  color: $bd-gray;
+  z-index: 500;
+}

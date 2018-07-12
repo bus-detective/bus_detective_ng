@@ -1,0 +1,29 @@
+.detail-header {
+  @include clearfix;
+  position: relative;
+  padding: $padding;
+  box-shadow: 0 0px 2px 2px transparentize($bd-dark-gray, 0.85);
+}
+
+.detail-header__title {
+  font-size: $ms3;
+  line-height: 1.2;
+  margin: 10px 0 15px 0;
+  .tag {
+    position: relative;
+    top: -4px;
+    width: 66px;
+    height: 30px;
+    font-size: $ms1;
+    line-height: 30px;
+  }
+}
+
+.deatil-header__distance, .deatil-header__location, {
+  line-height: 20px;
+  color: $bd-gray;
+}
+
+.deatil-header__distance {
+  float: right;
+}

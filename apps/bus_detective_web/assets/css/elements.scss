@@ -1,0 +1,46 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  position: relative;
+  max-width: 1080px;
+  margin: 0 auto;
+  font-family: 'Cooper Hewitt', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: $base-font-size;
+  color: $bd-dark-gray;
+  font-weight: 400;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html, body {
+  height: 100%;
+}
+
+body > div {
+  min-height: 100%;
+  position: relative;
+}
+
+h1 {
+  font-weight: 600;
+  font-size: $ms3;
+}
+
+h2 {
+  font-weight: 700;
+  font-size: $ms-2;
+  color: $bd-gray;
+  text-transform: uppercase;
+  letter-spacing: 0.066em;
+}
+
+a {
+  text-decoration: none;
+}
+
+button {
+  border: none;
+}

@@ -1,0 +1,36 @@
+.tag {
+  float: left;
+  display: inline-block;
+  width: 15.82%;
+  height: 20px;
+  margin-right: 1%;
+  margin-bottom: 2px;
+  border-radius: $border-radius;
+  color: #FFFFFF;
+  background-color: $bd-light-gray;
+  text-align: center;
+  font-size: $ms-2;
+  font-weight: 700;
+  line-height: 20px;
+  padding: 0 2px;
+  white-space: nowrap;
+  &:nth-of-type(6n) {
+    margin-right: 0;
+  }
+}
+
+.tag--blue {
+  background-color: $bd-blue;
+}
+
+.tag--green {
+  background-color: $bd-green;
+}
+
+.tag--purple {
+  background-color: $bd-purple;
+}
+
+.tag--red {
+  background-color: $bd-red;
+}

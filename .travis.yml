@@ -16,6 +16,9 @@ install:
 script:
 - mix format --check-formatted && mix credo --strict
 - MIX_ENV=test mix do ecto.create, ecto.migrate && mix test
+- cd apps/bus_detective_web/assets && npm install && cd ../../../
+- cd apps/bus_detective_web/assets && ./node_modules/.bin/eslint --format=junit --output-file="test/eslint/junit.xml" js/**/*.js && cd ../../../
+- cd apps/bus_detective_web/assets && node node_modules/webpack/bin/webpack.js --mode development && cd ../../../
 deploy:
   provider: heroku
   api_key:

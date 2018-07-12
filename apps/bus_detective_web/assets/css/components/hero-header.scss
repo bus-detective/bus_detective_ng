@@ -1,0 +1,67 @@
+.hero-header {
+  // based on the golden ratio
+  $hh-height-unitless: 43.75;
+  $hh-padding-unitless: 3.635;
+
+  $hh-height: $hh-height-unitless + 0%;
+  $hh-padding: $hh-padding-unitless + 0vh;
+
+  width: 100%;
+  height: $hh-height;
+  padding: $hh-padding;
+
+  @media screen and (max-width: 568px) {
+    padding-bottom: $hh-padding / 4;
+  }
+
+  .hero-header__logo {
+    width: 20vh;
+    //width: $hh-height-unitless - ($hh-padding-unitless * 2) + 0vh;
+    margin: auto;
+    background-color: $bd-lighter-gray;
+    border-radius: 50%;
+    box-shadow: $box-shadow;
+    // Pad the container 12% of its diameter
+    // keeps the proportions of the logo to the container consistant accross all screen sizes
+    padding: ($hh-height-unitless - ($hh-padding-unitless * 2)) * 0.12 + 0vh;
+  }
+
+  .hero-header__image {
+    width: $hh-height-unitless - ($hh-padding-unitless * 2) + 0vh;
+    height: 100%;
+    margin: auto;
+    background-color: white;
+    border-radius: 50%;
+    box-shadow: $box-shadow;
+    // Pad the container 17.5% of its diameter
+    // keeps the proportions of the logo to the container consistant accross all screen sizes
+    padding: ($hh-height-unitless - ($hh-padding-unitless * 2)) * 0.175 + 0vh;
+  }
+
+  .hero-header__logo--no-circle {
+    width: $hh-height-unitless - ($hh-padding-unitless * 2) + 0vh;
+    height: 100%;
+    margin: auto;
+    padding: 0;
+  }
+}
+
+.hero-header__logo > img {
+  width: 100%;
+  height: 100%;
+  // half the size of the amount that the magnifying glass protrudes from the bus
+  transform: translate(9.562%, 0);
+  -webkit-transform: translate(9.562%, 0);
+}
+
+.hero-header__image > img {
+  width: 100%;
+  height: 100%;
+}
+
+.hero-header__logo--no-circle > img {
+  width: 100%;
+  height: 100%;
+  transform: translate(6.562%, 0);
+  -webkit-transform: translate(6.562%, 0);
+}

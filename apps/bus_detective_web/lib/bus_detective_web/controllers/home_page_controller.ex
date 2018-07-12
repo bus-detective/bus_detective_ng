@@ -1,4 +1,4 @@
-defmodule BusDetectiveWeb.PageController do
+defmodule BusDetectiveWeb.HomePageController do
   use BusDetectiveWeb, :controller
 
   def index(conn, _params) do

@@ -1,0 +1,31 @@
+.flex {
+
+  &__container {
+    display: flex;
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-around;
+    padding: 0;
+    margin: 0;
+  }
+
+  &__cell {
+    background-color: #fff;
+    border-radius: $border-radius;
+    box-shadow: $box-shadow;
+    margin-bottom: $padding;
+    padding: $padding;
+
+    &--small {
+      width: 28px;
+    }
+
+    &--large {
+      width: calc(100% - 28px);
+    }
+  }
+
+}

@@ -1,0 +1,98 @@
+.list {
+  padding: 83px $padding $padding;
+  background-color: $bd-lighter-gray;
+  min-height: 100vh;
+
+  &--home {
+    background-color: none;
+
+    & .list-item__container {
+      height: calc(75vh - 260px);
+      overflow: scroll;
+
+      @media screen and (max-width: 480px) {
+        height: calc(75vh - 215px);
+      }
+    }
+  }
+}
+
+.list-item {
+  @include clearfix;
+  display: block;
+  margin-bottom: $padding;
+  padding: $padding;
+  background-color: #fff;
+  border-radius: $border-radius;
+  box-shadow: $box-shadow;
+  width: 100%;
+}
+
+.list-item__button {
+  float: right;
+  color: $bd-light-gray;
+  line-height: 2.15;
+}
+
+.list-item__title, .list-item__button {
+  font-size: $ms1;
+  line-height: 2;
+  margin: 0;
+}
+
+.list-item__title {
+  line-height: 1.25;
+  padding-right: $padding;
+  width: calc(100% - 2.1em);
+
+  .list--home & {
+    @media screen and (max-width: 520px) {
+      font-size: $ms-1;
+      font-weight: 400;
+      margin-left: $padding / 2;
+    }
+  }
+}
+
+.list-item__title--route {
+  font-size: $ms0;
+}
+
+.list-item__title small {
+  font-size: $ms-1;
+  font-weight: 400;
+  margin-left : $padding / 2;
+}
+
+.list-item__title .tag {
+    position: relative;
+    top: -4px;
+    width: 15.85%;
+    height: 20px;
+    font-size: 14px;
+    line-height: 20px;
+  }
+
+.list-item__details {
+  @include clearfix;
+  margin-top: $padding / 2;
+}
+
+.list-item__details .tag {
+  min-width: 15.82%;
+  width: auto;
+  height: $ms0;
+  font-size: $ms-3;
+  line-height: $ms0;
+}
+
+.list-item__distance, .list-item__location {
+  margin-top: $padding / 5;
+  line-height: $ms0;
+  color: $bd-gray;
+}
+
+.list-item__distance {
+  float: right;
+  font-size: $ms-2;
+}

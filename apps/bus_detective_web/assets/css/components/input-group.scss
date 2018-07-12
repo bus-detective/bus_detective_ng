@@ -1,0 +1,28 @@
+.input-group {
+  margin-top: 15px;
+  border-radius: 3px;
+  border: 1px solid #ccc;
+  display: table;
+  border-collapse: separate;
+
+  .text-field {
+    display: table-cell;
+    border: none;
+  }
+}
+
+.input-group__button {
+  height: 34px;
+  display: table-cell;
+  border-radius: 3px;
+  width: 1%;
+  vertical-align: middle;
+  border-left: 1px solid #ddd;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+
+  .button {
+    border: none;
+  }
+}
+

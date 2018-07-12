@@ -1,0 +1,69 @@
+.button {
+  display: inline-block;
+  height: 40px;
+  width: 40px;
+  padding: 0;
+  color: $bd-gray;
+  font-size: 1rem;
+  text-align: center;
+  line-height: 40px;
+  background-color: transparentize(#fff, 0.15);
+  border-radius: $border-radius;
+  box-shadow: $box-shadow;
+  .bd-icon {
+    line-height: inherit;
+  }
+}
+
+.button--return {
+  color: #fff;
+  background-color: transparentize($bd-blue, 0.15);
+  float: left;
+}
+
+.button--fav {
+  color: #fff;
+  background-color: transparentize($bd-red, 0.15);
+  position: absolute;
+  top: 55px;
+  right:10px;
+  z-index: 500;
+}
+
+.button--home {
+  background-image: url(/images/bd-mustache-icon.png);
+  background-repeat: no-repeat;
+  background-size: 80%;
+  background-position: center;
+  float: right;
+}
+
+.button--load-more {
+  display: block;
+  width: 66.66%;
+  margin: auto;
+  color: #fff;
+  background-color: transparentize($bd-blue, 0.15);
+}
+
+.button-large {
+  display: inline-block;
+  color: $bd-blue;
+  text-align: center;
+  line-height: 40px;
+  padding: 0 10px;
+  background-color: transparentize(#fff, 0.15);
+  border-radius: $border-radius;
+  box-shadow: $box-shadow;
+}
+
+.button--small {
+  display: inline-block;
+  padding: 5px;
+  color: $bd-blue;
+  font-size: $ms-2;
+  text-align: center;
+  background-color: transparentize(#fff, 0.15);
+  border-radius: $border-radius;
+  box-shadow: $box-shadow;
+}

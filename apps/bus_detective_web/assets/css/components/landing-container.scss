@@ -1,0 +1,18 @@
+.landing-container {
+  height: 100%;
+  & > .action-banner {
+    position: relative;
+    .search-bar {
+      width: 100%;
+      margin: 0;
+      & > input {
+        opacity: 1;
+        padding: 0 $padding;
+        width: calc(100% - 40px);
+      }
+      .button {
+        border-radius: 0 $border-radius $border-radius 0
+      }
+    }
+  }
+}

@@ -16,7 +16,8 @@ defmodule BusDetectiveWeb.Router do
   scope "/", BusDetectiveWeb do
     pipe_through(:browser)
 
-    get("/", PageController, :index)
+    get("/", HomePageController, :index)
+    resources("/search", SearchController, only: [:index])
   end
 
   scope "/api", BusDetectiveWeb do

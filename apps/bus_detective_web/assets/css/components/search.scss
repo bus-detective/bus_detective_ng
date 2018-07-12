@@ -1,0 +1,29 @@
+.search {
+  @include clearfix;
+  width: 100%;
+  position: relative;
+}
+
+.search__query {
+  -webkit-appearance: none;
+  float: left;
+  height: 40px;
+  width: 100%;
+  padding: 0 $padding;
+  background-color: rgba(255,255,255,0.85);
+  border: none;
+  border-radius: $border-radius;
+  box-shadow: $box-shadow, 0 1px 2px #fff inset;
+  transition: all 0.2s $ease;
+  vertical-align: bottom;
+  &:focus {
+    outline: none;
+  }
+}
+
+.search__submit {
+  position: absolute;
+  right: 0;
+  background: transparent;
+  box-shadow: none;
+}

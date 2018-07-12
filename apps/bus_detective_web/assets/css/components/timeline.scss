@@ -1,0 +1,12 @@
+.timeline {
+  padding: ($padding * 2.5) $padding;
+}
+
+.timeline__event {
+  @include clearfix;
+  display: block;
+  position: relative;
+  &:last-of-type .event__event-details {
+    border-color: transparent;
+  }
+}

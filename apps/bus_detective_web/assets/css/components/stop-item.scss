@@ -1,0 +1,49 @@
+.stop-item {
+  display: block;
+  position: relative;
+}
+
+.stop-item__content {
+  display: block;
+  text-decoration: none;
+  padding: 18px 30px 13px 15px;
+  white-space: nowrap;
+  text-overflow: hidden;
+  border-bottom: 1px solid #eee;
+}
+
+.stop-item__action {
+  display: block;
+  padding: 18px 15px 13px 5px;
+  line-height: 0.8;
+  position: absolute;
+  right: 0;
+  top: 0;
+  cursor: pointer;
+  background-color: white;
+}
+
+.stop-item__toggle-favorite {
+  float: right;
+  color: $bd-light-gray;
+  background-color: #fff;
+  // same height as the stop-item title
+  line-height: 38px;
+  // make the hit area square
+  width: 38px;
+  // align line item favorite icon with search icon in the control bar at the top of the screen
+  margin-right: -$padding;
+  margin-top: -$padding;
+  text-align: center;
+  border-radius: $border-radius;
+
+  .list--home & {
+    @media screen and (max-width: 520px) {
+      line-height: 30px;
+    }
+  }
+}
+
+.stop-item__toggle-favorite.toggle-favorite--favorite {
+  color: $bd-red;
+}

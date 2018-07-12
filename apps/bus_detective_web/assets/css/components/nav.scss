@@ -1,0 +1,32 @@
+.nav--fixed-bottom {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 60px;
+  padding: $padding;
+}
+
+.nav__button {
+  width: 100%;
+  color: $bd-blue;
+  box-shadow: $box-shadow, 0 1px 2px #FFF inset;
+
+  .bd-icon {
+    font-size: 18px;
+    margin-right: 5px;
+    vertical-align: middle;
+  }
+}
+
+.nav__attribution {
+  display: block;
+  text-align: center;
+  margin-top: 10px;
+  color: #fff;
+  img {
+    display: inline-block;
+    margin-right: $padding;
+    margin-bottom: -$padding / 2;
+  }
+}

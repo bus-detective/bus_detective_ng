@@ -1,0 +1,38 @@
+<div> <div class="action-banner action-banner--fixed-top"> <button class="button button--return"><i class="bd-icon bd-icon--arrow-left "></i></button> <form class="search__form search">
+      <input value="" placeholder="Search by street name" class="search__query" autofocus="false" autocorrect="false">
+      <button type="submit" class="button search__submit">
+        <i class="bd-icon bd-icon--search"></i>
+      </button>
+    </form>
+    <%= link "", to: home_page_path(@conn, :index), class: "button button--home" %>
+  </div>
+
+  <div class="list">
+    <section class="section">
+      <h2 class="light"><i class="bd-icon bd-icon--search"></i> Search results</h2>
+      <%= if Enum.empty?(@results) do %>
+        <p class="text-center">No stops found</p>
+      <% else %>
+        <%= for stop <- @results do %>
+          <div class="stop-item" data-test="stop_item">
+            <div class="flex__container">
+              <div class="flex__cell flex__cell--large">
+                <a href="#" class="unstyled">
+                  <button class="stop-item__toggle-favorite toggle-favorite ember-view"><i class="bd-icon bd-icon--heart-o"></i>
+                  </button>
+                  <h1 class="list-item__title"><%=  stop.name %><small class="light"><%= BusDetective.GTFS.Stop.direction(stop) %></small></h1>
+                  <div class="list-item__details">
+                    <%= for route <- stop.routes do %>
+                      <span class="tag" style="background-color: #<%= route.color %>; color: <%= route.text_color %>"><%= route.short_name %></span>
+                    <% end %>
+                  </div>
+                </a>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      <% end %>
+      <div class="pager"><!----></div>
+    </section>
+  </div>
+</div>

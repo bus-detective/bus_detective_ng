@@ -1,35 +1,16 @@
-<!DOCTYPE html>
-<html lang="en">
+<html>
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="">
-    <meta name="author" content="">
-
-    <title>Hello BusDetective!</title>
+    <title>Bus Detective</title>
+    <meta name="description" content="Find out exactly when your bus is coming. This free app gives you real-time arrival data for Cincinnati Metro buses. iPhone, Android and Web versions.">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link type="image/x-icon" href="favicon-mustache.ico" rel="shortcut icon">
     <link rel="stylesheet" href="<%= static_path(@conn, "/css/app.css") %>">
   </head>
+  <body class="bg-primary">
+    <%= render @view_module, @view_template, assigns %>
 
-  <body>
-    <div class="container">
-      <header class="header">
-        <nav role="navigation">
-          <ul class="nav nav-pills pull-right">
-            <li><a href="http://www.phoenixframework.org/docs">Get Started</a></li>
-          </ul>
-        </nav>
-        <span class="logo"></span>
-      </header>
-
-      <p class="alert alert-info" role="alert"><%= get_flash(@conn, :info) %></p>
-      <p class="alert alert-danger" role="alert"><%= get_flash(@conn, :error) %></p>
-
-      <main role="main">
-        <%= render @view_module, @view_template, assigns %>
-      </main>
-
-    </div> <!-- /container -->
     <script src="<%= static_path(@conn, "/js/app.js") %>"></script>
   </body>
 </html>

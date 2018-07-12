@@ -1,0 +1,46 @@
+<div>
+  <div class="landing-container">
+    <div class="hero-header">
+      <div class="hero-header__logo">
+        <%= img_tag(static_path(@conn, "/images/bus-detective-icon.png")) %>
+      </div>
+    </div>
+
+    <div class="action-banner">
+      <div class="search">
+        <%= form_tag(search_path(@conn, :index), method: :get, class: "search__form") do %>
+          <input type="text" name="search_query" placeholder="Search by street name" class="search__query" data-test="search_query">
+          <button type="submit" class="button search__submit" data-test="search_button">
+            <i class="bd-icon bd-icon--search"></i>
+          </button>
+        <% end %>
+      </div>
+      <a href="/stops/nearby" class="nav__button button push-top"><i class="bd-icon bd-icon--pin"></i>Nearby</a>
+    </div>
+
+    <div class="list--home push-sides">
+      <section class="section push-top">
+        <h2 class="white pull--left">
+          <i class="bd-icon bd-icon--heart"></i>
+          Favorites
+        </h2>
+        <a href="/stops/favorites" class="ember-view">
+          <h2 class="pull--right button--small push-top-5">View All</h2>
+        </a>
+        <div class="clear">
+          <div class="list-item__container">
+            <div> <!----> </div>
+            <div class="text-center white shove-top">Hit the heart icon on your favorite bus stops, and they’ll show up right here.
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div class="nav nav--fixed-bottom">
+      <a href="/about" class="nav__attribution">
+        <%= img_tag(static_path(@conn, "/images/gaslight-icon.png")) %><span>Made with love by Gaslight</span>
+      </a>
+    </div>
+  </div>
+</div>

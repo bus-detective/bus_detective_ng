@@ -1,0 +1,43 @@
+.action-banner {
+  @include clearfix;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 500;
+  padding: $padding;
+  // WORKAROUND - remove when full detail header is available
+  & > .detail-header__title {
+    margin: 0 0 -10px;
+    line-height: 1.7;
+    padding-left: 55px;
+  }
+}
+
+.action-banner--fixed-top {
+  position: fixed;
+  background-color: #FFF;
+  box-shadow: 0 0px 2px 2px transparentize($bd-dark-gray, 0.85);
+  width: 100%;
+  z-index: 10;
+  .search {
+    float: left;
+    width: calc(100% - 90px);
+  }
+  .search__query {
+    box-shadow: none;
+  }
+  .button {
+    box-shadow: none;
+  }
+
+  .button--home {
+    background-size: 55%;
+    border-left: 1px solid $bd-light-gray;
+    height: 100%;
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 60px;
+  }
+}
