@@ -14,7 +14,14 @@ defmodule BusDetectiveWeb.Mixfile do
       compilers: [:phoenix, :gettext] ++ Mix.compilers(),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(Mix.env()),
-      deps: deps()
+      deps: deps(),
+      preferred_cli_env: [
+        coveralls: :test,
+        "coveralls.detail": :test,
+        "coveralls.travis": :test,
+        "coveralls.html": :test
+      ],
+      test_coverage: [tool: ExCoveralls]
     ]
   end
 

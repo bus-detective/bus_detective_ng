@@ -6,3 +6,4 @@ erl_crash.dump
 
 **/screenshots
 apps/bus_detective_web/assets/test/eslint/junit.xml
+**/cover/

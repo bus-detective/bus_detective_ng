@@ -5,8 +5,15 @@ defmodule BusDetective.Umbrella.Mixfile do
     [
       aliases: aliases(Mix.env()),
       apps_path: "apps",
+      deps: deps(),
+      preferred_cli_env: [
+        coveralls: :test,
+        "coveralls.detail": :test,
+        "coveralls.travis": :test,
+        "coveralls.html": :test
+      ],
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      test_coverage: [tool: ExCoveralls]
     ]
   end
 
@@ -19,6 +26,6 @@ defmodule BusDetective.Umbrella.Mixfile do
   # Dependencies listed here are available only for this project
   # and cannot be accessed from applications inside the apps folder
   defp deps do
-    []
+    [{:excoveralls, "~> 0.8", only: :test}]
   end
 end

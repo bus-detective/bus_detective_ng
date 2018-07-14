@@ -13,7 +13,14 @@ defmodule BusDetective.Mixfile do
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(Mix.env()),
-      deps: deps()
+      deps: deps(),
+      preferred_cli_env: [
+        coveralls: :test,
+        "coveralls.detail": :test,
+        "coveralls.travis": :test,
+        "coveralls.html": :test
+      ],
+      test_coverage: [tool: ExCoveralls]
     ]
   end
 
