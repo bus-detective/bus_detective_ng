@@ -100,6 +100,47 @@ defmodule BusDetective.GTFSTest do
     assert [stop] == GTFS.list_stops(agency)
   end
 
+  describe "search_stops/1" do
+    setup do
+      agency = insert(:agency)
+
+      {:ok, agency: agency}
+    end
+
+    test "search is case-insensitive", %{agency: agency} do
+      insert(:stop, agency: agency, name: "unrelated")
+      stop = insert(:stop, agency: agency, name: "BIG TIME STOP")
+
+      results = GTFS.search_stops(query: "big time")
+
+      assert 1 == Enum.count(results)
+      assert stop.id == Enum.at(results, 0).id
+    end
+
+    test "searching by partial name returns the correct results", %{agency: agency} do
+      insert(:stop, agency: agency, name: "unrelated")
+      stop = insert(:stop, agency: agency, name: "This is a stop & it's great")
+
+      results = GTFS.search_stops(query: "great")
+
+      assert 1 == Enum.count(results)
+      assert stop.id == Enum.at(results, 0).id
+    end
+
+    test "it pages correctly", %{agency: agency} do
+      for x <- 1..20 do
+        insert(:stop, agency: agency, name: "thing #{x}")
+      end
+
+      results = GTFS.search_stops(query: "thing", page: 1, page_size: 7)
+
+      assert 3 == results.total_pages
+      assert 20 == results.total_entries
+      assert 1 == results.page_number
+      assert 7 == results.page_size
+    end
+  end
+
   test "create_shape/1" do
     agency = insert(:agency)
     params = %{remote_id: remote_id} = params_for(:shape, agency_id: agency.id)
