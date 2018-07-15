@@ -64,6 +64,6 @@ defmodule BusDetective.GTFS.Stop do
   end
 
   def direction(%__MODULE__{remote_id: remote_id}) do
-    Map.get(@direction_labels, String.last(remote_id))
+    Map.get(@direction_labels, String.last(remote_id), "")
   end
 end
