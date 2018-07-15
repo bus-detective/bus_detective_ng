@@ -19,12 +19,4 @@ defmodule BusDetectiveWeb.Router do
     get("/", HomePageController, :index)
     resources("/search", SearchController, only: [:index])
   end
-
-  scope "/api", BusDetectiveWeb do
-    pipe_through(:api)
-
-    resources("/departures", DepartureController, only: [:index])
-    resources("/stops", StopController, only: [:index, :show])
-    resources("/trips", TripController, only: [:index])
-  end
 end
