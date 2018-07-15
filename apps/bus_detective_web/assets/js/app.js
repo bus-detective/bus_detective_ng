@@ -8,13 +8,13 @@ moment.relativeTimeThreshold('h', 24)
 moment.relativeTimeThreshold('m', 60)
 moment.relativeTimeThreshold('s', 60)
 
-var timestamps = document.querySelectorAll("[data-timestamp]")
+var timestamps = document.querySelectorAll('[data-timestamp]')
 
 var updateTimestamps = () => {
-  for(var i = 0 ; i < timestamps.length ; i++) {
+  for (var i = 0; i < timestamps.length; i++) {
     let element = timestamps[i]
     let timestamp = element.dataset['timestamp']
-    if(timestamp) {
+    if (timestamp) {
       element.innerText = moment(timestamp).fromNow()
     }
   }
@@ -23,15 +23,15 @@ var updateTimestamps = () => {
 
 updateTimestamps()
 
-for(var i = 0 ; i < timestamps.length ; i++) {
+for (var i = 0; i < timestamps.length; i++) {
   let element = timestamps[i]
   let timestamp = element.dataset['timestamp']
-  if(timestamp) {
+  if (timestamp) {
     element.innerText = moment(timestamp).fromNow()
   }
 }
 
-if(document.getElementById('stopMap')) {
+if (document.getElementById('stopMap')) {
   const TILE_URL = 'https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png'
 
   var mapElement = document.getElementById('stopMap')
@@ -42,7 +42,7 @@ if(document.getElementById('stopMap')) {
 
   var center = [mapElement.dataset['latitude'], mapElement.dataset['longitude']]
   map.setView(center, 16)
-  map.addLayer(Leaflet.tileLayer(TILE_URL, { detectRetina: true}))
-  var shapeLayer = Leaflet.layerGroup().addTo(map)
+  map.addLayer(Leaflet.tileLayer(TILE_URL, {detectRetina: true}))
+  Leaflet.layerGroup().addTo(map)
   Leaflet.marker(center).addTo(map)
 }
