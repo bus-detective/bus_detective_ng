@@ -9,10 +9,6 @@ defmodule BusDetectiveWeb.Router do
     plug(:put_secure_browser_headers)
   end
 
-  pipeline :api do
-    plug(:accepts, ["json"])
-  end
-
   scope "/", BusDetectiveWeb do
     pipe_through(:browser)
 
