@@ -8,7 +8,7 @@ defmodule Importer do
   import Ecto.Query
 
   alias BusDetective.GTFS
-  alias BusDetective.GTFS.{Agency, Interval, Route, Service, Shape, Stop, StopTime, Trip}
+  alias BusDetective.GTFS.{Agency, Interval, Route, Service, Shape, Stop, Trip}
   alias BusDetective.Repo
   alias Ecto.Type
   alias Importer.{ColorFunctions, StringFunctions}
@@ -372,61 +372,40 @@ defmodule Importer do
       |> Enum.map(& &1.end_date)
       |> Enum.max_by(&Date.to_erl/1)
 
-    service_dates = map_service_dates(services, %TimexInterval{from: start_date, until: end_date})
-
-    Enum.each(service_dates, fn {service, dates} ->
-      service
-      |> load_stop_times()
-      |> Stream.flat_map(fn stop_time ->
-        Enum.map(dates, fn date ->
-          %{
-            stop_time_id: stop_time.id,
-            scheduled_arrival_time: shift_stop_time(date, timezone, stop_time.arrival_time),
-            scheduled_departure_time: shift_stop_time(date, timezone, stop_time.departure_time),
-            inserted_at: Timex.now(),
-            updated_at: Timex.now()
-          }
-        end)
-      end)
-      |> Stream.chunk_every(1000)
-      |> Enum.reduce({0, []}, fn batch, {count, inserted} ->
-        {added, projected_stop_time_ids} = GTFS.bulk_create_projected_stop_times(batch)
-        {count + added, inserted ++ projected_stop_time_ids}
-      end)
-    end)
-  end
-
-  defp map_service_dates(services, interval) do
-    Enum.reduce(
-      interval,
-      %{},
-      fn date, acc ->
-        Enum.reduce(active_services(services, date), acc, fn service, acc ->
-          dates = Map.get(acc, service, [])
-          Map.put(acc, service, [date | dates])
-        end)
+    for date <- %TimexInterval{from: start_date, until: end_date} do
+      for service <- active_services(services, date) do
+        Logger.debug(fn -> "Adding projected stop times for #{service.id} on #{date}" end)
+        start_of_day = start_of_agency_day_utc(date, timezone)
+        {:ok, %{num_rows: num_rows}} = add_projected_stop_times_for_service_date(service, start_of_day)
+        Logger.debug(fn -> "Added #{num_rows}" end)
       end
-    )
+    end
   end
 
-  def shift_stop_time(date, timezone, interval) do
-    offset = interval |> Map.take([:hours, :minutes, :seconds]) |> Map.to_list()
-
-    date
-    |> start_of_agency_day(timezone)
-    |> Timex.shift(offset)
-    |> Timezone.convert(:utc)
-  end
-
-  defp load_stop_times(service) do
-    Repo.all(
-      from(
-        stop_time in StopTime,
-        join: trip in assoc(stop_time, :trip),
-        where: trip.service_id == ^service.id
-      ),
-      timeout: 60_000
+  defp add_projected_stop_times_for_service_date(service, start_of_day) do
+    query = """
+    INSERT INTO projected_stop_times
+    (
+      "stop_time_id",
+      "scheduled_arrival_time",
+      "scheduled_departure_time",
+      "inserted_at",
+      "updated_at"
     )
+    (
+      SELECT s0."id",
+             ($1 AT TIME ZONE 'UTC' + s0."arrival_time"),
+             ($2 AT TIME ZONE 'UTC' + s0."departure_time"),
+             now(),
+             now()
+      FROM "stop_times" AS s0
+      INNER JOIN "trips" AS t1 ON t1."id" = s0."trip_id"
+      WHERE (t1."service_id" = $3)
+    )
+    RETURNING id
+    """
+
+    Repo.query(query, [start_of_day, start_of_day, service.id], timeout: 60_000)
   end
 
   defp active_services(services, date) do
@@ -434,11 +413,13 @@ defmodule Importer do
     Enum.filter(services, fn service -> Service.weekday_schedule(service)[weekday_name] end)
   end
 
-  def start_of_agency_day(date, agency_timezone) do
+  def start_of_agency_day_utc(date, agency_timezone) do
     case NaiveDateTime.new(date, ~T[12:00:00]) do
       {:ok, naive_noon} ->
-        noon = Timex.to_datetime(naive_noon, agency_timezone)
-        Timex.shift(noon, hours: -12)
+        naive_noon
+        |> Timex.to_datetime(agency_timezone)
+        |> Timex.shift(hours: -12)
+        |> Timezone.convert(:utc)
 
       error ->
         error
