@@ -55,4 +55,16 @@ defmodule BusDetective.GTFS.Service do
       :end_date
     ])
   end
+
+  def weekday_schedule(%__MODULE__{} = service) do
+    %{
+      "Sunday" => service.sunday,
+      "Monday" => service.monday,
+      "Tuesday" => service.tuesday,
+      "Wednesday" => service.wednesday,
+      "Thursday" => service.thursday,
+      "Friday" => service.friday,
+      "Saturday" => service.saturday
+    }
+  end
 end

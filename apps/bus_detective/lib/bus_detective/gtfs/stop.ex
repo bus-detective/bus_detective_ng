@@ -4,7 +4,7 @@ defmodule BusDetective.GTFS.Stop do
   use Ecto.Schema
   import Ecto.Changeset
 
-  alias BusDetective.GTFS.{Agency, RouteStop}
+  alias BusDetective.GTFS.{Agency, RouteStop, StopTime}
 
   @direction_labels %{
     "i" => "inbound",
@@ -30,8 +30,9 @@ defmodule BusDetective.GTFS.Stop do
     field(:wheelchair_boarding, :integer)
     field(:zone_id, :integer)
 
-    has_many(:stops_routes, RouteStop, on_delete: :delete_all)
-    has_many(:routes, through: [:stops_routes, :route])
+    has_many(:stop_routes, RouteStop, on_delete: :delete_all)
+    has_many(:routes, through: [:stop_routes, :route])
+    has_many(:stop_times, StopTime, on_delete: :delete_all)
 
     timestamps()
   end
