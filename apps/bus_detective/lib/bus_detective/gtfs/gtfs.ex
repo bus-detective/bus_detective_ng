@@ -17,7 +17,8 @@ defmodule BusDetective.GTFS do
         where: stop_time.stop_id == ^stop_id,
         where: projected.scheduled_departure_time >= ^start_time,
         where: projected.scheduled_departure_time <= ^end_time,
-        order_by: [:scheduled_departure_time]
+        order_by: [:scheduled_departure_time],
+        preload: [stop_time: [trip: [:route, :shape]]]
       )
     )
   end
