@@ -2,12 +2,35 @@ defmodule BusDetective.GTFSTest do
   use BusDetective.DataCase
 
   alias BusDetective.GTFS
-  alias BusDetective.GTFS.{Agency, Service, Route, ServiceException, Shape, Stop, StopTime, Trip}
+  alias BusDetective.GTFS.{Agency, Service, Route, RouteStop, ServiceException, Shape, Stop, StopTime, Trip}
+  alias BusDetective.Repo
 
   test "create_agency/1" do
     params = %{name: name} = params_for(:agency)
 
     assert {:ok, %Agency{name: ^name}} = GTFS.create_agency(params)
+  end
+
+  test "destroy_agency/1" do
+    agency = insert(:agency)
+    service = insert(:service, agency: agency)
+    stop = insert(:stop, agency: agency)
+    route = insert(:route, agency: agency)
+    insert(:route_stop, route: route, stop: stop)
+    shape = insert(:shape, agency: agency)
+    trip = insert(:trip, agency: agency, route: route, service: service, shape: shape)
+    insert(:stop_time, agency: agency, stop: stop, trip: trip)
+
+    GTFS.destroy_agency(agency.remote_id)
+
+    assert 0 == Repo.aggregate(Agency, :count, :id)
+    assert 0 == Repo.aggregate(Service, :count, :id)
+    assert 0 == Repo.aggregate(Stop, :count, :id)
+    assert 0 == Repo.aggregate(Route, :count, :id)
+    assert 0 == Repo.aggregate(RouteStop, :count, :id)
+    assert 0 == Repo.aggregate(Shape, :count, :id)
+    assert 0 == Repo.aggregate(Trip, :count, :id)
+    assert 0 == Repo.aggregate(StopTime, :count, :id)
   end
 
   test "list_agencies/0" do

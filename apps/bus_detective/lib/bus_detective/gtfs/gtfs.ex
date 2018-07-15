@@ -96,7 +96,7 @@ defmodule BusDetective.GTFS do
   @doc """
   Deletes an agency by remote_id and all the related associations
   """
-  def destroy(remote_id) do
+  def destroy_agency(remote_id) do
     agency =
       Repo.one(
         from(

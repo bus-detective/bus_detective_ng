@@ -73,7 +73,7 @@ defmodule Importer do
     |> Enum.map(fn {:ok, raw_agency} ->
       remote_id = raw_agency["agency_id"]
 
-      GTFS.destroy(remote_id)
+      GTFS.destroy_agency(remote_id)
 
       agency = %{
         fare_url: raw_agency["agency_fare_url"],
