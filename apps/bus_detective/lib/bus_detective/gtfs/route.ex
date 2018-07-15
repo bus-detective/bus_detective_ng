@@ -18,6 +18,7 @@ defmodule BusDetective.GTFS.Route do
     field(:url, :string)
 
     has_many(:route_stops, RouteStop, on_delete: :delete_all)
+    has_many(:stops, through: [:route_stops, :stop])
     has_many(:trips, Trip, on_delete: :delete_all)
 
     timestamps()

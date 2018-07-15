@@ -8,7 +8,7 @@ defmodule Importer do
   alias BusDetective.GTFS
   alias BusDetective.GTFS.{Agency, Interval, Route, Service, Shape, Stop, Trip}
   alias Ecto.Type
-  alias Importer.{ColorFunctions, StringFunctions}
+  alias Importer.{ColorFunctions, ProjectedStopTimeImporter, StringFunctions}
 
   def import_from_url(url) do
     {:ok, tmp_file} = download_gtfs_file(url)
@@ -28,6 +28,7 @@ defmodule Importer do
       trips_map = import_trips(file_map["trips"], agency, routes_map, services_map, shapes_map)
       import_stop_times(file_map["stop_times"], agency, stops_map, trips_map)
       GTFS.update_route_stops()
+      ProjectedStopTimeImporter.project_stop_times(agency)
     else
       error -> error
     end

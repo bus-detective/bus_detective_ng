@@ -6,5 +6,7 @@ defmodule BusDetective.Repo.Migrations.CreateRoutesStops do
       add(:route_id, references(:routes, on_delete: :delete_all), null: false)
       add(:stop_id, references(:stops, on_delete: :delete_all), null: false)
     end
+
+    create(index(:routes_stops, [:route_id, :stop_id]))
   end
 end

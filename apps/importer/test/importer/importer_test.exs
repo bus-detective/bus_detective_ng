@@ -60,7 +60,7 @@ defmodule Importer.ImporterTest do
   test "it imports the correct number of service exceptions", %{gtfs_file: gtfs_file} do
     Importer.import_from_file(gtfs_file)
     [agency] = GTFS.list_agencies()
-    service = GTFS.get_service(agency, "2")
+    service = GTFS.get_service(agency, "1")
 
     assert 1 == length(GTFS.list_service_exceptions(agency, service))
   end
@@ -69,7 +69,7 @@ defmodule Importer.ImporterTest do
     Importer.import_from_file(gtfs_file)
 
     [agency] = GTFS.list_agencies()
-    service = GTFS.get_service(agency, "2")
+    service = GTFS.get_service(agency, "1")
     [service_exception] = GTFS.list_service_exceptions(agency, service)
 
     assert %ServiceException{
@@ -200,5 +200,52 @@ defmodule Importer.ImporterTest do
              arrival_time: %Interval{hours: 22, minutes: 10, seconds: 57},
              departure_time: %Interval{hours: 22, minutes: 10, seconds: 57}
            } = stop_time
+  end
+
+  describe "departure calculation" do
+    test "it calculates agency timezone stop times correctly", %{gtfs_file: gtfs_file} do
+      Importer.import_from_file(gtfs_file)
+      [agency] = GTFS.list_agencies()
+      stop = GTFS.get_stop(agency, "EZZLINw")
+      trip = GTFS.get_trip(agency, "955305")
+      stop_time = GTFS.get_stop_time(agency, stop, 2, trip)
+      {:ok, start_time} = Timex.parse("2015-06-06 22:01:00-04:00", "{ISO:Extended}")
+      {:ok, end_time} = Timex.parse("2015-06-06 23:01:00-04:00", "{ISO:Extended}")
+
+      result = GTFS.projected_stop_times_for_stop(stop, start_time, end_time)
+
+      assert 1 == Enum.count(result)
+      assert stop_time.id == Enum.at(result, 0).stop_time_id
+    end
+
+    test "it calculates utc stop times correctly", %{gtfs_file: gtfs_file} do
+      Importer.import_from_file(gtfs_file)
+      [agency] = GTFS.list_agencies()
+      stop = GTFS.get_stop(agency, "EZZLINw")
+      trip = GTFS.get_trip(agency, "955305")
+      stop_time = GTFS.get_stop_time(agency, stop, 2, trip)
+      {:ok, start_time} = Timex.parse("2015-06-07 02:01:00-0000", "{ISO:Extended}")
+      {:ok, end_time} = Timex.parse("2015-06-07 03:01:00-0000", "{ISO:Extended}")
+
+      result = GTFS.projected_stop_times_for_stop(stop, start_time, end_time)
+
+      assert 1 == Enum.count(result)
+      assert stop_time.id == Enum.at(result, 0).stop_time_id
+    end
+
+    test "it handles service exceptions correctly", %{gtfs_file: gtfs_file} do
+      Importer.import_from_file(gtfs_file)
+      [agency] = GTFS.list_agencies()
+      stop = GTFS.get_stop(agency, "EZZLINw")
+      trip = GTFS.get_trip(agency, "955305")
+      stop_time = GTFS.get_stop_time(agency, stop, 2, trip)
+      {:ok, start_time} = Timex.parse("2015-05-26 02:01:00-0000", "{ISO:Extended}")
+      {:ok, end_time} = Timex.parse("2015-05-26 03:01:00-0000", "{ISO:Extended}")
+
+      result = GTFS.projected_stop_times_for_stop(stop, start_time, end_time)
+
+      assert 1 == Enum.count(result)
+      assert stop_time.id == Enum.at(result, 0).stop_time_id
+    end
   end
 end

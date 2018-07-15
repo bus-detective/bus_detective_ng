@@ -4,16 +4,13 @@ defmodule BusDetective.GTFS.StopTime do
   use Ecto.Schema
   import Ecto.Changeset
 
-  alias BusDetective.GTFS.{Agency, Interval, Stop, Trip}
+  alias BusDetective.GTFS.{Agency, Interval, ProjectedStopTime, Stop, Trip}
 
   schema "stop_times" do
     belongs_to(:agency, Agency)
     belongs_to(:stop, Stop)
     belongs_to(:trip, Trip)
-    # Interval is not the right thing to use here, since it's months, days and secs
-    # we want hours, minutes, seconds
-    # keeping it in Interval format for the short term to maintain consistency with
-    # Rails BD.
+
     field(:arrival_time, Interval)
     field(:calculated_arrival_time, :utc_datetime, virtual: true)
     field(:calculated_departure_time, :utc_datetime, virtual: true)
@@ -23,6 +20,8 @@ defmodule BusDetective.GTFS.StopTime do
     field(:shape_dist_traveled, :float)
     field(:stop_headsign, :string)
     field(:stop_sequence, :integer)
+
+    has_many(:projected_stop_times, ProjectedStopTime, on_delete: :delete_all)
 
     timestamps()
   end
