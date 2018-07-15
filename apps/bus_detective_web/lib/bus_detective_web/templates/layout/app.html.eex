@@ -8,7 +8,7 @@
     <link type="image/x-icon" href="favicon-mustache.ico" rel="shortcut icon">
     <link rel="stylesheet" href="<%= static_path(@conn, "/css/app.css") %>">
   </head>
-  <body class="bg-primary">
+  <body class="">
     <%= render @view_module, @view_template, assigns %>
 
     <script src="<%= static_path(@conn, "/js/app.js") %>"></script>

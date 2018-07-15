@@ -17,7 +17,7 @@
           <div class="stop-item" data-test="stop_item">
             <div class="flex__container">
               <div class="flex__cell flex__cell--large">
-                <a href="#" class="unstyled">
+                <%= link to: stop_path(@conn, :show, stop.id), class: "unstyled" do %>
                   <button class="stop-item__toggle-favorite toggle-favorite ember-view"><i class="bd-icon bd-icon--heart-o"></i>
                   </button>
                   <h1 class="list-item__title"><%=  stop.name %><small class="light"><%= BusDetective.GTFS.Stop.direction(stop) %></small></h1>
@@ -26,7 +26,7 @@
                       <span class="tag" style="background-color: #<%= route.color %>; color: <%= route.text_color %>"><%= route.short_name %></span>
                     <% end %>
                   </div>
-                </a>
+                <% end %>
               </div>
             </div>
           </div>

@@ -1,0 +1,49 @@
+<div>
+  <div id="stopMap" class="map" data-latitude="<%= @stop.latitude %>" data-longitude="<%= @stop.longitude %>" data-shape="<%= map_shapes(@departures) %>"></div>
+
+  <div class="action-banner">
+    <!-- {{bd-back-button}} -->
+    <%= link "", to: home_page_path(@conn, :index), class: "button button--home" %>
+  </div>
+
+  <div class="detail-header">
+    <h1 class="detail-header__title qa-stop-name"><%= @stop.name %></h1>
+    <div class="detail-header__details">
+      <%= for route <- @stop.routes do %>
+        <span class="tag" style="background-color: <%= route.color %>; color: <%= route.text_color %>;">
+          <%= route.short_name %>
+        </span>
+      <% end %>
+    </div>
+  </div>
+
+  <div>
+    <div class="timeline">
+      <%= if Enum.empty?(@departures) do %>
+        <p class="text-center">No departures found</p>
+      <% else %>
+        <%= for departure <- @departures do %>
+          <div class="timeline__event event event--future" data-test="departure_item">
+            <div class="event__time"><%= departure_time(departure.time, @stop.agency.timezone) %></div>
+            <div class="event__event-details">
+              <div class="event__marker"></div>
+              <div>
+                <span class="tag" style="background-color: <%= departure.route.color %>; color: <%= departure.route.text_color %>;">
+                  <%= departure.route.short_name %>
+                </span>
+                <span class="event__relative-time">
+                  scheduled <span data-timestamp="<%= Timex.format!(departure.time, "{ISO:Extended}") %>"></span>
+                </span>
+                <p class="event__title"><%= departure.trip.headsign %></p>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="attribution">
+    <p>&copy; OpenStreetMap contributors, CC-BY-SA, Tiles courtesy of Humanitarian OpenStreetMap Team</p>
+  </div>
+</div>

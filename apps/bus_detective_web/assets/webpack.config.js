@@ -42,6 +42,16 @@ module.exports = {
             publicPath: '../fonts/'
           }
         }
+      }, {
+        test: /\.(png)$/,
+        use: {
+          loader: 'file-loader',
+          options: {
+            name: '[name].[ext]',
+            outputPath: '../images/',
+            publicPath: '../images/'
+          }
+        }
       }
     ]
   },

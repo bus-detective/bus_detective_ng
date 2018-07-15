@@ -1,7 +1,19 @@
 defmodule BusDetective.Factory do
   use ExMachina.Ecto, repo: BusDetective.Repo
 
-  alias BusDetective.GTFS.{Agency, Interval, Route, RouteStop, Service, ServiceException, Shape, Stop, StopTime, Trip}
+  alias BusDetective.GTFS.{
+    Agency,
+    Interval,
+    ProjectedStopTime,
+    Route,
+    RouteStop,
+    Service,
+    ServiceException,
+    Shape,
+    Stop,
+    StopTime,
+    Trip
+  }
 
   def agency_factory do
     %Agency{
@@ -23,8 +35,8 @@ defmodule BusDetective.Factory do
       friday: Enum.random([true, false]),
       saturday: Enum.random([true, false]),
       sunday: Enum.random([true, false]),
-      start_date: Timex.parse!("2000-01-01 00:00:00-0000", "{ISO:Extended}"),
-      end_date: Timex.parse!("3000-01-01 00:00:00-0000", "{ISO:Extended}")
+      start_date: Timex.shift(Timex.now(), days: -30),
+      end_date: Timex.shift(Timex.now(), days: 30)
     }
   end
 
@@ -93,6 +105,14 @@ defmodule BusDetective.Factory do
       shape_dist_traveled: stop_time_sequence * 0.5,
       arrival_time: %Interval{seconds: 56_000 + stop_time_sequence * 2},
       departure_time: %Interval{seconds: 56_000 + stop_time_sequence * 2 + 1}
+    }
+  end
+
+  def projected_stop_time_factory do
+    %ProjectedStopTime{
+      stop_time: build(:stop_time),
+      scheduled_arrival_time: Timex.now(),
+      scheduled_departure_time: Timex.now()
     }
   end
 
