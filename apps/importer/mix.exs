@@ -3,25 +3,31 @@ defmodule Importer.Mixfile do
 
   def project do
     [
+      aliases: aliases(Mix.env()),
       app: :importer,
-      version: "0.0.1",
       build_path: "../../_build",
       config_path: "../../config/config.exs",
-      deps_path: "../../deps",
-      lockfile: "../../mix.lock",
-      elixir: "~> 1.4",
-      elixirc_paths: elixirc_paths(Mix.env()),
-      start_permanent: Mix.env() == :prod,
-      aliases: aliases(Mix.env()),
       deps: deps(),
+      deps_path: "../../deps",
+      elixir: "~> 1.6",
+      elixirc_paths: elixirc_paths(Mix.env()),
+      lockfile: "../../mix.lock",
       preferred_cli_env: [
         coveralls: :test,
         "coveralls.detail": :test,
         "coveralls.travis": :test,
         "coveralls.html": :test
       ],
-      test_coverage: [tool: ExCoveralls]
+      start_permanent: Mix.env() == :prod,
+      test_coverage: [tool: ExCoveralls],
+      version: "0.0.1"
     ]
+  end
+
+  defp aliases(:dev), do: []
+
+  defp aliases(_) do
+    [compile: "compile --warnings-as-errors"]
   end
 
   # Configuration for the OTP application.
@@ -33,10 +39,6 @@ defmodule Importer.Mixfile do
       extra_applications: [:logger, :runtime_tools]
     ]
   end
-
-  # Specifies which paths to compile per environment.
-  defp elixirc_paths(:test), do: ["lib", "test/support"]
-  defp elixirc_paths(_), do: ["lib"]
 
   # Specifies your project dependencies.
   #
@@ -51,9 +53,7 @@ defmodule Importer.Mixfile do
     ]
   end
 
-  defp aliases(:dev), do: []
-
-  defp aliases(_) do
-    [compile: "compile --warnings-as-errors"]
-  end
+  # Specifies which paths to compile per environment.
+  defp elixirc_paths(:test), do: ["lib", "test/support"]
+  defp elixirc_paths(_), do: ["lib"]
 end

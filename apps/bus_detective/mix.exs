@@ -3,25 +3,33 @@ defmodule BusDetective.Mixfile do
 
   def project do
     [
+      aliases: aliases(Mix.env()),
       app: :bus_detective,
-      version: "0.0.1",
       build_path: "../../_build",
       config_path: "../../config/config.exs",
+      deps: deps(),
       deps_path: "../../deps",
-      lockfile: "../../mix.lock",
       elixir: "~> 1.4",
       elixirc_paths: elixirc_paths(Mix.env()),
-      start_permanent: Mix.env() == :prod,
-      aliases: aliases(Mix.env()),
-      deps: deps(),
+      lockfile: "../../mix.lock",
       preferred_cli_env: [
         coveralls: :test,
         "coveralls.detail": :test,
         "coveralls.travis": :test,
         "coveralls.html": :test
       ],
-      test_coverage: [tool: ExCoveralls]
+      start_permanent: Mix.env() == :prod,
+      test_coverage: [tool: ExCoveralls],
+      version: "0.0.1"
     ]
+  end
+
+  defp aliases(env) do
+    [
+      "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
+      "ecto.reset": ["ecto.drop", "ecto.setup"],
+      test: ["ecto.create --quiet", "ecto.migrate", "test"]
+    ] ++ env_aliases(env)
   end
 
   # Configuration for the OTP application.
@@ -33,10 +41,6 @@ defmodule BusDetective.Mixfile do
       extra_applications: [:logger, :runtime_tools]
     ]
   end
-
-  # Specifies which paths to compile per environment.
-  defp elixirc_paths(:test), do: ["lib", "test/support"]
-  defp elixirc_paths(_), do: ["lib"]
 
   # Specifies your project dependencies.
   #
@@ -53,13 +57,9 @@ defmodule BusDetective.Mixfile do
     ]
   end
 
-  defp aliases(env) do
-    [
-      "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
-      "ecto.reset": ["ecto.drop", "ecto.setup"],
-      test: ["ecto.create --quiet", "ecto.migrate", "test"]
-    ] ++ env_aliases(env)
-  end
+  # Specifies which paths to compile per environment.
+  defp elixirc_paths(:test), do: ["lib", "test/support"]
+  defp elixirc_paths(_), do: ["lib"]
 
   defp env_aliases(:dev), do: []
 
