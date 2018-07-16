@@ -405,6 +405,18 @@ defmodule BusDetective.GTFS do
   end
 
   @doc """
+  Gets trips with the given block_id
+  """
+  def get_trips_in_block(block_id) do
+    Repo.all(
+      from(
+        trip in Trip,
+        where: trip.block_id == ^block_id
+      )
+    )
+  end
+
+  @doc """
   Creates a trip.
   """
   def create_trip(attrs \\ %{}) do
