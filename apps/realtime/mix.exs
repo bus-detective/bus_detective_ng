@@ -39,7 +39,9 @@ defmodule Realtime.MixProject do
   end
 
   defp deps do
-    []
+    [
+      {:exprotobuf, "~> 1.2.9"}
+    ]
   end
 
   # Specifies which paths to compile per environment.
