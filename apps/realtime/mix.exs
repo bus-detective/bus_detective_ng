@@ -40,7 +40,6 @@ defmodule Realtime.MixProject do
 
   defp deps do
     [
-      {:bus_detective, in_umbrella: true},
       {:exprotobuf, "~> 1.2.9"},
       {:httpoison, "~> 0.12"}
     ]

@@ -3,42 +3,20 @@ defmodule Realtime.TripUpdates do
   This module contains the functions for processing a realtime feed's trip updates
   """
 
-  alias BusDetective.GTFS
-  alias BusDetective.GTFS.{StopTime, Trip}
   alias Realtime.Messages.{FeedEntity, FeedMessage, TripDescriptor, TripUpdate}
   alias Realtime.StopTimeUpdate
 
-  def find_stop_time(%FeedMessage{} = feed, %StopTime{trip: trip} = stop_time) do
-    with nil <- find_trip(feed, trip),
-         nil <- find_related_trip(feed, trip) do
+  def find_stop_time(%FeedMessage{} = feed, block_id, trip_remote_id, stop_sequence, fetch_related_trips_fn) do
+    with nil <- find_trip(feed, trip_remote_id),
+         nil <- find_related_trip(feed, block_id, fetch_related_trips_fn) do
       nil
     else
       %TripUpdate{} = trip_update ->
-        find_stop_time(trip_update, stop_time)
+        _find_stop_time(trip_update, trip_remote_id, stop_sequence)
     end
   end
 
-  def find_stop_time(%TripUpdate{trip: %TripDescriptor{trip_id: remote_id}} = trip_update, %StopTime{
-        trip: %Trip{remote_id: remote_id},
-        stop_sequence: stop_sequence
-      }) do
-    trip_update
-    |> Map.get(:stop_time_update)
-    |> Enum.filter(&(&1.stop_sequence <= stop_sequence))
-    |> Enum.sort_by(& &1.stop_sequence, &>=/2)
-    |> Enum.at(0)
-    |> StopTimeUpdate.from_message()
-  end
-
-  def find_stop_time(%TripUpdate{} = trip_update, _) do
-    trip_update
-    |> Map.get(:stop_time_update)
-    |> Enum.sort_by(& &1.stop_sequence, &>=/2)
-    |> Enum.at(0)
-    |> StopTimeUpdate.from_message()
-  end
-
-  def find_trip(%FeedMessage{} = feed, %Trip{remote_id: remote_id}) do
+  def find_trip(%FeedMessage{} = feed, remote_id) do
     feed
     |> Map.get(:entity)
     |> Enum.filter(fn
@@ -52,11 +30,8 @@ defmodule Realtime.TripUpdates do
     |> Enum.at(0)
   end
 
-  def find_related_trip(%FeedMessage{} = feed, %Trip{block_id: block_id}) do
-    trip_remote_ids =
-      block_id
-      |> GTFS.get_trips_in_block()
-      |> Enum.map(& &1.remote_id)
+  def find_related_trip(%FeedMessage{} = feed, block_id, fetch_related_trips_fn) do
+    trip_remote_ids = fetch_related_trips_fn.(block_id)
 
     feed
     |> Map.get(:entity)
@@ -70,41 +45,23 @@ defmodule Realtime.TripUpdates do
     |> Enum.map(& &1.trip_update)
     |> Enum.at(0)
   end
-end
 
-defmodule Realtime.StopTimeUpdate do
-  @moduledoc """
-  A flattened version of a StopTimeUpdate useful for overlaying on top of scheduled StopTimes
-  """
+  defp _find_stop_time(
+         %TripUpdate{stop_time_update: stop_time_updates, trip: %TripDescriptor{trip_id: trip_id}},
+         remote_trip_id,
+         stop_sequence
+       ) do
 
-  defstruct [:departure_time, :delay, :stop_id, :stop_sequence]
-
-  alias Realtime.Messages.TripUpdate.StopTimeUpdate, as: StopTimeUpdateMessage
-  alias Realtime.Messages.TripUpdate.StopTimeEvent
-
-  def from_message(%StopTimeUpdateMessage{} = message) do
-    with {:ok, departure} <- departure(message.arrival, message.departure),
-         {:ok, departure_time} <- departure_time(departure) do
-      %__MODULE__{
-        departure_time: departure_time,
-        delay: departure.delay,
-        stop_id: message.stop_id,
-        stop_sequence: message.stop_sequence
-      }
-    end
+    stop_time_updates
+    |> maybe_filter_stop_time_updates(stop_sequence, trip_id == remote_trip_id)
+    |> Enum.sort_by(& &1.stop_sequence, &>=/2)
+    |> Enum.at(0)
+    |> StopTimeUpdate.from_message()
   end
 
-  def from_message(_), do: nil
+  defp maybe_filter_stop_time_updates(stop_time_updates, _, false), do: stop_time_updates
 
-  defp departure(_, %StopTimeEvent{} = departure), do: {:ok, departure}
-
-  defp departure(arrival, nil), do: {:ok, arrival}
-
-  defp departure(_, _), do: {:error, :no_departure}
-
-  defp departure_time(nil), do: {:error, :no_departure_time}
-
-  defp departure_time(%StopTimeEvent{} = departure) do
-    DateTime.from_unix(departure.time)
+  defp maybe_filter_stop_time_updates(stop_time_updates, stop_sequence, true) do
+    Enum.filter(stop_time_updates, &(&1.stop_sequence <= stop_sequence))
   end
 end
