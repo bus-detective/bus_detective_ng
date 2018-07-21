@@ -8,11 +8,17 @@ defmodule Realtime.Application do
   alias Realtime.TripUpdates
 
   def start(_type, _args) do
-    children = [
-      TripUpdates.child_spec([])
-    ]
+    children =
+      realtime_feeds()
+      |> Enum.map(fn {agency_remote_id, %{trip_updates_url: trip_updates_url}} ->
+        TripUpdates.child_spec(agency: agency_remote_id, trip_updates_url: trip_updates_url, id: agency_remote_id)
+      end)
 
     opts = [strategy: :one_for_one, name: Realtime.Supervisor]
-    Supervisor.start_link(children, opts)
+    Supervisor.start_link([{Registry, keys: :unique, name: TripUpdates} | children], opts)
+  end
+
+  defp realtime_feeds do
+    Application.get_env(:realtime, :feeds)
   end
 end

@@ -11,34 +11,87 @@ defmodule Realtime.TripUpdates do
   alias Realtime.StopTimeUpdateFinder
 
   def start_link(args) do
-    GenServer.start_link(__MODULE__, args, name: __MODULE__)
+    feed_name = Keyword.get(args, :feed_name)
+    trip_updates_url = Keyword.get(args, :trip_updates_url)
+    name = via_tuple(feed_name)
+    Logger.info(fn -> "Starting TripUpdates realtime process for #{feed_name} using url: #{trip_updates_url}" end)
+    GenServer.start_link(__MODULE__, args, name: name)
+  end
+
+  def child_spec(args) do
+    %{
+      id: args[:id],
+      start: {__MODULE__, :start_link, [args]},
+      restart: :permanent,
+      shutdown: 5000,
+      type: :worker
+    }
+  end
+
+  def via_tuple(feed_name) do
+    {:via, Registry, {__MODULE__, feed_name}}
   end
 
   def init(args) do
     schedule_fetch(500)
-    {:ok, args}
+
+    {:ok,
+     %{
+       feed: args[:feed],
+       trip_updates_url: args[:trip_updates_url],
+       realtime_data: nil,
+       last_fetched: nil
+     }}
   end
 
-  def find_stop_time(block_id, trip_remote_id, stop_sequence, fetch_related_trips_fn) do
-    GenServer.call(__MODULE__, {:find_stop_time, block_id, trip_remote_id, stop_sequence, fetch_related_trips_fn})
+  def find_stop_time(feed_name, block_id, trip_remote_id, stop_sequence, fetch_related_trips_fn) do
+    GenServer.call(
+      via_tuple(feed_name),
+      {:find_stop_time, block_id, trip_remote_id, stop_sequence, fetch_related_trips_fn}
+    )
   end
 
-  def handle_call({:find_stop_time, block_id, trip_remote_id, stop_sequence, fetch_related_trips_fn}, _, feed) do
+  def handle_call({:find_stop_time, _, _, _, _}, _, state = %{realtime_data: nil}),
+    do: {:reply, {:error, :no_data}, state}
+
+  def handle_call(
+        {:find_stop_time, block_id, trip_remote_id, stop_sequence, fetch_related_trips_fn},
+        _,
+        state = %{realtime_data: realtime_data}
+      ) do
     stop_time_update =
-      StopTimeUpdateFinder.find_stop_time(feed, block_id, trip_remote_id, stop_sequence, fetch_related_trips_fn)
+      StopTimeUpdateFinder.find_stop_time(
+        realtime_data,
+        block_id,
+        trip_remote_id,
+        stop_sequence,
+        fetch_related_trips_fn
+      )
 
-    {:reply, {:ok, stop_time_update}, feed}
+    {:reply, {:ok, stop_time_update}, state}
   end
 
   def handle_info(:fetch_feed, state) do
-    case HTTPoison.get("http://developer.go-metro.com/TMGTFSRealTimeWebService/TripUpdate/TripUpdates.pb") do
+    Logger.info(fn -> "Updating realtime info for #{state.feed}" end)
+
+    case HTTPoison.get(state.trip_updates_url) do
       {:ok, response} ->
-        state = FeedMessage.decode(response.body)
+        state = %{state | realtime_data: FeedMessage.decode(response.body), last_fetched: Timex.now()}
+
+        Logger.info(fn ->
+          "Successfully refreshed realtime data for feed #{inspect(state.feed)} at #{inspect(state.last_fetched)}"
+        end)
+
         schedule_fetch(60_000)
         {:noreply, state}
 
       error ->
-        Logger.error(fn -> error end)
+        Logger.error(fn ->
+          "Failed to fetch realtime data for feed #{inspect(state.feed)} at #{inspect(Timex.now())}, error: #{
+            inspect(error)
+          }"
+        end)
+
         schedule_fetch(5_000)
         {:noreply, state}
     end

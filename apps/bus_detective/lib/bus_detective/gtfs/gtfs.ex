@@ -29,10 +29,14 @@ defmodule BusDetective.GTFS do
     |> projected_stop_times_for_stop(start_time, end_time)
     |> Enum.map(fn projected_stop_time ->
       %ProjectedStopTime{
-        stop_time: %StopTime{trip: %Trip{block_id: block_id, remote_id: trip_remote_id}, stop_sequence: stop_sequence}
+        stop_time: %StopTime{
+          feed: %Feed{name: feed_name},
+          trip: %Trip{block_id: block_id, remote_id: trip_remote_id},
+          stop_sequence: stop_sequence
+        }
       } = projected_stop_time
 
-      case TripUpdates.find_stop_time(block_id, trip_remote_id, stop_sequence, &fetch_related_trips/1) do
+      case TripUpdates.find_stop_time(feed_name, block_id, trip_remote_id, stop_sequence, &fetch_related_trips/1) do
         {:ok, %StopTimeUpdate{} = stop_time_update} ->
           %Departure{
             scheduled_time: projected_stop_time.scheduled_departure_time,
@@ -78,7 +82,7 @@ defmodule BusDetective.GTFS do
         where: projected.scheduled_departure_time >= ^start_time,
         where: projected.scheduled_departure_time <= ^end_time,
         order_by: [:scheduled_departure_time],
-        preload: [stop_time: [trip: [:shape, route: :agency]]]
+        preload: [stop_time: [:feed, trip: [:shape, route: :agency]]]
       )
     )
   end

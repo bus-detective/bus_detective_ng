@@ -10,7 +10,7 @@ defmodule Realtime.StopTimeUpdate do
   alias Realtime.Messages.TripUpdate.StopTimeUpdate, as: StopTimeUpdateMessage
 
   def from_message(%StopTimeUpdateMessage{} = message) do
-    with{:ok, departure_time} <- departure_time([message.arrival, message.departure]),
+    with {:ok, departure_time} <- departure_time([message.arrival, message.departure]),
          delay <- delay([message.arrival, message.departure]) do
       %__MODULE__{
         departure_time: departure_time,
@@ -26,7 +26,7 @@ defmodule Realtime.StopTimeUpdate do
   defp departure_time(arrival_and_departure) do
     arrival_and_departure
     |> Enum.filter(&(!is_nil(&1)))
-    |> Enum.map(&(&1.time))
+    |> Enum.map(& &1.time)
     |> Enum.max()
     |> DateTime.from_unix()
   end
@@ -34,7 +34,7 @@ defmodule Realtime.StopTimeUpdate do
   defp delay(arrival_and_departure) do
     arrival_and_departure
     |> Enum.filter(&(!is_nil(&1)))
-    |> Enum.map(&(&1.delay))
+    |> Enum.map(& &1.delay)
     |> Enum.max()
   end
 end
