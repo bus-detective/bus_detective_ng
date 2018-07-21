@@ -5,7 +5,7 @@
     <title>Bus Detective</title>
     <meta name="description" content="Find out exactly when your bus is coming. This free app gives you real-time arrival data for Cincinnati Metro buses. iPhone, Android and Web versions.">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <link type="image/x-icon" href="favicon-mustache.ico" rel="shortcut icon">
+    <link type="image/x-icon" href="<%= static_path(@conn, "/images/favicon-mustache.ico") %>" rel="shortcut icon">
     <link rel="stylesheet" href="<%= static_path(@conn, "/css/app.css") %>">
   </head>
   <body class="">
