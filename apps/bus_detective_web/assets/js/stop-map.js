@@ -1,5 +1,8 @@
 import Leaflet from 'leaflet';
 
+Leaflet.Control.Attribution.prototype.options.prefix = ' Leaflet';
+Leaflet.Icon.Default.imagePath = '/images/';
+
 class StopMap extends HTMLElement {
 
   get latitude() {
