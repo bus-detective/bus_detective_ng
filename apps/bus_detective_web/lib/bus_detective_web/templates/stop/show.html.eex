@@ -1,5 +1,6 @@
 <div>
-  <div id="stopMap" class="map" data-latitude="<%= @stop.latitude %>" data-longitude="<%= @stop.longitude %>" data-shape="<%= map_shapes(@departures) %>"></div>
+  <bd-stop-map latitude="<%= @stop.latitude %>" longitude="<%= @stop.longitude %>"></bd-stop-map>
+  <!-- div id="stopMap" class="map" data-latitude="<%= @stop.latitude %>" data-longitude="<%= @stop.longitude %>" data-shape="<%= map_shapes(@departures) %>"></div -->
 
   <div class="action-banner">
     <!-- {{bd-back-button}} -->
@@ -32,7 +33,7 @@
                   <%= departure.route.short_name %>
                 </span>
                 <span class="event__relative-time">
-                  scheduled <span data-timestamp="<%= Timex.format!(departure.time, "{ISO:Extended}") %>"></span>
+                  scheduled <bd-timestamp timestamp="<%= Timex.format!(departure.time, "{ISO:Extended}") %>"></bd-timestamp>
                 </span>
                 <p class="event__title"><%= departure.trip.headsign %></p>
               </div>
