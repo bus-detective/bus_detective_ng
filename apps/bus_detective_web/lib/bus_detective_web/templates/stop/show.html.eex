@@ -11,9 +11,7 @@
     <h1 class="detail-header__title qa-stop-name"><%= @stop.name %></h1>
     <div class="detail-header__details">
       <%= for route <- @stop.routes do %>
-        <span class="tag" style="background-color: <%= route.color %>; color: <%= route.text_color %>;">
-          <%= route.short_name %>
-        </span>
+        <bd-route bg-color="<%= route.color %>" color="<%= route.text_color %>" name="<%= route.short_name %>"></bd-route>
       <% end %>
     </div>
   </div>
@@ -29,9 +27,8 @@
             <div class="event__event-details">
               <div class="event__marker"></div>
               <div>
-                <span class="tag" style="background-color: <%= departure.route.color %>; color: <%= departure.route.text_color %>;">
-                  <%= departure.route.short_name %>
-                </span>
+                <bd-route bg-color="<%= departure.route.color %>" color="<%= departure.route.text_color %>" name="<%= departure.route.short_name %>"></bd-route>
+
                 <span class="event__relative-time">
                   scheduled <bd-timestamp timestamp="<%= Timex.format!(departure.time, "{ISO:Extended}") %>"></bd-timestamp>
                 </span>

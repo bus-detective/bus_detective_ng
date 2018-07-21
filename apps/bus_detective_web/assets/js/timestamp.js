@@ -15,6 +15,7 @@ class Timestamp extends HTMLElement {
   get displayedTimestamp() {
     return moment(this.timestamp).fromNow();
   }
+  
   connectedCallback() {
     const update = () => {
       this.innerHTML = this.displayedTimestamp;
