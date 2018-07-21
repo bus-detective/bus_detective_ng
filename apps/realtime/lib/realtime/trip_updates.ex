@@ -1,67 +1,50 @@
 defmodule Realtime.TripUpdates do
   @moduledoc """
-  This module contains the functions for processing a realtime feed's trip updates
+  Main entrypoint for realtime trip updates
   """
 
-  alias Realtime.Messages.{FeedEntity, FeedMessage, TripDescriptor, TripUpdate}
-  alias Realtime.StopTimeUpdate
+  use GenServer
 
-  def find_stop_time(%FeedMessage{} = feed, block_id, trip_remote_id, stop_sequence, fetch_related_trips_fn) do
-    with nil <- find_trip(feed, trip_remote_id),
-         nil <- find_related_trip(feed, block_id, fetch_related_trips_fn) do
-      nil
-    else
-      %TripUpdate{} = trip_update ->
-        _find_stop_time(trip_update, trip_remote_id, stop_sequence)
+  require Logger
+
+  alias Realtime.Messages.FeedMessage
+  alias Realtime.StopTimeUpdateFinder
+
+  def start_link(args) do
+    GenServer.start_link(__MODULE__, args, name: __MODULE__)
+  end
+
+  def init(args) do
+    schedule_fetch(500)
+    {:ok, args}
+  end
+
+  def find_stop_time(block_id, trip_remote_id, stop_sequence, fetch_related_trips_fn) do
+    GenServer.call(__MODULE__, {:find_stop_time, block_id, trip_remote_id, stop_sequence, fetch_related_trips_fn})
+  end
+
+  def handle_call({:find_stop_time, block_id, trip_remote_id, stop_sequence, fetch_related_trips_fn}, _, feed) do
+    stop_time_update =
+      StopTimeUpdateFinder.find_stop_time(feed, block_id, trip_remote_id, stop_sequence, fetch_related_trips_fn)
+
+    {:reply, {:ok, stop_time_update}, feed}
+  end
+
+  def handle_info(:fetch_feed, state) do
+    case HTTPoison.get("http://developer.go-metro.com/TMGTFSRealTimeWebService/TripUpdate/TripUpdates.pb") do
+      {:ok, response} ->
+        state = FeedMessage.decode(response.body)
+        schedule_fetch(60_000)
+        {:noreply, state}
+
+      error ->
+        Logger.error(fn -> error end)
+        schedule_fetch(5_000)
+        {:noreply, state}
     end
   end
 
-  def find_trip(%FeedMessage{} = feed, remote_id) do
-    feed
-    |> Map.get(:entity)
-    |> Enum.filter(fn
-      %FeedEntity{trip_update: %TripUpdate{trip: %TripDescriptor{trip_id: ^remote_id}}} ->
-        true
-
-      _ ->
-        false
-    end)
-    |> Enum.map(& &1.trip_update)
-    |> Enum.at(0)
-  end
-
-  def find_related_trip(%FeedMessage{} = feed, block_id, fetch_related_trips_fn) do
-    trip_remote_ids = fetch_related_trips_fn.(block_id)
-
-    feed
-    |> Map.get(:entity)
-    |> Enum.filter(fn
-      %FeedEntity{trip_update: %TripUpdate{trip: %TripDescriptor{trip_id: trip_id}}} ->
-        trip_id in trip_remote_ids
-
-      _ ->
-        false
-    end)
-    |> Enum.map(& &1.trip_update)
-    |> Enum.at(0)
-  end
-
-  defp _find_stop_time(
-         %TripUpdate{stop_time_update: stop_time_updates, trip: %TripDescriptor{trip_id: trip_id}},
-         remote_trip_id,
-         stop_sequence
-       ) do
-
-    stop_time_updates
-    |> maybe_filter_stop_time_updates(stop_sequence, trip_id == remote_trip_id)
-    |> Enum.sort_by(& &1.stop_sequence, &>=/2)
-    |> Enum.at(0)
-    |> StopTimeUpdate.from_message()
-  end
-
-  defp maybe_filter_stop_time_updates(stop_time_updates, _, false), do: stop_time_updates
-
-  defp maybe_filter_stop_time_updates(stop_time_updates, stop_sequence, true) do
-    Enum.filter(stop_time_updates, &(&1.stop_sequence <= stop_sequence))
+  defp schedule_fetch(time_ms) do
+    Process.send_after(self(), :fetch_feed, time_ms)
   end
 end

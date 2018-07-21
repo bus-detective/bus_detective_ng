@@ -52,6 +52,7 @@ defmodule BusDetective.Mixfile do
       {:ex_machina, "~> 2.2", only: [:dev, :test]},
       {:geo_postgis, "~> 2.0"},
       {:postgrex, ">= 0.0.0"},
+      {:realtime, in_umbrella: true},
       {:scrivener_ecto, "~> 1.0"},
       {:timex, "~> 3.1"}
     ]

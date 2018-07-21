@@ -1,8 +1,8 @@
-defmodule Realtime.TripUpdatesTest do
+defmodule Realtime.StopTimeUpdateFinderTest do
   use ExUnit.Case
 
   alias Realtime.Messages.FeedMessage
-  alias Realtime.TripUpdates
+  alias Realtime.StopTimeUpdateFinder
 
   setup do
     fixture = File.read!(Path.join(File.cwd!(), "test/fixtures/realtime_updates.buf"))
@@ -13,12 +13,12 @@ defmodule Realtime.TripUpdatesTest do
   describe "find_trip/1" do
     test "with a matching trip.remote_trip_id it returns the correct TripUpdate", %{feed: feed} do
       remote_trip_id = "940135"
-      assert remote_trip_id == TripUpdates.find_trip(feed, remote_trip_id).trip.trip_id
+      assert remote_trip_id == StopTimeUpdateFinder.find_trip(feed, remote_trip_id).trip.trip_id
     end
 
     test "with a non-matching trip.remote_trip_id it returns nil", %{feed: feed} do
       remote_trip_id = "999999"
-      assert is_nil(TripUpdates.find_trip(feed, remote_trip_id))
+      assert is_nil(StopTimeUpdateFinder.find_trip(feed, remote_trip_id))
     end
   end
 
@@ -33,24 +33,25 @@ defmodule Realtime.TripUpdatesTest do
 
     test "with a matching stop_time.trip.remote_trip_id, and stop_time.stop.remote.id, and stop_time.stop_sequence it returns a StopTimeUpdate for the stop_time",
          %{feed: feed, fetch_related_trips: fetch_related_trips} do
-      assert %{stop_id: "HAMBELi"} = TripUpdates.find_stop_time(feed, nil, "940135", 30, fetch_related_trips)
+      assert %{stop_id: "HAMBELi"} = StopTimeUpdateFinder.find_stop_time(feed, nil, "940135", 30, fetch_related_trips)
     end
 
     test "with stop_sequence after one of the given it interprets the delay as the delay from the previous stop_sequence",
          %{feed: feed, fetch_related_trips: fetch_related_trips} do
-      assert %{stop_sequence: 97, delay: 120} = TripUpdates.find_stop_time(feed, nil, "940135", 99, fetch_related_trips)
+      assert %{stop_sequence: 97, delay: 120} =
+               StopTimeUpdateFinder.find_stop_time(feed, nil, "940135", 99, fetch_related_trips)
     end
 
     test "with stop from a different trip with the same block number it interprets the delay as the delay from the last stop_sequence of the previous trip on the block",
          %{feed: feed, fetch_related_trips: fetch_related_trips} do
       assert %{stop_sequence: 97, delay: 120} =
-               TripUpdates.find_stop_time(feed, "12345", "940136", 1, fetch_related_trips)
+               StopTimeUpdateFinder.find_stop_time(feed, "12345", "940136", 1, fetch_related_trips)
     end
 
     test "with a non-matching stop_time it returns nil", %{feed: feed} do
       fetch_related_trips = fn _ -> [] end
 
-      assert is_nil(TripUpdates.find_stop_time(feed, "99999", "11111", 42, fetch_related_trips))
+      assert is_nil(StopTimeUpdateFinder.find_stop_time(feed, "99999", "11111", 42, fetch_related_trips))
     end
   end
 end

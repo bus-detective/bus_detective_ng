@@ -7,6 +7,7 @@ defmodule BusDetective.GTFS do
 
   alias BusDetective.GTFS.{
     Agency,
+    Departure,
     Feed,
     ProjectedStopTime,
     Route,
@@ -21,6 +22,52 @@ defmodule BusDetective.GTFS do
 
   alias BusDetective.Repo
   alias Ecto.Adapters.SQL
+  alias Realtime.{StopTimeUpdate, TripUpdates}
+
+  def departures_for_stop(stop, start_time, end_time) do
+    stop
+    |> projected_stop_times_for_stop(start_time, end_time)
+    |> Enum.map(fn projected_stop_time ->
+      %ProjectedStopTime{
+        stop_time: %StopTime{trip: %Trip{block_id: block_id, remote_id: trip_remote_id}, stop_sequence: stop_sequence}
+      } = projected_stop_time
+
+      case TripUpdates.find_stop_time(block_id, trip_remote_id, stop_sequence, &fetch_related_trips/1) do
+        {:ok, %StopTimeUpdate{} = stop_time_update} ->
+          %Departure{
+            scheduled_time: projected_stop_time.scheduled_departure_time,
+            time: stop_time_update.departure_time,
+            realtime?: true,
+            delay: stop_time_update.delay,
+            trip: projected_stop_time.stop_time.trip,
+            route: projected_stop_time.stop_time.trip.route,
+            agency: projected_stop_time.stop_time.trip.route.agency
+          }
+
+        _ ->
+          %Departure{
+            scheduled_time: projected_stop_time.scheduled_departure_time,
+            time: projected_stop_time.scheduled_departure_time,
+            realtime?: false,
+            delay: 0,
+            trip: projected_stop_time.stop_time.trip,
+            route: projected_stop_time.stop_time.trip.route,
+            agency: projected_stop_time.stop_time.trip.route.agency
+          }
+      end
+    end)
+    |> Enum.sort_by(&Timex.to_erl(&1.time))
+  end
+
+  def fetch_related_trips(block_id) do
+    Repo.all(
+      from(
+        trip in Trip,
+        where: trip.block_id == ^block_id,
+        select: trip.remote_id
+      )
+    )
+  end
 
   def projected_stop_times_for_stop(%Stop{id: stop_id}, %DateTime{} = start_time, %DateTime{} = end_time) do
     Repo.all(
