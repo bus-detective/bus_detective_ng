@@ -7,6 +7,7 @@ services:
 - postgresql
 addons:
   postgresql: '9.5'
+  chrome: stable
 install:
 - sudo apt-get install -y postgresql-9.5-postgis-2.3
 - sudo service postgresql restart
