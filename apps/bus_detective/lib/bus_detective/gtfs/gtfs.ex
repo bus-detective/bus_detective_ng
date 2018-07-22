@@ -5,6 +5,8 @@ defmodule BusDetective.GTFS do
 
   import Ecto.Query, warn: false
 
+  require Logger
+
   alias BusDetective.GTFS.{
     Agency,
     Departure,
