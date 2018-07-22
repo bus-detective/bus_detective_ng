@@ -8,4 +8,6 @@ config :bus_detective_web, BusDetectiveWeb.Endpoint,
 
 config :bus_detective, :sql_sandbox, true
 
-config :wallaby, screenshot_on_failure: true
+config :wallaby,
+  driver: Wallaby.Experimental.Chrome,
+  screenshot_on_failure: true
