@@ -21,5 +21,6 @@ defmodule BusDetective.GTFS.Shape do
     shape
     |> cast(attrs, [:agency_id, :remote_id, :geometry])
     |> validate_required([:agency_id, :remote_id, :geometry])
+    |> unique_constraint(:remote_id, name: :shapes_agency_id_remote_id_index)
   end
 end

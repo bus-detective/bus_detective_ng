@@ -17,6 +17,6 @@ defmodule BusDetective.Repo.Migrations.CreateRoutes do
     end
 
     create(index(:routes, :agency_id))
-    create(index(:routes, [:remote_id, :agency_id]))
+    create(unique_index(:routes, [:agency_id, :remote_id]))
   end
 end

@@ -11,5 +11,6 @@ defmodule BusDetective.Repo.Migrations.CreateShapes do
     end
 
     create(index(:shapes, :agency_id))
+    create(unique_index(:shapes, [:agency_id, :remote_id]))
   end
 end

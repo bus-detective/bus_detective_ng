@@ -44,5 +44,6 @@ defmodule BusDetective.GTFS.Agency do
       :gtfs_service_alerts_url
     ])
     |> validate_required([:name, :url, :timezone])
+    |> unique_constraint(:remote_id, name: :agencies_remote_id_index)
   end
 end

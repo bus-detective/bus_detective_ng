@@ -6,13 +6,22 @@ defmodule Importer.ImporterTest do
 
   setup do
     gtfs_file = Path.join(File.cwd!(), "test/fixtures/google_transit_info.zip")
-    {:ok, gtfs_file: gtfs_file}
+    updated_gtfs_file = Path.join(File.cwd!(), "test/fixtures/updated_google_transit_info.zip")
+    {:ok, gtfs_file: gtfs_file, updated_gtfs_file: updated_gtfs_file}
   end
 
   test "it imports the correct number of agencies", %{gtfs_file: gtfs_file} do
     Importer.import_from_file(gtfs_file)
 
     assert 1 == length(GTFS.list_agencies())
+  end
+
+  test "it upserts the agency on subsequent import", %{gtfs_file: gtfs_file, updated_gtfs_file: updated_gtfs_file} do
+    Importer.import_from_file(gtfs_file)
+    [%Agency{id: id}] = GTFS.list_agencies()
+
+    Importer.import_from_file(updated_gtfs_file)
+    assert [%Agency{id: ^id, name: "Updated"}] = GTFS.list_agencies()
   end
 
   test "it imports the agency correctly", %{gtfs_file: gtfs_file} do
@@ -36,6 +45,16 @@ defmodule Importer.ImporterTest do
     [agency] = GTFS.list_agencies()
 
     assert 3 == length(GTFS.list_services(agency))
+  end
+
+  test "it upserts the services on subsequent import", %{gtfs_file: gtfs_file, updated_gtfs_file: updated_gtfs_file} do
+    Importer.import_from_file(gtfs_file)
+    [agency] = GTFS.list_agencies()
+    %Service{id: id, monday: false} = GTFS.get_service(agency, "1")
+
+    Importer.import_from_file(updated_gtfs_file)
+    [agency] = GTFS.list_agencies()
+    assert %Service{id: ^id, monday: true} = GTFS.get_service(agency, "1")
   end
 
   test "it imports a service correctly", %{gtfs_file: gtfs_file} do
@@ -65,6 +84,15 @@ defmodule Importer.ImporterTest do
     assert 1 == length(GTFS.list_service_exceptions(agency, service))
   end
 
+  test "it re-imports the correct number of service exceptions on subsequent import", %{gtfs_file: gtfs_file, updated_gtfs_file: updated_gtfs_file} do
+    Importer.import_from_file(gtfs_file)
+    Importer.import_from_file(updated_gtfs_file)
+    [agency] = GTFS.list_agencies()
+    service = GTFS.get_service(agency, "1")
+
+    assert 1 == length(GTFS.list_service_exceptions(agency, service))
+  end
+
   test "it imports a service exception correctly", %{gtfs_file: gtfs_file} do
     Importer.import_from_file(gtfs_file)
 
@@ -83,6 +111,16 @@ defmodule Importer.ImporterTest do
     [agency] = GTFS.list_agencies()
 
     assert 10 == length(GTFS.list_routes(agency))
+  end
+
+  test "it upserts the routes on subsequent import", %{gtfs_file: gtfs_file, updated_gtfs_file: updated_gtfs_file} do
+    Importer.import_from_file(gtfs_file)
+    [agency] = GTFS.list_agencies()
+    %Route{id: id} = GTFS.get_route(agency, "1")
+
+    Importer.import_from_file(updated_gtfs_file)
+    [agency] = GTFS.list_agencies()
+    assert %Route{id: ^id, long_name: "Updated"} = GTFS.get_route(agency, "1")
   end
 
   test "it imports a route correctly", %{gtfs_file: gtfs_file} do
@@ -107,6 +145,16 @@ defmodule Importer.ImporterTest do
     assert 10 == length(GTFS.list_stops(agency))
   end
 
+  test "it upserts the stops on subsequent import", %{gtfs_file: gtfs_file, updated_gtfs_file: updated_gtfs_file} do
+    Importer.import_from_file(gtfs_file)
+    [agency] = GTFS.list_agencies()
+    %Stop{id: id} = GTFS.get_stop(agency, "EZZLINe")
+
+    Importer.import_from_file(updated_gtfs_file)
+    [agency] = GTFS.list_agencies()
+    assert %Stop{id: ^id, name: "Updated"} = GTFS.get_stop(agency, "EZZLINe")
+  end
+
   test "it imports a stop correctly", %{gtfs_file: gtfs_file} do
     Importer.import_from_file(gtfs_file)
 
@@ -126,6 +174,16 @@ defmodule Importer.ImporterTest do
     [agency] = GTFS.list_agencies()
 
     assert 1 == length(GTFS.list_shapes(agency))
+  end
+
+  test "it upserts the shapes on subsequent import", %{gtfs_file: gtfs_file, updated_gtfs_file: updated_gtfs_file} do
+    Importer.import_from_file(gtfs_file)
+    [agency] = GTFS.list_agencies()
+    %Shape{id: id} = GTFS.get_shape(agency, "83146")
+
+    Importer.import_from_file(updated_gtfs_file)
+    [agency] = GTFS.list_agencies()
+    assert %Shape{id: ^id} = GTFS.get_shape(agency, "83146")
   end
 
   test "it imports a shape correctly", %{gtfs_file: gtfs_file} do
@@ -160,6 +218,16 @@ defmodule Importer.ImporterTest do
     assert 10 == length(GTFS.list_trips(agency))
   end
 
+  test "it upserts the trips on subsequent import", %{gtfs_file: gtfs_file, updated_gtfs_file: updated_gtfs_file} do
+    Importer.import_from_file(gtfs_file)
+    [agency] = GTFS.list_agencies()
+    %Trip{id: id} = GTFS.get_trip(agency, "955305")
+
+    Importer.import_from_file(updated_gtfs_file)
+    [agency] = GTFS.list_agencies()
+    assert %Trip{id: ^id, headsign: "Updated"} = GTFS.get_trip(agency, "955305")
+  end
+
   test "it imports a trip correctly", %{gtfs_file: gtfs_file} do
     Importer.import_from_file(gtfs_file)
 
@@ -181,6 +249,14 @@ defmodule Importer.ImporterTest do
 
   test "it imports the correct number of stop times", %{gtfs_file: gtfs_file} do
     Importer.import_from_file(gtfs_file)
+    [agency] = GTFS.list_agencies()
+
+    assert 10 == length(GTFS.list_stop_times(agency))
+  end
+
+  test "it re-imports the correct number of stop times on subsequent import", %{gtfs_file: gtfs_file, updated_gtfs_file: updated_gtfs_file} do
+    Importer.import_from_file(gtfs_file)
+    Importer.import_from_file(updated_gtfs_file)
     [agency] = GTFS.list_agencies()
 
     assert 10 == length(GTFS.list_stop_times(agency))

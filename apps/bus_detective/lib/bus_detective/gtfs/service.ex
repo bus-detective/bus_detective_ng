@@ -54,6 +54,7 @@ defmodule BusDetective.GTFS.Service do
       :start_date,
       :end_date
     ])
+    |> unique_constraint(:remote_id, name: :services_agency_id_remote_id_index)
   end
 
   def weekday_schedule(%__MODULE__{} = service) do

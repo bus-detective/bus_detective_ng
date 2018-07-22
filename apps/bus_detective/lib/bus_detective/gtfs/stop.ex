@@ -62,6 +62,7 @@ defmodule BusDetective.GTFS.Stop do
       :latitude,
       :longitude
     ])
+    |> unique_constraint(:remote_id, name: :stops_agency_id_remote_id_index)
   end
 
   def direction(%__MODULE__{remote_id: remote_id}) do

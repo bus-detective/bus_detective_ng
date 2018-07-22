@@ -45,5 +45,6 @@ defmodule BusDetective.GTFS.Route do
       :long_name,
       :route_type
     ])
+    |> unique_constraint(:remote_id, name: :routes_agency_id_remote_id_index)
   end
 end

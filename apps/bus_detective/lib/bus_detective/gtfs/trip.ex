@@ -44,5 +44,6 @@ defmodule BusDetective.GTFS.Trip do
       :route_id,
       :remote_id
     ])
+    |> unique_constraint(:remote_id, name: :trips_agency_id_remote_id_index)
   end
 end

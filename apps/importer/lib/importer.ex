@@ -18,17 +18,20 @@ defmodule Importer do
   def import_from_file(file) do
     with {:ok, tmp_path} <- Briefly.create(directory: true),
          {:ok, file_map} <- unzip_gtfs_file(file, tmp_path) do
-      [agency] = import_agencies(file_map["agency"])
-
-      services_map = import_services(file_map["calendar"], agency)
-      import_service_exceptions(file_map["calendar_dates"], agency, services_map)
-      routes_map = import_routes(file_map["routes"], agency)
-      stops_map = import_stops(file_map["stops"], agency)
-      shapes_map = import_shapes(file_map["shapes"], agency)
-      trips_map = import_trips(file_map["trips"], agency, routes_map, services_map, shapes_map)
-      import_stop_times(file_map["stop_times"], agency, stops_map, trips_map)
-      GTFS.update_route_stops()
-      ProjectedStopTimeImporter.project_stop_times(agency)
+      file_map["agency"]
+      |> import_agencies()
+      |> Enum.each(fn agency ->
+        delete_data(agency)
+        services_map = import_services(file_map["calendar"], agency)
+        import_service_exceptions(file_map["calendar_dates"], agency, services_map)
+        routes_map = import_routes(file_map["routes"], agency)
+        stops_map = import_stops(file_map["stops"], agency)
+        shapes_map = import_shapes(file_map["shapes"], agency)
+        trips_map = import_trips(file_map["trips"], agency, routes_map, services_map, shapes_map)
+        import_stop_times(file_map["stop_times"], agency, stops_map, trips_map)
+        GTFS.update_route_stops(agency)
+        ProjectedStopTimeImporter.project_stop_times(agency)
+      end)
     else
       error -> error
     end
@@ -65,6 +68,17 @@ defmodule Importer do
     end
   end
 
+  defp delete_data(agency) do
+    Logger.info(fn -> "Start deleting transient and calculated data for #{agency.remote_id}" end)
+    Logger.debug(fn -> "Deleting service exceptions for #{agency.remote_id}" end)
+    GTFS.destroy_service_exceptions_for_agency(agency)
+    Logger.debug(fn -> "Deleting stop times for #{agency.remote_id}" end)
+    GTFS.destroy_stop_times_for_agency(agency)
+    Logger.debug(fn -> "Deleting route stops for #{agency.remote_id}" end)
+    GTFS.destroy_route_stops_for_agency(agency)
+    Logger.info(fn -> "Done deleting transient and calculated data for #{agency.remote_id}" end)
+  end
+
   def import_agencies(file) do
     Logger.info("Importing agencies")
 
@@ -74,9 +88,7 @@ defmodule Importer do
     |> Enum.map(fn {:ok, raw_agency} ->
       remote_id = raw_agency["agency_id"]
 
-      GTFS.destroy_agency(remote_id)
-
-      agency = %{
+      changeset = %{
         fare_url: raw_agency["agency_fare_url"],
         remote_id: remote_id,
         language: raw_agency["agency_lang"],
@@ -86,7 +98,15 @@ defmodule Importer do
         url: raw_agency["agency_url"]
       }
 
-      {:ok, agency = %Agency{}} = GTFS.create_agency(agency)
+      {:ok, agency} =
+        case GTFS.get_agency_by_remote_id(remote_id) do
+          nil ->
+            GTFS.create_agency(changeset)
+
+          %Agency{} = agency ->
+            GTFS.update_agency(agency, changeset)
+        end
+
       agency
     end)
   end

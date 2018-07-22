@@ -18,6 +18,6 @@ defmodule BusDetective.Repo.Migrations.CreateAgencies do
       timestamps()
     end
 
-    create(index(:agencies, :remote_id))
+    create(unique_index(:agencies, :remote_id))
   end
 end
