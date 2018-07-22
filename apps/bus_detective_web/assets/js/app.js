@@ -1,6 +1,7 @@
-import '../css/app.scss'
+/* global customElements */
+import '../css/app.scss';
 
-import StopMap from './stop-map.js'
+import StopMap from './stop-map.js';
 import Route from './route.js';
 import Timestamp from './timestamp.js';
 
