@@ -13,7 +13,7 @@ defmodule Importer.ProjectedStopTimeImporter do
   alias Timex.Timezone
   alias Timex.Interval, as: TimexInterval
 
-  def project_stop_times(%Agency{id: agency_id, timezone: tz}) do
+  def project_stop_times(%Agency{id: agency_id, timezone: tz}, opts \\ []) do
     Logger.info("Projecting stop times")
     timezone = Timezone.get(tz)
 
@@ -25,15 +25,8 @@ defmodule Importer.ProjectedStopTimeImporter do
         )
       )
 
-    start_date =
-      services
-      |> Enum.map(& &1.start_date)
-      |> Enum.min_by(&Date.to_erl/1)
-
-    end_date =
-      services
-      |> Enum.map(& &1.end_date)
-      |> Enum.max_by(&Date.to_erl/1)
+    start_date = Keyword.get(opts, :start_date, Timex.now() |> Timex.shift(days: -1) |> Timex.to_date())
+    end_date = Keyword.get(opts, :end_date, Timex.now() |> Timex.shift(days: 2) |> Timex.to_date())
 
     service_exceptions =
       Repo.all(

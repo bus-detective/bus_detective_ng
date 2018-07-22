@@ -10,12 +10,12 @@ defmodule Importer do
   alias Ecto.Type
   alias Importer.{ColorFunctions, ProjectedStopTimeImporter, StringFunctions}
 
-  def import_from_url(url) do
+  def import_from_url(url, opts \\ []) do
     {:ok, tmp_file} = download_gtfs_file(url)
-    import_from_file(tmp_file)
+    import_from_file(tmp_file, opts)
   end
 
-  def import_from_file(file) do
+  def import_from_file(file, opts \\ []) do
     with {:ok, tmp_path} <- Briefly.create(directory: true),
          {:ok, file_map} <- unzip_gtfs_file(file, tmp_path) do
       file_map["agency"]
@@ -30,7 +30,7 @@ defmodule Importer do
         trips_map = import_trips(file_map["trips"], agency, routes_map, services_map, shapes_map)
         import_stop_times(file_map["stop_times"], agency, stops_map, trips_map)
         GTFS.update_route_stops(agency)
-        ProjectedStopTimeImporter.project_stop_times(agency)
+        ProjectedStopTimeImporter.project_stop_times(agency, opts)
       end)
     else
       error -> error

@@ -286,13 +286,19 @@ defmodule Importer.ImporterTest do
 
   describe "departure calculation" do
     test "it calculates agency timezone stop times correctly", %{gtfs_file: gtfs_file} do
-      Importer.import_from_file(gtfs_file)
+      {:ok, start_time} = Timex.parse("2015-06-06 22:01:00-04:00", "{ISO:Extended}")
+      {:ok, end_time} = Timex.parse("2015-06-06 23:01:00-04:00", "{ISO:Extended}")
+
+      Importer.import_from_file(
+        gtfs_file,
+        start_date: Timex.to_date(Timex.shift(start_time, days: -1)),
+        start_date: Timex.to_date(Timex.shift(end_time, days: 1))
+      )
+
       [agency] = GTFS.list_agencies()
       stop = GTFS.get_stop(agency, "EZZLINw")
       trip = GTFS.get_trip(agency, "955305")
       stop_time = GTFS.get_stop_time(agency, stop, 2, trip)
-      {:ok, start_time} = Timex.parse("2015-06-06 22:01:00-04:00", "{ISO:Extended}")
-      {:ok, end_time} = Timex.parse("2015-06-06 23:01:00-04:00", "{ISO:Extended}")
 
       result = GTFS.projected_stop_times_for_stop(stop, start_time, end_time)
 
@@ -301,13 +307,19 @@ defmodule Importer.ImporterTest do
     end
 
     test "it calculates utc stop times correctly", %{gtfs_file: gtfs_file} do
-      Importer.import_from_file(gtfs_file)
+      {:ok, start_time} = Timex.parse("2015-06-07 02:01:00-0000", "{ISO:Extended}")
+      {:ok, end_time} = Timex.parse("2015-06-07 03:01:00-0000", "{ISO:Extended}")
+
+      Importer.import_from_file(
+        gtfs_file,
+        start_date: Timex.to_date(Timex.shift(start_time, days: -1)),
+        start_date: Timex.to_date(Timex.shift(end_time, days: 1))
+      )
+
       [agency] = GTFS.list_agencies()
       stop = GTFS.get_stop(agency, "EZZLINw")
       trip = GTFS.get_trip(agency, "955305")
       stop_time = GTFS.get_stop_time(agency, stop, 2, trip)
-      {:ok, start_time} = Timex.parse("2015-06-07 02:01:00-0000", "{ISO:Extended}")
-      {:ok, end_time} = Timex.parse("2015-06-07 03:01:00-0000", "{ISO:Extended}")
 
       result = GTFS.projected_stop_times_for_stop(stop, start_time, end_time)
 
@@ -316,13 +328,19 @@ defmodule Importer.ImporterTest do
     end
 
     test "it handles service exceptions correctly", %{gtfs_file: gtfs_file} do
-      Importer.import_from_file(gtfs_file)
+      {:ok, start_time} = Timex.parse("2015-05-26 02:01:00-0000", "{ISO:Extended}")
+      {:ok, end_time} = Timex.parse("2015-05-26 03:01:00-0000", "{ISO:Extended}")
+
+      Importer.import_from_file(
+        gtfs_file,
+        start_date: Timex.to_date(Timex.shift(start_time, days: -1)),
+        start_date: Timex.to_date(Timex.shift(end_time, days: 1))
+      )
+
       [agency] = GTFS.list_agencies()
       stop = GTFS.get_stop(agency, "EZZLINw")
       trip = GTFS.get_trip(agency, "955305")
       stop_time = GTFS.get_stop_time(agency, stop, 2, trip)
-      {:ok, start_time} = Timex.parse("2015-05-26 02:01:00-0000", "{ISO:Extended}")
-      {:ok, end_time} = Timex.parse("2015-05-26 03:01:00-0000", "{ISO:Extended}")
 
       result = GTFS.projected_stop_times_for_stop(stop, start_time, end_time)
 
