@@ -19,6 +19,7 @@ script:
 - cd $TRAVIS_BUILD_DIR/apps/bus_detective_web/assets && npm install
 - cd $TRAVIS_BUILD_DIR/apps/bus_detective_web/assets && ./node_modules/.bin/eslint js/**/*.js
 - cd $TRAVIS_BUILD_DIR/apps/bus_detective_web/assets && node node_modules/webpack/bin/webpack.js --mode development
+- cd $TRAVIS_BUILD_DIR
 deploy:
   provider: heroku
   api_key:
