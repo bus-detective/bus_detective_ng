@@ -22,12 +22,17 @@ defmodule Importer do
       |> import_agencies()
       |> Enum.each(fn agency ->
         delete_data(agency)
-        services_map = import_services(file_map["calendar"], agency)
+
+        services_task = Task.async(fn -> import_services(file_map["calendar"], agency) end)
+        routes_task = Task.async(fn -> import_routes(file_map["routes"], agency) end)
+        stops_task = Task.async(fn -> import_stops(file_map["stops"], agency) end)
+        shapes_task = Task.async(fn -> import_shapes(file_map["shapes"], agency) end)
+        services_map = Task.await(services_task, 300_000)
         import_service_exceptions(file_map["calendar_dates"], agency, services_map)
-        routes_map = import_routes(file_map["routes"], agency)
-        stops_map = import_stops(file_map["stops"], agency)
-        shapes_map = import_shapes(file_map["shapes"], agency)
+        routes_map = Task.await(routes_task, 300_000)
+        shapes_map = Task.await(shapes_task, 300_000)
         trips_map = import_trips(file_map["trips"], agency, routes_map, services_map, shapes_map)
+        stops_map = Task.await(stops_task, 300_000)
         import_stop_times(file_map["stop_times"], agency, stops_map, trips_map)
         GTFS.update_route_stops(agency)
         ProjectedStopTimeImporter.project_stop_times(agency, opts)
@@ -114,7 +119,7 @@ defmodule Importer do
   def import_services(file, %Agency{id: agency_id}) do
     Logger.info("Importing services")
 
-    {_services_count, services} =
+    {services_count, services} =
       file
       |> File.stream!()
       |> CSV.decode(headers: true, strip_fields: true)
@@ -147,6 +152,8 @@ defmodule Importer do
       end)
       |> GTFS.bulk_create_services()
 
+    Logger.info("Done importing #{services_count} services")
+
     Enum.reduce(services, %{}, fn %Service{id: id, remote_id: remote_id, agency_id: agency_id}, acc ->
       Map.put(acc, {agency_id, remote_id}, id)
     end)
@@ -155,30 +162,36 @@ defmodule Importer do
   def import_service_exceptions(file, %Agency{id: agency_id}, services_map) do
     Logger.info("Importing service exceptions")
 
-    file
-    |> File.stream!()
-    |> CSV.decode(headers: true, strip_fields: true)
-    |> Enum.map(fn {:ok, raw_service_exception} ->
-      service_id = services_map[{agency_id, raw_service_exception["service_id"]}]
-      date = raw_service_exception["date"] |> Timex.parse!("%Y%m%d", :strftime) |> Timex.to_date()
-      {:ok, exception} = maybe_cast(:integer, raw_service_exception["exception_type"])
+    service_exceptions =
+      {service_exceptions_count, _} =
+      file
+      |> File.stream!()
+      |> CSV.decode(headers: true, strip_fields: true)
+      |> Enum.map(fn {:ok, raw_service_exception} ->
+        service_id = services_map[{agency_id, raw_service_exception["service_id"]}]
+        date = raw_service_exception["date"] |> Timex.parse!("%Y%m%d", :strftime) |> Timex.to_date()
+        {:ok, exception} = maybe_cast(:integer, raw_service_exception["exception_type"])
 
-      %{
-        agency_id: agency_id,
-        service_id: service_id,
-        date: date,
-        exception: exception,
-        inserted_at: Ecto.DateTime.utc(),
-        updated_at: Ecto.DateTime.utc()
-      }
-    end)
-    |> GTFS.bulk_create_service_exceptions()
+        %{
+          agency_id: agency_id,
+          service_id: service_id,
+          date: date,
+          exception: exception,
+          inserted_at: Ecto.DateTime.utc(),
+          updated_at: Ecto.DateTime.utc()
+        }
+      end)
+      |> GTFS.bulk_create_service_exceptions()
+
+    Logger.info("Done importing #{service_exceptions_count} service exceptions")
+
+    service_exceptions
   end
 
   def import_routes(file, %Agency{id: agency_id}) do
     Logger.info("Importing routes")
 
-    {_routes_count, routes} =
+    {routes_count, routes} =
       file
       |> File.stream!()
       |> CSV.decode(headers: true, strip_fields: true)
@@ -199,6 +212,8 @@ defmodule Importer do
       end)
       |> GTFS.bulk_create_routes()
 
+    Logger.info("Done importing #{routes_count} routes")
+
     Enum.reduce(routes, %{}, fn %Route{id: id, remote_id: remote_id, agency_id: agency_id}, acc ->
       Map.put(acc, {agency_id, remote_id}, id)
     end)
@@ -215,7 +230,7 @@ defmodule Importer do
   def import_stops(file, %Agency{id: agency_id}) do
     Logger.info("Importing stops")
 
-    {_stops_count, stops} =
+    {stops_count, stops} =
       file
       |> File.stream!()
       |> CSV.decode(headers: true, strip_fields: true)
@@ -251,6 +266,8 @@ defmodule Importer do
         {count + added, inserted ++ stops}
       end)
 
+    Logger.info("Done importing #{stops_count} stops")
+
     Enum.reduce(stops, %{}, fn %Stop{id: id, remote_id: remote_id, agency_id: agency_id}, acc ->
       Map.put(acc, {agency_id, remote_id}, id)
     end)
@@ -259,7 +276,7 @@ defmodule Importer do
   def import_shapes(file, %Agency{id: agency_id}) do
     Logger.info("Importing shapes")
 
-    {_shapes_count, shapes} =
+    {shapes_count, shapes} =
       file
       |> File.stream!()
       |> CSV.decode(headers: true, strip_fields: true)
@@ -291,6 +308,8 @@ defmodule Importer do
         {count + added, inserted ++ shapes}
       end)
 
+    Logger.info("Done importing #{shapes_count} shapes")
+
     Enum.reduce(shapes, %{}, fn %Shape{id: id, remote_id: remote_id, agency_id: agency_id}, acc ->
       Map.put(acc, {agency_id, remote_id}, id)
     end)
@@ -299,7 +318,7 @@ defmodule Importer do
   def import_trips(file, %Agency{id: agency_id}, routes_map, services_map, shapes_map) do
     Logger.info("Importing trips")
 
-    {_trip_count, trips} =
+    {trips_count, trips} =
       file
       |> File.stream!()
       |> CSV.decode(headers: true, strip_fields: true)
@@ -326,6 +345,8 @@ defmodule Importer do
       end)
       |> GTFS.bulk_create_trips()
 
+    Logger.info("Done importing #{trips_count} trips")
+
     Enum.reduce(trips, %{}, fn %Trip{id: id, agency_id: agency_id, remote_id: remote_id}, acc ->
       Map.put(acc, {agency_id, remote_id}, id)
     end)
@@ -334,34 +355,40 @@ defmodule Importer do
   def import_stop_times(file, %Agency{id: agency_id}, stops_map, trips_map) do
     Logger.info("Importing stop times")
 
-    file
-    |> File.stream!()
-    |> CSV.decode(headers: true, strip_fields: true)
-    |> Enum.map(fn {:ok, raw_stop_time} ->
-      stop_id = stops_map[{agency_id, raw_stop_time["stop_id"]}]
-      trip_id = trips_map[{agency_id, raw_stop_time["trip_id"]}]
+    stop_times =
+      {stop_times_count, _} =
+      file
+      |> File.stream!()
+      |> CSV.decode(headers: true, strip_fields: true)
+      |> Enum.map(fn {:ok, raw_stop_time} ->
+        stop_id = stops_map[{agency_id, raw_stop_time["stop_id"]}]
+        trip_id = trips_map[{agency_id, raw_stop_time["trip_id"]}]
 
-      {:ok, arrival_time} = maybe_cast(Interval, raw_stop_time["arrival_time"])
-      {:ok, departure_time} = maybe_cast(Interval, raw_stop_time["departure_time"])
-      {:ok, shape_dist_traveled} = maybe_cast(:float, raw_stop_time["shape_dist_traveled"])
-      {:ok, stop_sequence} = maybe_cast(:integer, raw_stop_time["stop_sequence"])
+        {:ok, arrival_time} = maybe_cast(Interval, raw_stop_time["arrival_time"])
+        {:ok, departure_time} = maybe_cast(Interval, raw_stop_time["departure_time"])
+        {:ok, shape_dist_traveled} = maybe_cast(:float, raw_stop_time["shape_dist_traveled"])
+        {:ok, stop_sequence} = maybe_cast(:integer, raw_stop_time["stop_sequence"])
 
-      %{
-        agency_id: agency_id,
-        stop_id: stop_id,
-        trip_id: trip_id,
-        stop_sequence: stop_sequence,
-        shape_dist_traveled: shape_dist_traveled,
-        arrival_time: arrival_time,
-        departure_time: departure_time,
-        inserted_at: Ecto.DateTime.utc(),
-        updated_at: Ecto.DateTime.utc()
-      }
-    end)
-    |> Enum.chunk_every(1000)
-    |> Enum.reduce({0, []}, fn batch, {count, inserted} ->
-      {added, stop_times} = GTFS.bulk_create_stop_times(batch)
-      {count + added, inserted ++ stop_times}
-    end)
+        %{
+          agency_id: agency_id,
+          stop_id: stop_id,
+          trip_id: trip_id,
+          stop_sequence: stop_sequence,
+          shape_dist_traveled: shape_dist_traveled,
+          arrival_time: arrival_time,
+          departure_time: departure_time,
+          inserted_at: Ecto.DateTime.utc(),
+          updated_at: Ecto.DateTime.utc()
+        }
+      end)
+      |> Enum.chunk_every(1000)
+      |> Enum.reduce({0, []}, fn batch, {count, inserted} ->
+        {added, stop_times} = GTFS.bulk_create_stop_times(batch)
+        {count + added, inserted ++ stop_times}
+      end)
+
+    Logger.info("Done importing #{stop_times_count} stop times")
+
+    stop_times
   end
 end
