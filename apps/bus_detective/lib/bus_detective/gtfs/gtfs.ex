@@ -39,17 +39,25 @@ defmodule BusDetective.GTFS do
   @doc """
   Gets an agency by its remote id
   """
-  def get_agency_by_remote_id(remote_id) do
+  def get_agency_by_remote_id(feed_id, remote_id) do
     Repo.one(
       from(
         a in Agency,
+        where: a.feed_id == ^feed_id,
         where: a.remote_id == ^remote_id
       )
     )
   end
 
   @doc """
-  Returns the list of agencies.
+  returns the list of feeds.
+  """
+  def list_feeds do
+    Repo.all(Feed)
+  end
+
+  @doc """
+  returns the list of agencies.
   """
   def list_agencies do
     Repo.all(Agency)

@@ -11,23 +11,23 @@ defmodule Importer.ImporterTest do
   end
 
   test "it imports the correct number of agencies", %{gtfs_file: gtfs_file} do
-    Importer.import_from_file(gtfs_file)
+    Importer.import_from_file("TEST", gtfs_file)
 
     assert 1 == length(GTFS.list_agencies())
   end
 
   test "it upserts the agency on subsequent import", %{gtfs_file: gtfs_file, updated_gtfs_file: updated_gtfs_file} do
-    Importer.import_from_file(gtfs_file)
+    Importer.import_from_file("TEST", gtfs_file)
     [%Agency{id: id}] = GTFS.list_agencies()
 
-    Importer.import_from_file(updated_gtfs_file)
+    Importer.import_from_file("TEST", updated_gtfs_file)
     assert [%Agency{id: ^id, name: "Updated"}] = GTFS.list_agencies()
   end
 
   test "it imports the agency correctly", %{gtfs_file: gtfs_file} do
-    Importer.import_from_file(gtfs_file)
+    Importer.import_from_file("TEST", gtfs_file)
 
-    agency = GTFS.list_agencies() |> List.first()
+    feed = GTFS.list_agencies() |> List.first()
 
     assert %Agency{
              fare_url: "http://www.go-metro.com/fares-passes",
@@ -37,31 +37,31 @@ defmodule Importer.ImporterTest do
              phone: "513-621-4455",
              timezone: "America/Detroit",
              url: "http://www.go-metro.com"
-           } = agency
+           } = feed
   end
 
   test "it imports the correct number of services", %{gtfs_file: gtfs_file} do
-    Importer.import_from_file(gtfs_file)
-    [agency] = GTFS.list_agencies()
+    Importer.import_from_file("TEST", gtfs_file)
+    [feed] = GTFS.list_feeds()
 
-    assert 3 == length(GTFS.list_services(agency))
+    assert 3 == length(GTFS.list_services(feed))
   end
 
   test "it upserts the services on subsequent import", %{gtfs_file: gtfs_file, updated_gtfs_file: updated_gtfs_file} do
-    Importer.import_from_file(gtfs_file)
-    [agency] = GTFS.list_agencies()
-    %Service{id: id, monday: false} = GTFS.get_service(agency, "1")
+    Importer.import_from_file("TEST", gtfs_file)
+    [feed] = GTFS.list_feeds()
+    %Service{id: id, monday: false} = GTFS.get_service(feed, "1")
 
-    Importer.import_from_file(updated_gtfs_file)
-    [agency] = GTFS.list_agencies()
-    assert %Service{id: ^id, monday: true} = GTFS.get_service(agency, "1")
+    Importer.import_from_file("TEST", updated_gtfs_file)
+    [feed] = GTFS.list_feeds()
+    assert %Service{id: ^id, monday: true} = GTFS.get_service(feed, "1")
   end
 
   test "it imports a service correctly", %{gtfs_file: gtfs_file} do
-    Importer.import_from_file(gtfs_file)
+    Importer.import_from_file("TEST", gtfs_file)
 
-    [agency] = GTFS.list_agencies()
-    service = GTFS.get_service(agency, "1")
+    [feed] = GTFS.list_feeds()
+    service = GTFS.get_service(feed, "1")
 
     assert %Service{
              monday: false,
@@ -77,31 +77,31 @@ defmodule Importer.ImporterTest do
   end
 
   test "it imports the correct number of service exceptions", %{gtfs_file: gtfs_file} do
-    Importer.import_from_file(gtfs_file)
-    [agency] = GTFS.list_agencies()
-    service = GTFS.get_service(agency, "1")
+    Importer.import_from_file("TEST", gtfs_file)
+    [feed] = GTFS.list_feeds()
+    service = GTFS.get_service(feed, "1")
 
-    assert 1 == length(GTFS.list_service_exceptions(agency, service))
+    assert 1 == length(GTFS.list_service_exceptions(feed, service))
   end
 
   test "it re-imports the correct number of service exceptions on subsequent import", %{
     gtfs_file: gtfs_file,
     updated_gtfs_file: updated_gtfs_file
   } do
-    Importer.import_from_file(gtfs_file)
-    Importer.import_from_file(updated_gtfs_file)
-    [agency] = GTFS.list_agencies()
-    service = GTFS.get_service(agency, "1")
+    Importer.import_from_file("TEST", gtfs_file)
+    Importer.import_from_file("TEST", updated_gtfs_file)
+    [feed] = GTFS.list_feeds()
+    service = GTFS.get_service(feed, "1")
 
-    assert 1 == length(GTFS.list_service_exceptions(agency, service))
+    assert 1 == length(GTFS.list_service_exceptions(feed, service))
   end
 
   test "it imports a service exception correctly", %{gtfs_file: gtfs_file} do
-    Importer.import_from_file(gtfs_file)
+    Importer.import_from_file("TEST", gtfs_file)
 
-    [agency] = GTFS.list_agencies()
-    service = GTFS.get_service(agency, "1")
-    [service_exception] = GTFS.list_service_exceptions(agency, service)
+    [feed] = GTFS.list_feeds()
+    service = GTFS.get_service(feed, "1")
+    [service_exception] = GTFS.list_service_exceptions(feed, service)
 
     assert %ServiceException{
              date: ~D[2015-05-25],
@@ -110,27 +110,27 @@ defmodule Importer.ImporterTest do
   end
 
   test "it imports the correct number of routes", %{gtfs_file: gtfs_file} do
-    Importer.import_from_file(gtfs_file)
-    [agency] = GTFS.list_agencies()
+    Importer.import_from_file("TEST", gtfs_file)
+    [feed] = GTFS.list_feeds()
 
-    assert 10 == length(GTFS.list_routes(agency))
+    assert 10 == length(GTFS.list_routes(feed))
   end
 
   test "it upserts the routes on subsequent import", %{gtfs_file: gtfs_file, updated_gtfs_file: updated_gtfs_file} do
-    Importer.import_from_file(gtfs_file)
-    [agency] = GTFS.list_agencies()
-    %Route{id: id} = GTFS.get_route(agency, "1")
+    Importer.import_from_file("TEST", gtfs_file)
+    [feed] = GTFS.list_feeds()
+    %Route{id: id} = GTFS.get_route(feed, "1")
 
-    Importer.import_from_file(updated_gtfs_file)
-    [agency] = GTFS.list_agencies()
-    assert %Route{id: ^id, long_name: "Updated"} = GTFS.get_route(agency, "1")
+    Importer.import_from_file("TEST", updated_gtfs_file)
+    [feed] = GTFS.list_feeds()
+    assert %Route{id: ^id, long_name: "Updated"} = GTFS.get_route(feed, "1")
   end
 
   test "it imports a route correctly", %{gtfs_file: gtfs_file} do
-    Importer.import_from_file(gtfs_file)
+    Importer.import_from_file("TEST", gtfs_file)
 
-    [agency] = GTFS.list_agencies()
-    route = GTFS.get_route(agency, "1")
+    [feed] = GTFS.list_feeds()
+    route = GTFS.get_route(feed, "1")
 
     assert %Route{
              short_name: "1",
@@ -142,27 +142,27 @@ defmodule Importer.ImporterTest do
   end
 
   test "it imports the correct number of stops", %{gtfs_file: gtfs_file} do
-    Importer.import_from_file(gtfs_file)
-    [agency] = GTFS.list_agencies()
+    Importer.import_from_file("TEST", gtfs_file)
+    [feed] = GTFS.list_feeds()
 
-    assert 10 == length(GTFS.list_stops(agency))
+    assert 10 == length(GTFS.list_stops(feed))
   end
 
   test "it upserts the stops on subsequent import", %{gtfs_file: gtfs_file, updated_gtfs_file: updated_gtfs_file} do
-    Importer.import_from_file(gtfs_file)
-    [agency] = GTFS.list_agencies()
-    %Stop{id: id} = GTFS.get_stop(agency, "EZZLINe")
+    Importer.import_from_file("TEST", gtfs_file)
+    [feed] = GTFS.list_feeds()
+    %Stop{id: id} = GTFS.get_stop(feed, "EZZLINe")
 
-    Importer.import_from_file(updated_gtfs_file)
-    [agency] = GTFS.list_agencies()
-    assert %Stop{id: ^id, name: "Updated"} = GTFS.get_stop(agency, "EZZLINe")
+    Importer.import_from_file("TEST", updated_gtfs_file)
+    [feed] = GTFS.list_feeds()
+    assert %Stop{id: ^id, name: "Updated"} = GTFS.get_stop(feed, "EZZLINe")
   end
 
   test "it imports a stop correctly", %{gtfs_file: gtfs_file} do
-    Importer.import_from_file(gtfs_file)
+    Importer.import_from_file("TEST", gtfs_file)
 
-    [agency] = GTFS.list_agencies()
-    stop = GTFS.get_stop(agency, "EZZLINe")
+    [feed] = GTFS.list_feeds()
+    stop = GTFS.get_stop(feed, "EZZLINe")
 
     assert %Stop{
              code: 4451,
@@ -173,27 +173,27 @@ defmodule Importer.ImporterTest do
   end
 
   test "it imports the correct number of shapes", %{gtfs_file: gtfs_file} do
-    Importer.import_from_file(gtfs_file)
-    [agency] = GTFS.list_agencies()
+    Importer.import_from_file("TEST", gtfs_file)
+    [feed] = GTFS.list_feeds()
 
-    assert 1 == length(GTFS.list_shapes(agency))
+    assert 1 == length(GTFS.list_shapes(feed))
   end
 
   test "it upserts the shapes on subsequent import", %{gtfs_file: gtfs_file, updated_gtfs_file: updated_gtfs_file} do
-    Importer.import_from_file(gtfs_file)
-    [agency] = GTFS.list_agencies()
-    %Shape{id: id} = GTFS.get_shape(agency, "83146")
+    Importer.import_from_file("TEST", gtfs_file)
+    [feed] = GTFS.list_feeds()
+    %Shape{id: id} = GTFS.get_shape(feed, "83146")
 
-    Importer.import_from_file(updated_gtfs_file)
-    [agency] = GTFS.list_agencies()
-    assert %Shape{id: ^id} = GTFS.get_shape(agency, "83146")
+    Importer.import_from_file("TEST", updated_gtfs_file)
+    [feed] = GTFS.list_feeds()
+    assert %Shape{id: ^id} = GTFS.get_shape(feed, "83146")
   end
 
   test "it imports a shape correctly", %{gtfs_file: gtfs_file} do
-    Importer.import_from_file(gtfs_file)
+    Importer.import_from_file("TEST", gtfs_file)
 
-    [agency] = GTFS.list_agencies()
-    shape = GTFS.get_shape(agency, "83146")
+    [feed] = GTFS.list_feeds()
+    shape = GTFS.get_shape(feed, "83146")
 
     assert %Shape{
              geometry: %Geo.LineString{
@@ -215,31 +215,31 @@ defmodule Importer.ImporterTest do
   end
 
   test "it imports the correct number of trips", %{gtfs_file: gtfs_file} do
-    Importer.import_from_file(gtfs_file)
-    [agency] = GTFS.list_agencies()
+    Importer.import_from_file("TEST", gtfs_file)
+    [feed] = GTFS.list_feeds()
 
-    assert 10 == length(GTFS.list_trips(agency))
+    assert 10 == length(GTFS.list_trips(feed))
   end
 
   test "it upserts the trips on subsequent import", %{gtfs_file: gtfs_file, updated_gtfs_file: updated_gtfs_file} do
-    Importer.import_from_file(gtfs_file)
-    [agency] = GTFS.list_agencies()
-    %Trip{id: id} = GTFS.get_trip(agency, "955305")
+    Importer.import_from_file("TEST", gtfs_file)
+    [feed] = GTFS.list_feeds()
+    %Trip{id: id} = GTFS.get_trip(feed, "955305")
 
-    Importer.import_from_file(updated_gtfs_file)
-    [agency] = GTFS.list_agencies()
-    assert %Trip{id: ^id, headsign: "Updated"} = GTFS.get_trip(agency, "955305")
+    Importer.import_from_file("TEST", updated_gtfs_file)
+    [feed] = GTFS.list_feeds()
+    assert %Trip{id: ^id, headsign: "Updated"} = GTFS.get_trip(feed, "955305")
   end
 
   test "it imports a trip correctly", %{gtfs_file: gtfs_file} do
-    Importer.import_from_file(gtfs_file)
+    Importer.import_from_file("TEST", gtfs_file)
 
-    [agency] = GTFS.list_agencies()
-    %Route{id: route_id} = GTFS.get_route(agency, "1")
-    %Service{id: service_id} = GTFS.get_service(agency, "1")
-    %Shape{id: shape_id} = GTFS.get_shape(agency, "83146")
+    [feed] = GTFS.list_feeds()
+    %Route{id: route_id} = GTFS.get_route(feed, "1")
+    %Service{id: service_id} = GTFS.get_service(feed, "1")
+    %Shape{id: shape_id} = GTFS.get_shape(feed, "83146")
 
-    trip = GTFS.get_trip(agency, "955305")
+    trip = GTFS.get_trip(feed, "955305")
 
     assert %Trip{
              route_id: ^route_id,
@@ -251,31 +251,31 @@ defmodule Importer.ImporterTest do
   end
 
   test "it imports the correct number of stop times", %{gtfs_file: gtfs_file} do
-    Importer.import_from_file(gtfs_file)
-    [agency] = GTFS.list_agencies()
+    Importer.import_from_file("TEST", gtfs_file)
+    [feed] = GTFS.list_feeds()
 
-    assert 10 == length(GTFS.list_stop_times(agency))
+    assert 10 == length(GTFS.list_stop_times(feed))
   end
 
   test "it re-imports the correct number of stop times on subsequent import", %{
     gtfs_file: gtfs_file,
     updated_gtfs_file: updated_gtfs_file
   } do
-    Importer.import_from_file(gtfs_file)
-    Importer.import_from_file(updated_gtfs_file)
-    [agency] = GTFS.list_agencies()
+    Importer.import_from_file("TEST", gtfs_file)
+    Importer.import_from_file("TEST", updated_gtfs_file)
+    [feed] = GTFS.list_feeds()
 
-    assert 10 == length(GTFS.list_stop_times(agency))
+    assert 10 == length(GTFS.list_stop_times(feed))
   end
 
   test "it imports a stop time correctly", %{gtfs_file: gtfs_file} do
-    Importer.import_from_file(gtfs_file)
+    Importer.import_from_file("TEST", gtfs_file)
 
-    [agency] = GTFS.list_agencies()
-    stop = GTFS.get_stop(agency, "EZZLINw")
-    trip = GTFS.get_trip(agency, "955305")
+    [feed] = GTFS.list_feeds()
+    stop = GTFS.get_stop(feed, "EZZLINw")
+    trip = GTFS.get_trip(feed, "955305")
 
-    stop_time = GTFS.get_stop_time(agency, stop, 2, trip)
+    stop_time = GTFS.get_stop_time(feed, stop, 2, trip)
 
     assert %StopTime{
              shape_dist_traveled: 0.3616,
@@ -289,16 +289,16 @@ defmodule Importer.ImporterTest do
       {:ok, start_time} = Timex.parse("2015-06-06 22:01:00-04:00", "{ISO:Extended}")
       {:ok, end_time} = Timex.parse("2015-06-06 23:01:00-04:00", "{ISO:Extended}")
 
-      Importer.import_from_file(
+      Importer.import_from_file("TEST",
         gtfs_file,
         start_date: Timex.to_date(Timex.shift(start_time, days: -1)),
         start_date: Timex.to_date(Timex.shift(end_time, days: 1))
       )
 
-      [agency] = GTFS.list_agencies()
-      stop = GTFS.get_stop(agency, "EZZLINw")
-      trip = GTFS.get_trip(agency, "955305")
-      stop_time = GTFS.get_stop_time(agency, stop, 2, trip)
+      [feed] = GTFS.list_feeds()
+      stop = GTFS.get_stop(feed, "EZZLINw")
+      trip = GTFS.get_trip(feed, "955305")
+      stop_time = GTFS.get_stop_time(feed, stop, 2, trip)
 
       result = GTFS.projected_stop_times_for_stop(stop, start_time, end_time)
 
@@ -310,16 +310,16 @@ defmodule Importer.ImporterTest do
       {:ok, start_time} = Timex.parse("2015-06-07 02:01:00-0000", "{ISO:Extended}")
       {:ok, end_time} = Timex.parse("2015-06-07 03:01:00-0000", "{ISO:Extended}")
 
-      Importer.import_from_file(
+      Importer.import_from_file("TEST",
         gtfs_file,
         start_date: Timex.to_date(Timex.shift(start_time, days: -1)),
         start_date: Timex.to_date(Timex.shift(end_time, days: 1))
       )
 
-      [agency] = GTFS.list_agencies()
-      stop = GTFS.get_stop(agency, "EZZLINw")
-      trip = GTFS.get_trip(agency, "955305")
-      stop_time = GTFS.get_stop_time(agency, stop, 2, trip)
+      [feed] = GTFS.list_feeds()
+      stop = GTFS.get_stop(feed, "EZZLINw")
+      trip = GTFS.get_trip(feed, "955305")
+      stop_time = GTFS.get_stop_time(feed, stop, 2, trip)
 
       result = GTFS.projected_stop_times_for_stop(stop, start_time, end_time)
 
@@ -331,16 +331,16 @@ defmodule Importer.ImporterTest do
       {:ok, start_time} = Timex.parse("2015-05-26 02:01:00-0000", "{ISO:Extended}")
       {:ok, end_time} = Timex.parse("2015-05-26 03:01:00-0000", "{ISO:Extended}")
 
-      Importer.import_from_file(
+      Importer.import_from_file("TEST",
         gtfs_file,
         start_date: Timex.to_date(Timex.shift(start_time, days: -1)),
         start_date: Timex.to_date(Timex.shift(end_time, days: 1))
       )
 
-      [agency] = GTFS.list_agencies()
-      stop = GTFS.get_stop(agency, "EZZLINw")
-      trip = GTFS.get_trip(agency, "955305")
-      stop_time = GTFS.get_stop_time(agency, stop, 2, trip)
+      [feed] = GTFS.list_feeds()
+      stop = GTFS.get_stop(feed, "EZZLINw")
+      trip = GTFS.get_trip(feed, "955305")
+      stop_time = GTFS.get_stop_time(feed, stop, 2, trip)
 
       result = GTFS.projected_stop_times_for_stop(stop, start_time, end_time)
 

@@ -17,6 +17,7 @@ defmodule BusDetective.GTFS.Stop do
 
   schema "stops" do
     belongs_to(:feed, Feed)
+
     field(:code, :integer)
     field(:description, :string)
     field(:latitude, :float)
