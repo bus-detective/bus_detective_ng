@@ -3,9 +3,9 @@ defmodule BusDetective.Repo.Migrations.CreateFeeds do
 
   def change do
     create table(:feeds) do
-      add :last_updated, :utc_datetime
-      add :last_file_hash, :string
-      add :name, :string, null: false
+      add(:last_updated, :utc_datetime)
+      add(:last_file_hash, :string)
+      add(:name, :string, null: false)
 
       timestamps()
     end

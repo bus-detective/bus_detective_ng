@@ -16,21 +16,25 @@ defmodule Importer do
   end
 
   def file_hash(file) do
-    File.stream!(file,[],2048)
-    |> Enum.reduce(:crypto.hash_init(:sha256),fn(line, acc) -> :crypto.hash_update(acc,line) end )
-    |> :crypto.hash_final
-    |> Base.encode16
+    file
+    |> File.stream!([], 2048)
+    |> Enum.reduce(:crypto.hash_init(:sha256), fn line, acc -> :crypto.hash_update(acc, line) end)
+    |> :crypto.hash_final()
+    |> Base.encode16()
   end
 
   def import_from_file(name, file, opts \\ []) do
     with file_hash <- file_hash(file) do
-      feed = case GTFS.get_feed_by_name(name) do
-               nil ->
-                 {:ok, feed} = GTFS.create_feed(%{name: name})
-                 feed
-               %Feed{} = feed ->
-                 feed
-             end
+      feed =
+        case GTFS.get_feed_by_name(name) do
+          nil ->
+            {:ok, feed} = GTFS.create_feed(%{name: name})
+            feed
+
+          %Feed{} = feed ->
+            feed
+        end
+
       import_feed(feed, file_hash, file, opts)
     end
   end
@@ -42,7 +46,6 @@ defmodule Importer do
   def import_feed(%Feed{} = feed, _file_hash, file, opts) do
     with {:ok, tmp_path} <- Briefly.create(directory: true),
          {:ok, file_map} <- unzip_gtfs_file(file, tmp_path) do
-
       delete_data(feed)
 
       agencies = import_agencies(file_map["agency"], feed)
@@ -59,21 +62,6 @@ defmodule Importer do
       import_stop_times(file_map["stop_times"], feed, stops, trips)
       GTFS.update_route_stops(feed)
       ProjectedStopTimeImporter.project_stop_times(feed, opts)
-
-
-      # Enum.map(stops_map)
-      # Repo.delete_all(
-      #   from(
-      #     stop in Stop,
-      #     where: stop.remote_id
-      #   )
-      # )
-      # Stop.where(agency: @agency).where("stops.remote_id NOT IN (?)", source.stops.map(&:id)).delete_all
-      # Trip.where(agency: @agency).where("trips.remote_id NOT IN (?)", source.trips.map(&:id)).delete_all
-      # Shape.where(agency: @agency).where("shapes.remote_id NOT IN (?)", source.shapes.map(&:id)).delete_all
-      # Route.where(agency: @agency).where("routes.remote_id NOT IN (?)", source.routes.map(&:id)).delete_all
-      # Service.where(agency: @agency).where("services.remote_id NOT IN (?)", source.calendars.map(&:service_id)).delete_all
-
     else
       error -> error
     end

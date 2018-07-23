@@ -17,8 +17,9 @@ defmodule Importer.ProjectedStopTimeImporter do
 
   def project_stop_times(%Feed{} = feed, opts) do
     feed = Repo.preload(feed, :agencies)
+
     feed.agencies
-    |> Enum.each(fn(agency) -> project_stop_times(agency, opts) end)
+    |> Enum.each(fn agency -> project_stop_times(agency, opts) end)
   end
 
   def project_stop_times(%Agency{id: agency_id, feed_id: feed_id, timezone: tz, remote_id: remote_id}, opts) do
@@ -50,7 +51,11 @@ defmodule Importer.ProjectedStopTimeImporter do
     for date <- %TimexInterval{from: start_date, until: end_date} do
       for service_id <- active_service_ids(date, services, service_exceptions) do
         start_of_day = start_of_agency_day_utc(date, timezone)
-        Logger.debug(fn -> "Adding projected stop times for agency: #{remote_id}, for service: #{service_id} on #{date}" end)
+
+        Logger.debug(fn ->
+          "Adding projected stop times for agency: #{remote_id}, for service: #{service_id} on #{date}"
+        end)
+
         {:ok, %{num_rows: num_rows}} = add_projected_stop_times_for_service_date(service_id, agency_id, start_of_day)
         Logger.debug(fn -> "Added #{num_rows}" end)
       end
@@ -107,7 +112,7 @@ defmodule Importer.ProjectedStopTimeImporter do
 
       (Enum.empty?(service_removals) && regular_service?) || Enum.count(service_additions) > 0
     end)
-    |> Enum.map(&(&1.id))
+    |> Enum.map(& &1.id)
   end
 
   def start_of_agency_day_utc(date, agency_timezone) do

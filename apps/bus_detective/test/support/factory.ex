@@ -18,7 +18,7 @@ defmodule BusDetective.Factory do
 
   def feed_factory do
     %Feed{
-      name: sequence(:feed_name, &"Feed Name #{&1}"),
+      name: sequence(:feed_name, &"Feed Name #{&1}")
     }
   end
 

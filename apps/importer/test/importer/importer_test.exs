@@ -289,7 +289,8 @@ defmodule Importer.ImporterTest do
       {:ok, start_time} = Timex.parse("2015-06-06 22:01:00-04:00", "{ISO:Extended}")
       {:ok, end_time} = Timex.parse("2015-06-06 23:01:00-04:00", "{ISO:Extended}")
 
-      Importer.import_from_file("TEST",
+      Importer.import_from_file(
+        "TEST",
         gtfs_file,
         start_date: Timex.to_date(Timex.shift(start_time, days: -1)),
         start_date: Timex.to_date(Timex.shift(end_time, days: 1))
@@ -310,7 +311,8 @@ defmodule Importer.ImporterTest do
       {:ok, start_time} = Timex.parse("2015-06-07 02:01:00-0000", "{ISO:Extended}")
       {:ok, end_time} = Timex.parse("2015-06-07 03:01:00-0000", "{ISO:Extended}")
 
-      Importer.import_from_file("TEST",
+      Importer.import_from_file(
+        "TEST",
         gtfs_file,
         start_date: Timex.to_date(Timex.shift(start_time, days: -1)),
         start_date: Timex.to_date(Timex.shift(end_time, days: 1))
@@ -331,7 +333,8 @@ defmodule Importer.ImporterTest do
       {:ok, start_time} = Timex.parse("2015-05-26 02:01:00-0000", "{ISO:Extended}")
       {:ok, end_time} = Timex.parse("2015-05-26 03:01:00-0000", "{ISO:Extended}")
 
-      Importer.import_from_file("TEST",
+      Importer.import_from_file(
+        "TEST",
         gtfs_file,
         start_date: Timex.to_date(Timex.shift(start_time, days: -1)),
         start_date: Timex.to_date(Timex.shift(end_time, days: 1))
