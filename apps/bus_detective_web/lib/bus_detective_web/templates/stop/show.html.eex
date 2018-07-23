@@ -23,7 +23,7 @@
       <% else %>
         <%= for departure <- @departures do %>
           <div class="timeline__event event event--future" data-test="departure_item">
-            <div class="event__time"><%= departure_time(departure.time, @stop.agency.timezone) %></div>
+            <div class="event__time"><%= departure_time(departure.time, departure.agency.timezone) %></div>
             <div class="event__event-details">
               <div class="event__marker"></div>
               <div>

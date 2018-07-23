@@ -4,8 +4,7 @@ defmodule SearchingForAStopTest do
   alias BusDetectiveWeb.{HomePage, SearchPage}
 
   setup do
-    agency = insert(:agency)
-    stop = insert(:stop, agency: agency)
+    stop = insert(:stop)
 
     {:ok, stop: stop}
   end
