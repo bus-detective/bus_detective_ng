@@ -84,7 +84,10 @@ defmodule Importer.ImporterTest do
     assert 1 == length(GTFS.list_service_exceptions(agency, service))
   end
 
-  test "it re-imports the correct number of service exceptions on subsequent import", %{gtfs_file: gtfs_file, updated_gtfs_file: updated_gtfs_file} do
+  test "it re-imports the correct number of service exceptions on subsequent import", %{
+    gtfs_file: gtfs_file,
+    updated_gtfs_file: updated_gtfs_file
+  } do
     Importer.import_from_file(gtfs_file)
     Importer.import_from_file(updated_gtfs_file)
     [agency] = GTFS.list_agencies()
@@ -254,7 +257,10 @@ defmodule Importer.ImporterTest do
     assert 10 == length(GTFS.list_stop_times(agency))
   end
 
-  test "it re-imports the correct number of stop times on subsequent import", %{gtfs_file: gtfs_file, updated_gtfs_file: updated_gtfs_file} do
+  test "it re-imports the correct number of stop times on subsequent import", %{
+    gtfs_file: gtfs_file,
+    updated_gtfs_file: updated_gtfs_file
+  } do
     Importer.import_from_file(gtfs_file)
     Importer.import_from_file(updated_gtfs_file)
     [agency] = GTFS.list_agencies()

@@ -13,13 +13,13 @@ defmodule BusDetective.GTFSTest do
 
   test "destroy_agency/1" do
     agency = insert(:agency)
-    service = insert(:service, agency: agency)
-    stop = insert(:stop, agency: agency)
-    route = insert(:route, agency: agency)
+    service = :service |> build() |> with_agency(agency) |> insert()
+    stop = :stop |> build() |> with_agency(agency) |> insert()
+    route = :route |> build() |> with_agency(agency) |> insert()
     insert(:route_stop, route: route, stop: stop)
-    shape = insert(:shape, agency: agency)
-    trip = insert(:trip, agency: agency, route: route, service: service, shape: shape)
-    insert(:stop_time, agency: agency, stop: stop, trip: trip)
+    shape = :shape |> build() |> with_agency(agency) |> insert()
+    trip = :trip |> build(route: route, service: service, shape: shape) |> with_agency(agency) |> insert()
+    :stop_time |> build(stop: stop, trip: trip) |> with_agency(agency) |> insert()
 
     GTFS.destroy_agency(agency.remote_id)
 
@@ -182,19 +182,18 @@ defmodule BusDetective.GTFSTest do
 
   test "create_stop_time/1" do
     agency = insert(:agency)
-    stop = insert(:stop, agency: agency)
-    trip = insert(:trip, agency: agency)
+    stop = :stop |> build() |> with_agency(agency) |> insert()
+    trip = :trip |> build() |> with_agency(agency) |> insert()
 
-    params =
-      %{stop_sequence: stop_sequence} = params_for(:stop_time, agency_id: agency.id, stop_id: stop.id, trip_id: trip.id)
+    params = %{stop_sequence: stop_sequence} = params_for(:stop_time, agency: agency, stop: stop, trip: trip)
 
     assert {:ok, %StopTime{stop_sequence: ^stop_sequence}} = GTFS.create_stop_time(params)
   end
 
   test "list_stop_times/1" do
     agency = insert(:agency)
-    stop = insert(:stop, agency: agency)
-    trip = insert(:trip, agency: agency)
+    stop = :stop |> build() |> with_agency(agency) |> insert()
+    trip = :trip |> build() |> with_agency(agency) |> insert()
 
     %StopTime{stop_sequence: stop_sequence} = insert(:stop_time, agency: agency, stop: stop, trip: trip)
 

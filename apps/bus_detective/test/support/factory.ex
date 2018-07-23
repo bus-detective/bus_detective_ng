@@ -98,7 +98,7 @@ defmodule BusDetective.Factory do
     agency = build(:agency)
 
     %StopTime{
-      agency: build(:agency),
+      agency: agency,
       stop: build(:stop, agency: agency),
       trip: build(:trip, agency: agency),
       stop_sequence: stop_time_sequence,
@@ -126,6 +126,40 @@ defmodule BusDetective.Factory do
       service: build(:service, agency: agency),
       shape: build(:shape, agency: agency),
       block_id: sequence(:trip_block_id, & &1)
+    }
+  end
+
+  def with_agency(%Route{} = route, agency) do
+    %{route | agency: agency}
+  end
+
+  def with_agency(%Service{} = service, agency) do
+    %{service | agency: agency}
+  end
+
+  def with_agency(%ServiceException{} = service_exception, agency) do
+    %{service_exception | agency: agency, service: with_agency(service_exception.service, agency)}
+  end
+
+  def with_agency(%Shape{} = shape, agency) do
+    %{shape | agency: agency}
+  end
+
+  def with_agency(%Stop{} = stop, agency) do
+    %{stop | agency: agency}
+  end
+
+  def with_agency(%StopTime{} = stop_time, agency) do
+    %{stop_time | agency: agency, stop: with_agency(stop_time.stop, agency), trip: with_agency(stop_time.trip, agency)}
+  end
+
+  def with_agency(%Trip{} = trip, agency) do
+    %{
+      trip
+      | agency: agency,
+        route: with_agency(trip.route, agency),
+        service: with_agency(trip.service, agency),
+        shape: with_agency(trip.shape, agency)
     }
   end
 end
