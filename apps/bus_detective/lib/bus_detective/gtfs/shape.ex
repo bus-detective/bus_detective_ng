@@ -4,10 +4,11 @@ defmodule BusDetective.GTFS.Shape do
   use Ecto.Schema
   import Ecto.Changeset
 
-  alias BusDetective.GTFS.{Agency, Trip}
+  alias BusDetective.GTFS.{Feed, Trip}
 
   schema "shapes" do
-    belongs_to(:agency, Agency)
+    belongs_to(:feed, Feed)
+
     field(:geometry, Geo.PostGIS.Geometry)
     field(:remote_id, :string)
 
@@ -19,8 +20,8 @@ defmodule BusDetective.GTFS.Shape do
   @doc false
   def changeset(shape, attrs) do
     shape
-    |> cast(attrs, [:agency_id, :remote_id, :geometry])
-    |> validate_required([:agency_id, :remote_id, :geometry])
-    |> unique_constraint(:remote_id, name: :shapes_agency_id_remote_id_index)
+    |> cast(attrs, [:feed_id, :remote_id, :geometry])
+    |> validate_required([:feed_id, :remote_id, :geometry])
+    |> unique_constraint(:remote_id, name: :shapes_feed_id_remote_id_index)
   end
 end

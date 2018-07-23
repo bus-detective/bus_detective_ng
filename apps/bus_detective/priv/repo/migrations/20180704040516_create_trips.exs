@@ -3,7 +3,7 @@ defmodule BusDetective.Repo.Migrations.CreateTrips do
 
   def change do
     create table(:trips) do
-      add(:agency_id, references(:agencies, on_delete: :delete_all), null: false)
+      add(:feed_id, references(:feeds, on_delete: :delete_all), null: false)
       add(:service_id, references(:services, on_delete: :delete_all), null: false)
       add(:route_id, references(:routes, on_delete: :delete_all), null: false)
       add(:shape_id, references(:shapes, on_delete: :delete_all), null: false)
@@ -18,10 +18,10 @@ defmodule BusDetective.Repo.Migrations.CreateTrips do
       timestamps()
     end
 
-    create(index(:trips, :agency_id))
+    create(index(:trips, :feed_id))
     create(index(:trips, :route_id))
     create(index(:trips, :shape_id))
     create(index(:trips, :service_id))
-    create(unique_index(:trips, [:agency_id, :remote_id]))
+    create(unique_index(:trips, [:feed_id, :remote_id]))
   end
 end

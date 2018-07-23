@@ -3,6 +3,7 @@ defmodule BusDetective.Factory do
 
   alias BusDetective.GTFS.{
     Agency,
+    Feed,
     Interval,
     ProjectedStopTime,
     Route,
@@ -15,8 +16,15 @@ defmodule BusDetective.Factory do
     Trip
   }
 
+  def feed_factory do
+    %Feed{
+      name: sequence(:feed_name, &"Feed Name #{&1}"),
+    }
+  end
+
   def agency_factory do
     %Agency{
+      feed: build(:feed),
       remote_id: sequence(:agency_remote_id, &"Agency Remote ID #{&1}"),
       name: sequence(:agency_name, &"Agency-#{&1}"),
       url: sequence(:agency_url, &"http://url-#{&1}.test"),
@@ -26,7 +34,7 @@ defmodule BusDetective.Factory do
 
   def service_factory do
     %Service{
-      agency: build(:agency),
+      feed: build(:feed),
       remote_id: sequence(:service_remote_id, &"Service-#{&1}"),
       monday: Enum.random([true, false]),
       tuesday: Enum.random([true, false]),
@@ -42,11 +50,11 @@ defmodule BusDetective.Factory do
 
   def service_exception_factory do
     date = Timex.to_date(Timex.now())
-    agency = build(:agency)
+    feed = build(:feed)
 
     %ServiceException{
-      agency: agency,
-      service: build(:service, agency: agency),
+      feed: feed,
+      service: build(:service, feed: feed),
       date: date,
       exception: Enum.random(0..10)
     }
@@ -54,6 +62,7 @@ defmodule BusDetective.Factory do
 
   def route_factory do
     %Route{
+      feed: build(:feed),
       agency: build(:agency),
       remote_id: sequence(:route_remote_id, &"R#{&1}"),
       short_name: sequence(:route_short_name, &"#{&1}"),
@@ -71,7 +80,7 @@ defmodule BusDetective.Factory do
 
   def stop_factory do
     %Stop{
-      agency: build(:agency),
+      feed: build(:feed),
       remote_id: sequence(:stop_remote_id, &"STOP#{&1}"),
       name: sequence(:stop_remote_id, &"5th and Walnut & #{&1} North St"),
       latitude: Float.round(39 + :rand.uniform(), 6),
@@ -81,7 +90,7 @@ defmodule BusDetective.Factory do
 
   def shape_factory do
     %Shape{
-      agency: build(:agency),
+      feed: build(:feed),
       remote_id: sequence(:shape_remote_id, &"#{&1}"),
       geometry: %Geo.LineString{
         srid: 4326,
@@ -95,12 +104,12 @@ defmodule BusDetective.Factory do
 
   def stop_time_factory do
     stop_time_sequence = sequence(:stop_time_sequence, & &1)
-    agency = build(:agency)
+    feed = build(:feed)
 
     %StopTime{
-      agency: agency,
-      stop: build(:stop, agency: agency),
-      trip: build(:trip, agency: agency),
+      feed: feed,
+      stop: build(:stop, feed: feed),
+      trip: build(:trip, feed: feed),
       stop_sequence: stop_time_sequence,
       shape_dist_traveled: stop_time_sequence * 0.5,
       arrival_time: %Interval{seconds: 56_000 + stop_time_sequence * 2},
@@ -117,14 +126,14 @@ defmodule BusDetective.Factory do
   end
 
   def trip_factory do
-    agency = build(:agency)
+    feed = build(:feed)
 
     %Trip{
-      agency: agency,
+      feed: feed,
       remote_id: sequence(:trip_remote_id, &"Trip#{&1}"),
-      route: build(:route, agency: agency),
-      service: build(:service, agency: agency),
-      shape: build(:shape, agency: agency),
+      route: build(:route, feed: feed),
+      service: build(:service, feed: feed),
+      shape: build(:shape, feed: feed),
       block_id: sequence(:trip_block_id, & &1)
     }
   end
@@ -133,33 +142,37 @@ defmodule BusDetective.Factory do
     %{route | agency: agency}
   end
 
-  def with_agency(%Service{} = service, agency) do
-    %{service | agency: agency}
+  def with_feed(%Route{} = route, feed) do
+    %{route | feed: feed}
   end
 
-  def with_agency(%ServiceException{} = service_exception, agency) do
-    %{service_exception | agency: agency, service: with_agency(service_exception.service, agency)}
+  def with_feed(%Service{} = service, feed) do
+    %{service | feed: feed}
   end
 
-  def with_agency(%Shape{} = shape, agency) do
-    %{shape | agency: agency}
+  def with_feed(%ServiceException{} = service_exception, feed) do
+    %{service_exception | feed: feed, service: with_feed(service_exception.service, feed)}
   end
 
-  def with_agency(%Stop{} = stop, agency) do
-    %{stop | agency: agency}
+  def with_feed(%Shape{} = shape, feed) do
+    %{shape | feed: feed}
   end
 
-  def with_agency(%StopTime{} = stop_time, agency) do
-    %{stop_time | agency: agency, stop: with_agency(stop_time.stop, agency), trip: with_agency(stop_time.trip, agency)}
+  def with_feed(%Stop{} = stop, feed) do
+    %{stop | feed: feed}
   end
 
-  def with_agency(%Trip{} = trip, agency) do
+  def with_feed(%StopTime{} = stop_time, feed) do
+    %{stop_time | feed: feed, stop: with_feed(stop_time.stop, feed), trip: with_feed(stop_time.trip, feed)}
+  end
+
+  def with_feed(%Trip{} = trip, feed) do
     %{
       trip
-      | agency: agency,
-        route: with_agency(trip.route, agency),
-        service: with_agency(trip.service, agency),
-        shape: with_agency(trip.shape, agency)
+      | feed: feed,
+        route: with_feed(trip.route, feed),
+        service: with_feed(trip.service, feed),
+        shape: with_feed(trip.shape, feed)
     }
   end
 end

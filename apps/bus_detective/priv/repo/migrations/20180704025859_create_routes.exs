@@ -3,6 +3,7 @@ defmodule BusDetective.Repo.Migrations.CreateRoutes do
 
   def change do
     create table(:routes) do
+      add(:feed_id, references(:feeds, on_delete: :delete_all), null: false)
       add(:agency_id, references(:agencies, on_delete: :delete_all), null: false)
       add(:remote_id, :string)
       add(:short_name, :string)
@@ -16,7 +17,8 @@ defmodule BusDetective.Repo.Migrations.CreateRoutes do
       timestamps()
     end
 
+    create(index(:routes, :feed_id))
     create(index(:routes, :agency_id))
-    create(unique_index(:routes, [:agency_id, :remote_id]))
+    create(unique_index(:routes, [:feed_id, :remote_id]))
   end
 end

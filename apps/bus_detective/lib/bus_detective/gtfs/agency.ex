@@ -4,9 +4,11 @@ defmodule BusDetective.GTFS.Agency do
   use Ecto.Schema
   import Ecto.Changeset
 
-  alias BusDetective.GTFS.{Route, Service, Shape}
+  alias BusDetective.GTFS.{Feed, Route}
 
   schema "agencies" do
+    belongs_to(:feed, Feed)
+
     field(:display_name, :string)
     field(:fare_url, :string)
     field(:gtfs_endpoint, :string)
@@ -21,8 +23,6 @@ defmodule BusDetective.GTFS.Agency do
     field(:url, :string)
 
     has_many(:routes, Route, on_delete: :delete_all)
-    has_many(:services, Service, on_delete: :delete_all)
-    has_many(:shapes, Shape, on_delete: :delete_all)
 
     timestamps()
   end
@@ -31,6 +31,7 @@ defmodule BusDetective.GTFS.Agency do
   def changeset(agency, attrs) do
     agency
     |> cast(attrs, [
+      :feed_id,
       :remote_id,
       :name,
       :url,
@@ -43,7 +44,7 @@ defmodule BusDetective.GTFS.Agency do
       :gtfs_vehicle_positions_url,
       :gtfs_service_alerts_url
     ])
-    |> validate_required([:name, :url, :timezone])
-    |> unique_constraint(:remote_id, name: :agencies_remote_id_index)
+    |> validate_required([:feed_id, :name, :url, :timezone])
+    |> unique_constraint(:remote_id, name: :agencies_feed_id_remote_id_index)
   end
 end

@@ -3,7 +3,7 @@ defmodule BusDetective.Repo.Migrations.CreateStopTimes do
 
   def change do
     create table(:stop_times) do
-      add(:agency_id, references(:agencies, on_delete: :delete_all), null: false)
+      add(:feed_id, references(:feeds, on_delete: :delete_all), null: false)
       add(:stop_id, references(:stops, on_delete: :delete_all), null: false)
       add(:trip_id, references(:trips, on_delete: :delete_all), null: false)
       add(:stop_headsign, :string)
@@ -17,8 +17,8 @@ defmodule BusDetective.Repo.Migrations.CreateStopTimes do
       timestamps()
     end
 
-    create(index(:stop_times, :agency_id))
-    create(index(:stop_times, [:agency_id, :stop_id, :trip_id]))
+    create(index(:stop_times, :feed_id))
+    create(index(:stop_times, [:feed_id, :stop_id, :trip_id]))
     create(index(:stop_times, :stop_id))
     create(index(:stop_times, :trip_id))
   end

@@ -3,7 +3,7 @@ defmodule BusDetective.Repo.Migrations.CreateServices do
 
   def change do
     create table(:services) do
-      add(:agency_id, references(:agencies, on_delete: :delete_all), null: false)
+      add(:feed_id, references(:feeds, on_delete: :delete_all), null: false)
       add(:remote_id, :string)
       add(:monday, :boolean, default: false, null: false)
       add(:tuesday, :boolean, default: false, null: false)
@@ -18,7 +18,7 @@ defmodule BusDetective.Repo.Migrations.CreateServices do
       timestamps()
     end
 
-    create(index(:services, :agency_id))
-    create(unique_index(:services, [:agency_id, :remote_id]))
+    create(index(:services, :feed_id))
+    create(unique_index(:services, [:feed_id, :remote_id]))
   end
 end

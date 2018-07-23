@@ -2,114 +2,93 @@ defmodule BusDetective.GTFSTest do
   use BusDetective.DataCase
 
   alias BusDetective.GTFS
-  alias BusDetective.GTFS.{Agency, Service, Route, RouteStop, ServiceException, Shape, Stop, StopTime, Trip}
-  alias BusDetective.Repo
+  alias BusDetective.GTFS.{Agency, Feed, Service, Route, ServiceException, Shape, Stop, StopTime, Trip}
 
   test "create_agency/1" do
-    params = %{name: name} = params_for(:agency)
+    %Feed{id: feed_id} = insert(:feed)
+    params = %{name: name} = params_for(:agency, feed_id: feed_id)
 
     assert {:ok, %Agency{name: ^name}} = GTFS.create_agency(params)
-  end
-
-  test "destroy_agency/1" do
-    agency = insert(:agency)
-    service = :service |> build() |> with_agency(agency) |> insert()
-    stop = :stop |> build() |> with_agency(agency) |> insert()
-    route = :route |> build() |> with_agency(agency) |> insert()
-    insert(:route_stop, route: route, stop: stop)
-    shape = :shape |> build() |> with_agency(agency) |> insert()
-    trip = :trip |> build(route: route, service: service, shape: shape) |> with_agency(agency) |> insert()
-    :stop_time |> build(stop: stop, trip: trip) |> with_agency(agency) |> insert()
-
-    GTFS.destroy_agency(agency.remote_id)
-
-    assert 0 == Repo.aggregate(Agency, :count, :id)
-    assert 0 == Repo.aggregate(Service, :count, :id)
-    assert 0 == Repo.aggregate(Stop, :count, :id)
-    assert 0 == Repo.aggregate(Route, :count, :id)
-    assert 0 == Repo.aggregate(RouteStop, :count, :id)
-    assert 0 == Repo.aggregate(Shape, :count, :id)
-    assert 0 == Repo.aggregate(Trip, :count, :id)
-    assert 0 == Repo.aggregate(StopTime, :count, :id)
   end
 
   test "list_agencies/0" do
     agency = insert(:agency)
 
-    assert [agency] == GTFS.list_agencies()
+    assert agency.id == Enum.at(GTFS.list_agencies(), 0).id
   end
 
   test "create_service/1" do
-    agency = insert(:agency)
-    params = %{remote_id: remote_id} = params_for(:service, agency_id: agency.id)
+    feed = insert(:feed)
+    params = %{remote_id: remote_id} = params_for(:service, feed_id: feed.id)
 
     assert {:ok, %Service{remote_id: ^remote_id}} = GTFS.create_service(params)
   end
 
   test "list_services/1" do
-    agency = insert(:agency)
-    %Service{remote_id: remote_id} = insert(:service, agency: agency)
-    service = GTFS.get_service(agency, remote_id)
+    feed = insert(:feed)
+    %Service{remote_id: remote_id} = insert(:service, feed: feed)
+    service = GTFS.get_service(feed, remote_id)
 
-    assert [service] == GTFS.list_services(agency)
+    assert [service] == GTFS.list_services(feed)
   end
 
   test "create_service_exception/1" do
-    agency = insert(:agency)
-    service = insert(:service, agency: agency)
-    params = %{date: date} = params_for(:service_exception, agency_id: agency.id, service_id: service.id)
+    feed = insert(:feed)
+    service = insert(:service, feed: feed)
+    params = %{date: date} = params_for(:service_exception, feed_id: feed.id, service_id: service.id)
 
     assert {:ok, %ServiceException{date: ^date}} = GTFS.create_service_exception(params)
   end
 
   test "list_service_exceptions/1" do
-    agency = insert(:agency)
-    service = insert(:service, agency: agency)
-    service_exception = GTFS.get_service_exception!(insert(:service_exception, agency: agency, service: service).id)
+    feed = insert(:feed)
+    service = insert(:service, feed: feed)
+    service_exception = GTFS.get_service_exception!(insert(:service_exception, feed: feed, service: service).id)
 
-    assert [service_exception] == GTFS.list_service_exceptions(agency, service)
+    assert [service_exception] == GTFS.list_service_exceptions(feed, service)
   end
 
   test "create_route/1" do
-    agency = insert(:agency)
-    params = %{long_name: long_name} = params_for(:route, agency_id: agency.id)
+    feed = insert(:feed)
+    agency = insert(:agency, feed: feed)
+    params = %{long_name: long_name} = params_for(:route, feed_id: feed.id, agency_id: agency.id)
 
     assert {:ok, %Route{long_name: ^long_name}} = GTFS.create_route(params)
   end
 
   test "list_routes/1" do
-    agency = insert(:agency)
-    %Route{remote_id: remote_id} = insert(:route, agency: agency)
-    route = GTFS.get_route(agency, remote_id)
+    feed = insert(:feed)
+    %Route{remote_id: remote_id} = insert(:route, feed: feed)
+    route = GTFS.get_route(feed, remote_id)
 
-    assert [route] == GTFS.list_routes(agency)
+    assert [route] == GTFS.list_routes(feed)
   end
 
   test "create_stop/1" do
-    agency = insert(:agency)
-    params = %{remote_id: remote_id} = params_for(:stop, agency_id: agency.id)
+    feed = insert(:feed)
+    params = %{remote_id: remote_id} = params_for(:stop, feed_id: feed.id)
 
     assert {:ok, %Stop{remote_id: ^remote_id}} = GTFS.create_stop(params)
   end
 
   test "list_stops/1" do
-    agency = insert(:agency)
-    %Stop{remote_id: remote_id} = insert(:stop, agency: agency)
-    stop = GTFS.get_stop(agency, remote_id)
+    feed = insert(:feed)
+    %Stop{remote_id: remote_id} = insert(:stop, feed: feed)
+    stop = GTFS.get_stop(feed, remote_id)
 
-    assert [stop] == GTFS.list_stops(agency)
+    assert [stop] == GTFS.list_stops(feed)
   end
 
   describe "search_stops/1" do
     setup do
-      agency = insert(:agency)
+      feed = insert(:feed)
 
-      {:ok, agency: agency}
+      {:ok, feed: feed}
     end
 
-    test "search is case-insensitive", %{agency: agency} do
-      insert(:stop, agency: agency, name: "unrelated")
-      stop = insert(:stop, agency: agency, name: "BIG TIME STOP")
+    test "search is case-insensitive", %{feed: feed} do
+      insert(:stop, feed: feed, name: "unrelated")
+      stop = insert(:stop, feed: feed, name: "BIG TIME STOP")
 
       results = GTFS.search_stops(query: "big time")
 
@@ -117,9 +96,9 @@ defmodule BusDetective.GTFSTest do
       assert stop.id == Enum.at(results, 0).id
     end
 
-    test "searching by partial name returns the correct results", %{agency: agency} do
-      insert(:stop, agency: agency, name: "unrelated")
-      stop = insert(:stop, agency: agency, name: "This is a stop & it's great")
+    test "searching by partial name returns the correct results", %{feed: feed} do
+      insert(:stop, feed: feed, name: "unrelated")
+      stop = insert(:stop, feed: feed, name: "This is a stop & it's great")
 
       results = GTFS.search_stops(query: "great")
 
@@ -127,9 +106,9 @@ defmodule BusDetective.GTFSTest do
       assert stop.id == Enum.at(results, 0).id
     end
 
-    test "it pages correctly", %{agency: agency} do
+    test "it pages correctly", %{feed: feed} do
       for x <- 1..20 do
-        insert(:stop, agency: agency, name: "thing #{x}")
+        insert(:stop, feed: feed, name: "thing #{x}")
       end
 
       results = GTFS.search_stops(query: "thing", page: 1, page_size: 7)
@@ -142,64 +121,64 @@ defmodule BusDetective.GTFSTest do
   end
 
   test "create_shape/1" do
-    agency = insert(:agency)
-    params = %{remote_id: remote_id} = params_for(:shape, agency_id: agency.id)
+    feed = insert(:feed)
+    params = %{remote_id: remote_id} = params_for(:shape, feed_id: feed.id)
 
     assert {:ok, %Shape{remote_id: ^remote_id}} = GTFS.create_shape(params)
   end
 
   test "list_shapes/1" do
-    agency = insert(:agency)
-    %Shape{remote_id: remote_id} = insert(:shape, agency: agency)
-    shape = GTFS.get_shape(agency, remote_id)
+    feed = insert(:feed)
+    %Shape{remote_id: remote_id} = insert(:shape, feed: feed)
+    shape = GTFS.get_shape(feed, remote_id)
 
-    assert [shape] == GTFS.list_shapes(agency)
+    assert [shape] == GTFS.list_shapes(feed)
   end
 
   test "create_trip/1" do
-    agency = insert(:agency)
-    service = insert(:service, agency: agency)
-    route = insert(:route, agency: agency)
-    shape = insert(:shape, agency: agency)
+    feed = insert(:feed)
+    service = insert(:service, feed: feed)
+    route = insert(:route, feed: feed)
+    shape = insert(:shape, feed: feed)
 
     params =
       %{remote_id: remote_id} =
-      params_for(:trip, agency_id: agency.id, shape_id: shape.id, service_id: service.id, route_id: route.id)
+      params_for(:trip, feed_id: feed.id, shape_id: shape.id, service_id: service.id, route_id: route.id)
 
     assert {:ok, %Trip{remote_id: ^remote_id}} = GTFS.create_trip(params)
   end
 
   test "list_trips/1" do
-    agency = insert(:agency)
-    service = insert(:service, agency: agency)
-    route = insert(:route, agency: agency)
+    feed = insert(:feed)
+    service = insert(:service, feed: feed)
+    route = insert(:route, feed: feed)
 
-    %Trip{remote_id: remote_id} = insert(:trip, agency: agency, service: service, route: route)
-    trip = GTFS.get_trip(agency, remote_id)
+    %Trip{remote_id: remote_id} = insert(:trip, feed: feed, service: service, route: route)
+    trip = GTFS.get_trip(feed, remote_id)
 
-    assert [trip] == GTFS.list_trips(agency)
+    assert [trip] == GTFS.list_trips(feed)
   end
 
   test "create_stop_time/1" do
-    agency = insert(:agency)
-    stop = :stop |> build() |> with_agency(agency) |> insert()
-    trip = :trip |> build() |> with_agency(agency) |> insert()
+    feed = insert(:feed)
+    stop = :stop |> build() |> with_feed(feed) |> insert()
+    trip = :trip |> build() |> with_feed(feed) |> insert()
 
-    params = %{stop_sequence: stop_sequence} = params_for(:stop_time, agency: agency, stop: stop, trip: trip)
+    params = %{stop_sequence: stop_sequence} = params_for(:stop_time, feed: feed, stop: stop, trip: trip)
 
     assert {:ok, %StopTime{stop_sequence: ^stop_sequence}} = GTFS.create_stop_time(params)
   end
 
   test "list_stop_times/1" do
-    agency = insert(:agency)
-    stop = :stop |> build() |> with_agency(agency) |> insert()
-    trip = :trip |> build() |> with_agency(agency) |> insert()
+    feed = insert(:feed)
+    stop = :stop |> build() |> with_feed(feed) |> insert()
+    trip = :trip |> build() |> with_feed(feed) |> insert()
 
-    %StopTime{stop_sequence: stop_sequence} = insert(:stop_time, agency: agency, stop: stop, trip: trip)
+    %StopTime{stop_sequence: stop_sequence} = insert(:stop_time, feed: feed, stop: stop, trip: trip)
 
-    stop_time = GTFS.get_stop_time(agency, stop, stop_sequence, trip)
+    stop_time = GTFS.get_stop_time(feed, stop, stop_sequence, trip)
 
-    assert 1 == length(GTFS.list_stop_times(agency))
-    assert stop_time.id == List.first(GTFS.list_stop_times(agency)).id
+    assert 1 == length(GTFS.list_stop_times(feed))
+    assert stop_time.id == List.first(GTFS.list_stop_times(feed)).id
   end
 end
