@@ -7,6 +7,7 @@ defmodule BusDetective.GTFS do
 
   alias BusDetective.GTFS.{
     Agency,
+    Feed,
     ProjectedStopTime,
     Route,
     RouteStop,
@@ -30,7 +31,7 @@ defmodule BusDetective.GTFS do
         where: projected.scheduled_departure_time >= ^start_time,
         where: projected.scheduled_departure_time <= ^end_time,
         order_by: [:scheduled_departure_time],
-        preload: [stop_time: [trip: [:route, :shape]]]
+        preload: [stop_time: [trip: [:shape, route: :agency]]]
       )
     )
   end
@@ -38,17 +39,25 @@ defmodule BusDetective.GTFS do
   @doc """
   Gets an agency by its remote id
   """
-  def get_agency_by_remote_id(remote_id) do
+  def get_agency_by_remote_id(feed_id, remote_id) do
     Repo.one(
       from(
         a in Agency,
+        where: a.feed_id == ^feed_id,
         where: a.remote_id == ^remote_id
       )
     )
   end
 
   @doc """
-  Returns the list of agencies.
+  returns the list of feeds.
+  """
+  def list_feeds do
+    Repo.all(Feed)
+  end
+
+  @doc """
+  returns the list of agencies.
   """
   def list_agencies do
     Repo.all(Agency)
@@ -73,57 +82,40 @@ defmodule BusDetective.GTFS do
   end
 
   @doc """
-  Deletes an agency by remote_id and all the related associations
+  Deletes all service exceptions for a feed
   """
-  def destroy_agency(remote_id) do
-    agency =
-      Repo.one(
-        from(
-          agency in Agency,
-          where: agency.remote_id == ^remote_id
-        )
-      )
-
-    if agency do
-      Repo.delete(agency, timeout: 60_000)
-    end
-  end
-
-  @doc """
-  Deletes all service exceptions for an agency
-  """
-  def destroy_service_exceptions_for_agency(%Agency{id: agency_id}) do
+  def destroy_service_exceptions_for_feed(%Feed{id: feed_id}) do
     Repo.delete_all(
       from(
         service_exception in ServiceException,
-        where: service_exception.agency_id == ^agency_id
+        where: service_exception.feed_id == ^feed_id
       ),
       timeout: 60_000
     )
   end
 
   @doc """
-  Deletes all stop times (and associated projected stop times) for an agency
+  Deletes all stop times (and associated projected stop times) for a feed
   """
-  def destroy_stop_times_for_agency(%Agency{id: agency_id}) do
+  def destroy_stop_times_for_feed(%Feed{id: feed_id}) do
     Repo.delete_all(
       from(
         stop_time in StopTime,
-        where: stop_time.agency_id == ^agency_id
+        where: stop_time.feed_id == ^feed_id
       ),
       timeout: 60_000
     )
   end
 
   @doc """
-  Deletes all calculated route stops for an agency
+  Deletes all calculated route stops for a feed
   """
-  def destroy_route_stops_for_agency(%Agency{id: agency_id}) do
+  def destroy_route_stops_for_feed(%Feed{id: feed_id}) do
     Repo.delete_all(
       from(
         route_stop in RouteStop,
         join: route in assoc(route_stop, :route),
-        where: route.agency_id == ^agency_id
+        where: route.feed_id == ^feed_id
       ),
       timeout: 60_000
     )
@@ -132,17 +124,17 @@ defmodule BusDetective.GTFS do
   @doc """
   Returns the list of services.
   """
-  def list_services(%Agency{id: agency_id}) do
-    Repo.all(from(service in Service, where: service.agency_id == ^agency_id))
+  def list_services(%Feed{id: feed_id}) do
+    Repo.all(from(service in Service, where: service.feed_id == ^feed_id))
   end
 
   @doc """
-  Gets a single service by agency and remote_id.
+  Gets a single service by feed and remote_id.
 
   Returns nil if no matching service exists
   """
-  def get_service(%Agency{id: agency_id}, remote_id) do
-    Repo.one(from(service in Service, where: service.agency_id == ^agency_id and service.remote_id == ^remote_id))
+  def get_service(%Feed{id: feed_id}, remote_id) do
+    Repo.one(from(service in Service, where: service.feed_id == ^feed_id and service.remote_id == ^remote_id))
   end
 
   @doc """
@@ -177,17 +169,17 @@ defmodule BusDetective.GTFS do
     Repo.insert_all(
       Service,
       services,
-      conflict_target: [:agency_id, :remote_id],
+      conflict_target: [:feed_id, :remote_id],
       on_conflict: on_conflict_query,
-      returning: [:id, :remote_id, :agency_id]
+      returning: [:id, :remote_id, :feed_id]
     )
   end
 
   @doc """
   Returns the list of service_exceptions.
   """
-  def list_service_exceptions(%Agency{id: agency_id}, %Service{id: service_id}) do
-    Repo.all(from(se in ServiceException, where: se.agency_id == ^agency_id and se.service_id == ^service_id))
+  def list_service_exceptions(%Feed{id: feed_id}, %Service{id: service_id}) do
+    Repo.all(from(se in ServiceException, where: se.feed_id == ^feed_id and se.service_id == ^service_id))
   end
 
   @doc """
@@ -213,8 +205,8 @@ defmodule BusDetective.GTFS do
   @doc """
   Returns the list of routes.
   """
-  def list_routes(%Agency{id: agency_id}) do
-    Repo.all(from(r in Route, where: r.agency_id == ^agency_id))
+  def list_routes(%Feed{id: feed_id}) do
+    Repo.all(from(r in Route, where: r.feed_id == ^feed_id))
   end
 
   @doc """
@@ -222,8 +214,8 @@ defmodule BusDetective.GTFS do
 
   Returns nil if no results found
   """
-  def get_route(%Agency{id: agency_id}, remote_id) do
-    Repo.one(from(r in Route, where: r.agency_id == ^agency_id and r.remote_id == ^remote_id))
+  def get_route(%Feed{id: feed_id}, remote_id) do
+    Repo.one(from(r in Route, where: r.feed_id == ^feed_id and r.remote_id == ^remote_id))
   end
 
   @doc """
@@ -256,9 +248,9 @@ defmodule BusDetective.GTFS do
     Repo.insert_all(
       Route,
       routes,
-      conflict_target: [:agency_id, :remote_id],
+      conflict_target: [:feed_id, :remote_id],
       on_conflict: on_conflict_query,
-      returning: [:id, :remote_id, :agency_id]
+      returning: [:id, :remote_id, :feed_id]
     )
   end
 
@@ -267,8 +259,8 @@ defmodule BusDetective.GTFS do
 
   Returns nil if no results found
   """
-  def list_stops(%Agency{id: agency_id}) do
-    Repo.all(from(s in Stop, where: s.agency_id == ^agency_id))
+  def list_stops(%Feed{id: feed_id}) do
+    Repo.all(from(s in Stop, where: s.feed_id == ^feed_id))
   end
 
   def search_stops(options) do
@@ -279,7 +271,7 @@ defmodule BusDetective.GTFS do
       from(
         s in Stop,
         where: fragment("? ILIKE ?", s.name, ^"%#{query}%"),
-        preload: [:routes, :agency]
+        preload: [:routes, :feed]
       ),
       pagination_options
     )
@@ -290,14 +282,14 @@ defmodule BusDetective.GTFS do
 
   Returns nil if no results found
   """
-  def get_stop(%Agency{id: agency_id}, remote_id) do
-    Repo.one(from(s in Stop, where: s.agency_id == ^agency_id and s.remote_id == ^remote_id))
+  def get_stop(%Feed{id: feed_id}, remote_id) do
+    Repo.one(from(s in Stop, where: s.feed_id == ^feed_id and s.remote_id == ^remote_id))
   end
 
   def get_stop!(id) do
     Stop
     |> Repo.get!(id)
-    |> Repo.preload([:agency, :routes])
+    |> Repo.preload([:feed, :routes])
   end
 
   @doc """
@@ -334,17 +326,17 @@ defmodule BusDetective.GTFS do
     Repo.insert_all(
       Stop,
       stops,
-      conflict_target: [:agency_id, :remote_id],
+      conflict_target: [:feed_id, :remote_id],
       on_conflict: on_conflict_query,
-      returning: [:id, :remote_id, :agency_id]
+      returning: [:id, :remote_id, :feed_id]
     )
   end
 
   @doc """
   Returns the list of shapes.
   """
-  def list_shapes(%Agency{id: agency_id}) do
-    Repo.all(from(s in Shape, where: s.agency_id == ^agency_id))
+  def list_shapes(%Feed{id: feed_id}) do
+    Repo.all(from(s in Shape, where: s.feed_id == ^feed_id))
   end
 
   @doc """
@@ -352,8 +344,8 @@ defmodule BusDetective.GTFS do
 
   Returns nil if no results found
   """
-  def get_shape(%Agency{id: agency_id}, remote_id) do
-    Repo.one(from(s in Shape, where: s.agency_id == ^agency_id and s.remote_id == ^remote_id))
+  def get_shape(%Feed{id: feed_id}, remote_id) do
+    Repo.one(from(s in Shape, where: s.feed_id == ^feed_id and s.remote_id == ^remote_id))
   end
 
   @doc """
@@ -380,17 +372,17 @@ defmodule BusDetective.GTFS do
     Repo.insert_all(
       Shape,
       shapes,
-      conflict_target: [:agency_id, :remote_id],
+      conflict_target: [:feed_id, :remote_id],
       on_conflict: on_conflict_query,
-      returning: [:id, :remote_id, :agency_id]
+      returning: [:id, :remote_id, :feed_id]
     )
   end
 
   @doc """
   Returns the list of trips.
   """
-  def list_trips(%Agency{id: agency_id}) do
-    Repo.all(from(t in Trip, where: t.agency_id == ^agency_id))
+  def list_trips(%Feed{id: feed_id}) do
+    Repo.all(from(t in Trip, where: t.feed_id == ^feed_id))
   end
 
   @doc """
@@ -398,8 +390,8 @@ defmodule BusDetective.GTFS do
 
   Returns nil if no results found
   """
-  def get_trip(%Agency{id: agency_id}, remote_id) do
-    Repo.one(from(t in Trip, where: t.agency_id == ^agency_id and t.remote_id == ^remote_id))
+  def get_trip(%Feed{id: feed_id}, remote_id) do
+    Repo.one(from(t in Trip, where: t.feed_id == ^feed_id and t.remote_id == ^remote_id))
   end
 
   def get_trips(ids) do
@@ -444,17 +436,17 @@ defmodule BusDetective.GTFS do
     Repo.insert_all(
       Trip,
       trips,
-      conflict_target: [:agency_id, :remote_id],
+      conflict_target: [:feed_id, :remote_id],
       on_conflict: on_conflict_query,
-      returning: [:id, :agency_id, :remote_id]
+      returning: [:id, :feed_id, :remote_id]
     )
   end
 
   @doc """
   Returns the list of stop_times.
   """
-  def list_stop_times(%Agency{id: agency_id}) do
-    Repo.all(from(st in StopTime, where: st.agency_id == ^agency_id))
+  def list_stop_times(%Feed{id: feed_id}) do
+    Repo.all(from(st in StopTime, where: st.feed_id == ^feed_id))
   end
 
   @doc """
@@ -462,12 +454,12 @@ defmodule BusDetective.GTFS do
 
   Returns nil if no results found
   """
-  def get_stop_time(%Agency{id: agency_id}, %Stop{id: stop_id}, stop_sequence, %Trip{id: trip_id}) do
+  def get_stop_time(%Feed{id: feed_id}, %Stop{id: stop_id}, stop_sequence, %Trip{id: trip_id}) do
     Repo.one(
       from(
         st in StopTime,
         where:
-          st.agency_id == ^agency_id and st.trip_id == ^trip_id and st.stop_id == ^stop_id and
+          st.feed_id == ^feed_id and st.trip_id == ^trip_id and st.stop_id == ^stop_id and
             st.stop_sequence == ^stop_sequence
       )
     )
@@ -490,7 +482,7 @@ defmodule BusDetective.GTFS do
     Repo.insert_all(ProjectedStopTime, projected_stop_times, returning: [:id], timeout: 60_000)
   end
 
-  def update_route_stops(%Agency{id: agency_id}) do
+  def update_route_stops(%Feed{id: feed_id}) do
     {:ok, _} =
       SQL.query(
         Repo,
@@ -501,9 +493,54 @@ defmodule BusDetective.GTFS do
         INNER JOIN trips ON trips.route_id = routes.id
         INNER JOIN stop_times ON stop_times.trip_id = trips.id
         INNER JOIN stops ON stops.id = stop_times.stop_id
-        WHERE routes.agency_id = $1
+        WHERE routes.feed_id = $1
         """,
-        [agency_id]
+        [feed_id]
       )
+  end
+
+  @doc """
+  Creates a feed.
+
+  ## Examples
+
+      iex> create_feed(%{field: value})
+      {:ok, %Feed{}}
+
+      iex> create_feed(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def create_feed(attrs \\ %{}) do
+    %Feed{}
+    |> Feed.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  def get_feed_by_name(name) do
+    Repo.one(
+      from(
+        feed in Feed,
+        where: feed.name == ^name
+      )
+    )
+  end
+
+  @doc """
+  Updates a feed.
+
+  ## Examples
+
+      iex> update_feed(feed, %{field: new_value})
+      {:ok, %Feed{}}
+
+      iex> update_feed(feed, %{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def update_feed(%Feed{} = feed, attrs) do
+    feed
+    |> Feed.changeset(attrs)
+    |> Repo.update()
   end
 end

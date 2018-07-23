@@ -4,13 +4,14 @@ defmodule BusDetective.GTFS.Trip do
   use Ecto.Schema
   import Ecto.Changeset
 
-  alias BusDetective.GTFS.{Agency, Route, Service, Shape}
+  alias BusDetective.GTFS.{Feed, Route, Service, Shape}
 
   schema "trips" do
-    belongs_to(:agency, Agency)
+    belongs_to(:feed, Feed)
     belongs_to(:route, Route)
     belongs_to(:service, Service)
     belongs_to(:shape, Shape)
+
     field(:bikes_allowed, :integer)
     field(:block_id, :integer)
     field(:direction_id, :integer)
@@ -26,7 +27,7 @@ defmodule BusDetective.GTFS.Trip do
   def changeset(trip, attrs) do
     trip
     |> cast(attrs, [
-      :agency_id,
+      :feed_id,
       :service_id,
       :route_id,
       :shape_id,
@@ -39,11 +40,11 @@ defmodule BusDetective.GTFS.Trip do
       :bikes_allowed
     ])
     |> validate_required([
-      :agency_id,
+      :feed_id,
       :service_id,
       :route_id,
       :remote_id
     ])
-    |> unique_constraint(:remote_id, name: :trips_agency_id_remote_id_index)
+    |> unique_constraint(:remote_id, name: :trips_feed_id_remote_id_index)
   end
 end

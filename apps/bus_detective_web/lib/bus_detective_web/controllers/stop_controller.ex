@@ -22,7 +22,8 @@ defmodule BusDetectiveWeb.StopController do
             realtime?: false,
             delay: 0,
             trip: projected_stop_time.stop_time.trip,
-            route: projected_stop_time.stop_time.trip.route
+            route: projected_stop_time.stop_time.trip.route,
+            agency: projected_stop_time.stop_time.trip.route.agency
           }
         end)
 

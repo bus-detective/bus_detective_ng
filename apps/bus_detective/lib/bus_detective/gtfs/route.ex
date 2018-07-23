@@ -4,10 +4,12 @@ defmodule BusDetective.GTFS.Route do
   use Ecto.Schema
   import Ecto.Changeset
 
-  alias BusDetective.GTFS.{Agency, RouteStop, Trip}
+  alias BusDetective.GTFS.{Agency, Feed, RouteStop, Trip}
 
   schema "routes" do
+    belongs_to(:feed, Feed)
     belongs_to(:agency, Agency)
+
     field(:color, :string)
     field(:description, :string)
     field(:long_name, :string)
@@ -28,6 +30,7 @@ defmodule BusDetective.GTFS.Route do
   def changeset(route, attrs) do
     route
     |> cast(attrs, [
+      :feed_id,
       :agency_id,
       :remote_id,
       :short_name,
@@ -39,12 +42,13 @@ defmodule BusDetective.GTFS.Route do
       :text_color
     ])
     |> validate_required([
+      :feed_id,
       :agency_id,
       :remote_id,
       :short_name,
       :long_name,
       :route_type
     ])
-    |> unique_constraint(:remote_id, name: :routes_agency_id_remote_id_index)
+    |> unique_constraint(:remote_id, name: :routes_feed_id_remote_id_index)
   end
 end

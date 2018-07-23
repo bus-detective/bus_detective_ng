@@ -4,7 +4,7 @@ defmodule BusDetective.GTFS.Stop do
   use Ecto.Schema
   import Ecto.Changeset
 
-  alias BusDetective.GTFS.{Agency, RouteStop, StopTime}
+  alias BusDetective.GTFS.{Feed, RouteStop, StopTime}
 
   @direction_labels %{
     "i" => "inbound",
@@ -16,7 +16,8 @@ defmodule BusDetective.GTFS.Stop do
   }
 
   schema "stops" do
-    belongs_to(:agency, Agency)
+    belongs_to(:feed, Feed)
+
     field(:code, :integer)
     field(:description, :string)
     field(:latitude, :float)
@@ -41,7 +42,7 @@ defmodule BusDetective.GTFS.Stop do
   def changeset(stop, attrs) do
     stop
     |> cast(attrs, [
-      :agency_id,
+      :feed_id,
       :remote_id,
       :code,
       :name,
@@ -56,13 +57,13 @@ defmodule BusDetective.GTFS.Stop do
       :wheelchair_boarding
     ])
     |> validate_required([
-      :agency_id,
+      :feed_id,
       :remote_id,
       :name,
       :latitude,
       :longitude
     ])
-    |> unique_constraint(:remote_id, name: :stops_agency_id_remote_id_index)
+    |> unique_constraint(:remote_id, name: :stops_feed_id_remote_id_index)
   end
 
   def direction(%__MODULE__{remote_id: remote_id}) do

@@ -4,10 +4,11 @@ defmodule BusDetective.GTFS.Service do
   use Ecto.Schema
   import Ecto.Changeset
 
-  alias BusDetective.GTFS.{Agency, ServiceException, Trip}
+  alias BusDetective.GTFS.{Feed, ServiceException, Trip}
 
   schema "services" do
-    belongs_to(:agency, Agency)
+    belongs_to(:feed, Feed)
+
     field(:end_date, :date)
     field(:friday, :boolean, default: false)
     field(:monday, :boolean, default: false)
@@ -29,7 +30,7 @@ defmodule BusDetective.GTFS.Service do
   def changeset(service, attrs) do
     service
     |> cast(attrs, [
-      :agency_id,
+      :feed_id,
       :remote_id,
       :monday,
       :tuesday,
@@ -42,7 +43,7 @@ defmodule BusDetective.GTFS.Service do
       :end_date
     ])
     |> validate_required([
-      :agency_id,
+      :feed_id,
       :remote_id,
       :monday,
       :tuesday,
@@ -54,7 +55,7 @@ defmodule BusDetective.GTFS.Service do
       :start_date,
       :end_date
     ])
-    |> unique_constraint(:remote_id, name: :services_agency_id_remote_id_index)
+    |> unique_constraint(:remote_id, name: :services_feed_id_remote_id_index)
   end
 
   def weekday_schedule(%__MODULE__{} = service) do

@@ -4,14 +4,15 @@ defmodule ViewingADepartureTest do
   alias BusDetectiveWeb.StopPage
 
   setup do
-    agency = insert(:agency)
-    service = insert(:service, agency: agency)
-    stop = insert(:stop, agency: agency)
-    route = insert(:route, agency: agency)
+    feed = insert(:feed)
+    agency = :agency |> build(feed: feed) |> insert()
+    service = :service |> build() |> with_feed(feed) |> insert()
+    stop = :stop |> build() |> with_feed(feed) |> insert()
+    route = :route |> build() |> with_feed(feed) |> with_agency(agency) |> insert()
     insert(:route_stop, route: route, stop: stop)
-    shape = insert(:shape, agency: agency)
-    trip = insert(:trip, agency: agency, route: route, service: service, shape: shape)
-    stop_time = insert(:stop_time, agency: agency, stop: stop, trip: trip)
+    shape = :shape |> build() |> with_feed(feed) |> insert()
+    trip = insert(:trip, feed: feed, route: route, service: service, shape: shape)
+    stop_time = insert(:stop_time, feed: feed, stop: stop, trip: trip)
 
     departure_time = Timex.shift(Timex.now(), minutes: 5)
 

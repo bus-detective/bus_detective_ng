@@ -4,11 +4,12 @@ defmodule BusDetective.GTFS.ServiceException do
   use Ecto.Schema
   import Ecto.Changeset
 
-  alias BusDetective.GTFS.{Agency, Service}
+  alias BusDetective.GTFS.{Feed, Service}
 
   schema "service_exceptions" do
-    belongs_to(:agency, Agency)
+    belongs_to(:feed, Feed)
     belongs_to(:service, Service)
+
     field(:date, :date)
     field(:exception, :integer)
 
@@ -18,7 +19,7 @@ defmodule BusDetective.GTFS.ServiceException do
   @doc false
   def changeset(service_exception, attrs) do
     service_exception
-    |> cast(attrs, [:agency_id, :service_id, :date, :exception])
-    |> validate_required([:agency_id, :service_id, :date, :exception])
+    |> cast(attrs, [:feed_id, :service_id, :date, :exception])
+    |> validate_required([:feed_id, :service_id, :date, :exception])
   end
 end

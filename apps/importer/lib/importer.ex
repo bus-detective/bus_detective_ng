@@ -6,37 +6,62 @@ defmodule Importer do
   require Logger
 
   alias BusDetective.GTFS
-  alias BusDetective.GTFS.{Agency, Interval, Route, Service, Shape, Stop, Trip}
+  alias BusDetective.GTFS.{Agency, Feed, Interval, Route, Service, Shape, Stop, Trip}
   alias Ecto.Type
   alias Importer.{ColorFunctions, ProjectedStopTimeImporter, StringFunctions}
 
-  def import_from_url(url, opts \\ []) do
+  def import_from_url(name, url, opts \\ []) do
     {:ok, tmp_file} = download_gtfs_file(url)
-    import_from_file(tmp_file, opts)
+    import_from_file(name, tmp_file, opts)
   end
 
-  def import_from_file(file, opts \\ []) do
+  def file_hash(file) do
+    file
+    |> File.stream!([], 2048)
+    |> Enum.reduce(:crypto.hash_init(:sha256), fn line, acc -> :crypto.hash_update(acc, line) end)
+    |> :crypto.hash_final()
+    |> Base.encode16()
+  end
+
+  def import_from_file(name, file, opts \\ []) do
+    with file_hash <- file_hash(file) do
+      feed =
+        case GTFS.get_feed_by_name(name) do
+          nil ->
+            {:ok, feed} = GTFS.create_feed(%{name: name})
+            feed
+
+          %Feed{} = feed ->
+            feed
+        end
+
+      import_feed(feed, file_hash, file, opts)
+    end
+  end
+
+  def import_feed(feed, file_hash, _, opts \\ [])
+
+  def import_feed(%Feed{last_file_hash: file_hash}, file_hash, _, _), do: nil
+
+  def import_feed(%Feed{} = feed, _file_hash, file, opts) do
     with {:ok, tmp_path} <- Briefly.create(directory: true),
          {:ok, file_map} <- unzip_gtfs_file(file, tmp_path) do
-      file_map["agency"]
-      |> import_agencies()
-      |> Enum.each(fn agency ->
-        delete_data(agency)
+      delete_data(feed)
 
-        services_task = Task.async(fn -> import_services(file_map["calendar"], agency) end)
-        routes_task = Task.async(fn -> import_routes(file_map["routes"], agency) end)
-        stops_task = Task.async(fn -> import_stops(file_map["stops"], agency) end)
-        shapes_task = Task.async(fn -> import_shapes(file_map["shapes"], agency) end)
-        services_map = Task.await(services_task, 300_000)
-        import_service_exceptions(file_map["calendar_dates"], agency, services_map)
-        routes_map = Task.await(routes_task, 300_000)
-        shapes_map = Task.await(shapes_task, 300_000)
-        trips_map = import_trips(file_map["trips"], agency, routes_map, services_map, shapes_map)
-        stops_map = Task.await(stops_task, 300_000)
-        import_stop_times(file_map["stop_times"], agency, stops_map, trips_map)
-        GTFS.update_route_stops(agency)
-        ProjectedStopTimeImporter.project_stop_times(agency, opts)
-      end)
+      agencies = import_agencies(file_map["agency"], feed)
+      services_task = Task.async(fn -> import_services(file_map["calendar"], feed) end)
+      routes_task = Task.async(fn -> import_routes(file_map["routes"], feed, agencies) end)
+      stops_task = Task.async(fn -> import_stops(file_map["stops"], feed) end)
+      shapes_task = Task.async(fn -> import_shapes(file_map["shapes"], feed) end)
+      services = Task.await(services_task, 300_000)
+      import_service_exceptions(file_map["calendar_dates"], feed, services)
+      routes = Task.await(routes_task, 300_000)
+      shapes = Task.await(shapes_task, 300_000)
+      trips = import_trips(file_map["trips"], feed, routes, services, shapes)
+      stops = Task.await(stops_task, 300_000)
+      import_stop_times(file_map["stop_times"], feed, stops, trips)
+      GTFS.update_route_stops(feed)
+      ProjectedStopTimeImporter.project_stop_times(feed, opts)
     else
       error -> error
     end
@@ -73,18 +98,18 @@ defmodule Importer do
     end
   end
 
-  defp delete_data(agency) do
-    Logger.info(fn -> "Start deleting transient and calculated data for #{agency.remote_id}" end)
-    Logger.debug(fn -> "Deleting service exceptions for #{agency.remote_id}" end)
-    GTFS.destroy_service_exceptions_for_agency(agency)
-    Logger.debug(fn -> "Deleting stop times for #{agency.remote_id}" end)
-    GTFS.destroy_stop_times_for_agency(agency)
-    Logger.debug(fn -> "Deleting route stops for #{agency.remote_id}" end)
-    GTFS.destroy_route_stops_for_agency(agency)
-    Logger.info(fn -> "Done deleting transient and calculated data for #{agency.remote_id}" end)
+  defp delete_data(feed) do
+    Logger.info(fn -> "Start deleting transient and calculated data for #{feed.name}" end)
+    Logger.debug(fn -> "Deleting service exceptions for #{feed.name}" end)
+    GTFS.destroy_service_exceptions_for_feed(feed)
+    Logger.debug(fn -> "Deleting stop times for #{feed.name}" end)
+    GTFS.destroy_stop_times_for_feed(feed)
+    Logger.debug(fn -> "Deleting route stops for #{feed.name}" end)
+    GTFS.destroy_route_stops_for_feed(feed)
+    Logger.info(fn -> "Done deleting transient and calculated data for #{feed.name}" end)
   end
 
-  def import_agencies(file) do
+  def import_agencies(file, %Feed{id: feed_id}) do
     Logger.info("Importing agencies")
 
     file
@@ -94,8 +119,9 @@ defmodule Importer do
       remote_id = raw_agency["agency_id"]
 
       changeset = %{
-        fare_url: raw_agency["agency_fare_url"],
+        feed_id: feed_id,
         remote_id: remote_id,
+        fare_url: raw_agency["agency_fare_url"],
         language: raw_agency["agency_lang"],
         name: raw_agency["agency_name"],
         phone: raw_agency["agency_phone"],
@@ -104,7 +130,7 @@ defmodule Importer do
       }
 
       {:ok, agency} =
-        case GTFS.get_agency_by_remote_id(remote_id) do
+        case GTFS.get_agency_by_remote_id(feed_id, remote_id) do
           nil ->
             GTFS.create_agency(changeset)
 
@@ -114,9 +140,10 @@ defmodule Importer do
 
       agency
     end)
+    |> Enum.reduce(%{}, fn agency, acc -> Map.put(acc, agency.remote_id, agency.id) end)
   end
 
-  def import_services(file, %Agency{id: agency_id}) do
+  def import_services(file, %Feed{id: feed_id}) do
     Logger.info("Importing services")
 
     {services_count, services} =
@@ -135,7 +162,7 @@ defmodule Importer do
         {:ok, sunday} = maybe_cast(:boolean, raw_service["sunday"])
 
         %{
-          agency_id: agency_id,
+          feed_id: feed_id,
           remote_id: raw_service["service_id"],
           monday: monday,
           tuesday: tuesday,
@@ -154,12 +181,12 @@ defmodule Importer do
 
     Logger.info("Done importing #{services_count} services")
 
-    Enum.reduce(services, %{}, fn %Service{id: id, remote_id: remote_id, agency_id: agency_id}, acc ->
-      Map.put(acc, {agency_id, remote_id}, id)
+    Enum.reduce(services, %{}, fn %Service{id: id, remote_id: remote_id}, acc ->
+      Map.put(acc, remote_id, id)
     end)
   end
 
-  def import_service_exceptions(file, %Agency{id: agency_id}, services_map) do
+  def import_service_exceptions(file, %Feed{id: feed_id}, services) do
     Logger.info("Importing service exceptions")
 
     service_exceptions =
@@ -168,12 +195,12 @@ defmodule Importer do
       |> File.stream!()
       |> CSV.decode(headers: true, strip_fields: true)
       |> Enum.map(fn {:ok, raw_service_exception} ->
-        service_id = services_map[{agency_id, raw_service_exception["service_id"]}]
+        service_id = services[raw_service_exception["service_id"]]
         date = raw_service_exception["date"] |> Timex.parse!("%Y%m%d", :strftime) |> Timex.to_date()
         {:ok, exception} = maybe_cast(:integer, raw_service_exception["exception_type"])
 
         %{
-          agency_id: agency_id,
+          feed_id: feed_id,
           service_id: service_id,
           date: date,
           exception: exception,
@@ -188,7 +215,7 @@ defmodule Importer do
     service_exceptions
   end
 
-  def import_routes(file, %Agency{id: agency_id}) do
+  def import_routes(file, %Feed{id: feed_id}, agencies) do
     Logger.info("Importing routes")
 
     {routes_count, routes} =
@@ -196,7 +223,10 @@ defmodule Importer do
       |> File.stream!()
       |> CSV.decode(headers: true, strip_fields: true)
       |> Enum.map(fn {:ok, raw_route} ->
+        agency_id = agencies[raw_route["agency_id"]] || Enum.at(agencies, 0)
+
         %{
+          feed_id: feed_id,
           agency_id: agency_id,
           remote_id: raw_route["route_id"],
           short_name: raw_route["route_short_name"],
@@ -214,8 +244,8 @@ defmodule Importer do
 
     Logger.info("Done importing #{routes_count} routes")
 
-    Enum.reduce(routes, %{}, fn %Route{id: id, remote_id: remote_id, agency_id: agency_id}, acc ->
-      Map.put(acc, {agency_id, remote_id}, id)
+    Enum.reduce(routes, %{}, fn %Route{id: id, remote_id: remote_id}, acc ->
+      Map.put(acc, remote_id, id)
     end)
   end
 
@@ -227,7 +257,7 @@ defmodule Importer do
     end
   end
 
-  def import_stops(file, %Agency{id: agency_id}) do
+  def import_stops(file, %Feed{id: feed_id}) do
     Logger.info("Importing stops")
 
     {stops_count, stops} =
@@ -243,7 +273,7 @@ defmodule Importer do
         {:ok, zone_id} = maybe_cast(:integer, raw_stop["zone_id"])
 
         %{
-          agency_id: agency_id,
+          feed_id: feed_id,
           remote_id: raw_stop["stop_id"],
           code: code,
           name: StringFunctions.titleize(raw_stop["stop_name"]),
@@ -268,12 +298,12 @@ defmodule Importer do
 
     Logger.info("Done importing #{stops_count} stops")
 
-    Enum.reduce(stops, %{}, fn %Stop{id: id, remote_id: remote_id, agency_id: agency_id}, acc ->
-      Map.put(acc, {agency_id, remote_id}, id)
+    Enum.reduce(stops, %{}, fn %Stop{id: id, remote_id: remote_id}, acc ->
+      Map.put(acc, remote_id, id)
     end)
   end
 
-  def import_shapes(file, %Agency{id: agency_id}) do
+  def import_shapes(file, %Feed{id: feed_id}) do
     Logger.info("Importing shapes")
 
     {shapes_count, shapes} =
@@ -295,7 +325,7 @@ defmodule Importer do
           |> Enum.map(fn point -> {point["shape_pt_lat"], point["shape_pt_lon"]} end)
 
         %{
-          agency_id: agency_id,
+          feed_id: feed_id,
           geometry: %Geo.LineString{srid: 4326, coordinates: coordinates},
           remote_id: shape_id,
           inserted_at: Ecto.DateTime.utc(),
@@ -310,12 +340,12 @@ defmodule Importer do
 
     Logger.info("Done importing #{shapes_count} shapes")
 
-    Enum.reduce(shapes, %{}, fn %Shape{id: id, remote_id: remote_id, agency_id: agency_id}, acc ->
-      Map.put(acc, {agency_id, remote_id}, id)
+    Enum.reduce(shapes, %{}, fn %Shape{id: id, remote_id: remote_id}, acc ->
+      Map.put(acc, remote_id, id)
     end)
   end
 
-  def import_trips(file, %Agency{id: agency_id}, routes_map, services_map, shapes_map) do
+  def import_trips(file, %Feed{id: feed_id}, routes, services, shapes) do
     Logger.info("Importing trips")
 
     {trips_count, trips} =
@@ -323,12 +353,12 @@ defmodule Importer do
       |> File.stream!()
       |> CSV.decode(headers: true, strip_fields: true)
       |> Enum.map(fn {:ok, raw_trip} ->
-        route_id = routes_map[{agency_id, raw_trip["route_id"]}]
-        service_id = services_map[{agency_id, raw_trip["service_id"]}]
-        shape_id = shapes_map[{agency_id, raw_trip["shape_id"]}]
+        route_id = routes[raw_trip["route_id"]]
+        service_id = services[raw_trip["service_id"]]
+        shape_id = shapes[raw_trip["shape_id"]]
 
         %{
-          agency_id: agency_id,
+          feed_id: feed_id,
           route_id: route_id,
           service_id: service_id,
           shape_id: shape_id,
@@ -347,12 +377,12 @@ defmodule Importer do
 
     Logger.info("Done importing #{trips_count} trips")
 
-    Enum.reduce(trips, %{}, fn %Trip{id: id, agency_id: agency_id, remote_id: remote_id}, acc ->
-      Map.put(acc, {agency_id, remote_id}, id)
+    Enum.reduce(trips, %{}, fn %Trip{id: id, remote_id: remote_id}, acc ->
+      Map.put(acc, remote_id, id)
     end)
   end
 
-  def import_stop_times(file, %Agency{id: agency_id}, stops_map, trips_map) do
+  def import_stop_times(file, %Feed{id: feed_id}, stops, trips) do
     Logger.info("Importing stop times")
 
     stop_times =
@@ -361,8 +391,8 @@ defmodule Importer do
       |> File.stream!()
       |> CSV.decode(headers: true, strip_fields: true)
       |> Enum.map(fn {:ok, raw_stop_time} ->
-        stop_id = stops_map[{agency_id, raw_stop_time["stop_id"]}]
-        trip_id = trips_map[{agency_id, raw_stop_time["trip_id"]}]
+        stop_id = stops[raw_stop_time["stop_id"]]
+        trip_id = trips[raw_stop_time["trip_id"]]
 
         {:ok, arrival_time} = maybe_cast(Interval, raw_stop_time["arrival_time"])
         {:ok, departure_time} = maybe_cast(Interval, raw_stop_time["departure_time"])
@@ -370,7 +400,7 @@ defmodule Importer do
         {:ok, stop_sequence} = maybe_cast(:integer, raw_stop_time["stop_sequence"])
 
         %{
-          agency_id: agency_id,
+          feed_id: feed_id,
           stop_id: stop_id,
           trip_id: trip_id,
           stop_sequence: stop_sequence,

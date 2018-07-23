@@ -4,10 +4,10 @@ defmodule BusDetective.GTFS.StopTime do
   use Ecto.Schema
   import Ecto.Changeset
 
-  alias BusDetective.GTFS.{Agency, Interval, ProjectedStopTime, Stop, Trip}
+  alias BusDetective.GTFS.{Feed, Interval, ProjectedStopTime, Stop, Trip}
 
   schema "stop_times" do
-    belongs_to(:agency, Agency)
+    belongs_to(:feed, Feed)
     belongs_to(:stop, Stop)
     belongs_to(:trip, Trip)
 
@@ -30,7 +30,7 @@ defmodule BusDetective.GTFS.StopTime do
   def changeset(stop_time, attrs) do
     stop_time
     |> cast(attrs, [
-      :agency_id,
+      :feed_id,
       :stop_id,
       :trip_id,
       :stop_headsign,
@@ -42,7 +42,7 @@ defmodule BusDetective.GTFS.StopTime do
       :stop_sequence
     ])
     |> validate_required([
-      :agency_id,
+      :feed_id,
       :stop_id,
       :trip_id,
       :arrival_time,
