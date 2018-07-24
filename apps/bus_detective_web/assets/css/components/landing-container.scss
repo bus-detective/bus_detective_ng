@@ -1,5 +1,8 @@
 .landing-container {
   height: 100%;
+  max-width: 1080px;
+  margin: 0 auto;
+
   & > .action-banner {
     position: relative;
     .search-bar {
