@@ -44,12 +44,12 @@ defmodule Realtime.TripUpdates do
      }}
   end
 
-  def find_stop_time(feed_name, block_id, trip_remote_id, stop_sequence, fetch_related_trips_fn) do
+  def find_stop_time(feed_name, trip_remote_id, stop_sequence) do
     case Registry.lookup(__MODULE__, feed_name) do
       [_ | _] ->
         GenServer.call(
           via_tuple(feed_name),
-          {:find_stop_time, block_id, trip_remote_id, stop_sequence, fetch_related_trips_fn}
+          {:find_stop_time, trip_remote_id, stop_sequence}
         )
 
       _ ->
@@ -57,21 +57,19 @@ defmodule Realtime.TripUpdates do
     end
   end
 
-  def handle_call({:find_stop_time, _, _, _, _}, _, %{realtime_data: nil} = state),
+  def handle_call({:find_stop_time, _, _}, _, %{realtime_data: nil} = state),
     do: {:reply, {:error, :no_data}, state}
 
   def handle_call(
-        {:find_stop_time, block_id, trip_remote_id, stop_sequence, fetch_related_trips_fn},
+        {:find_stop_time, trip_remote_id, stop_sequence},
         _,
         %{realtime_data: realtime_data} = state
       ) do
     stop_time_update =
-      StopTimeUpdateFinder.find_stop_time(
+      StopTimeUpdateFinder.find_stop_time_update(
         realtime_data,
-        block_id,
         trip_remote_id,
-        stop_sequence,
-        fetch_related_trips_fn
+        stop_sequence
       )
 
     {:reply, {:ok, stop_time_update}, state}

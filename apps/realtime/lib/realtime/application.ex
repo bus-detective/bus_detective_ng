@@ -10,8 +10,8 @@ defmodule Realtime.Application do
   def start(_type, _args) do
     children =
       realtime_feeds()
-      |> Enum.map(fn {agency_remote_id, %{trip_updates_url: trip_updates_url}} ->
-        TripUpdates.child_spec(agency: agency_remote_id, trip_updates_url: trip_updates_url, id: agency_remote_id)
+      |> Enum.map(fn {feed_name, %{trip_updates_url: trip_updates_url}} ->
+        TripUpdates.child_spec(feed_name: feed_name, trip_updates_url: trip_updates_url, id: feed_name)
       end)
 
     opts = [strategy: :one_for_one, name: Realtime.Supervisor]
