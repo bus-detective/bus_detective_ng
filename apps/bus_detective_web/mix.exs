@@ -3,25 +3,34 @@ defmodule BusDetectiveWeb.Mixfile do
 
   def project do
     [
+      aliases: aliases(Mix.env()),
       app: :bus_detective_web,
-      version: "0.0.1",
       build_path: "../../_build",
+      compilers: [:phoenix, :gettext] ++ Mix.compilers(),
       config_path: "../../config/config.exs",
+      deps: deps(),
       deps_path: "../../deps",
-      lockfile: "../../mix.lock",
       elixir: "~> 1.4",
       elixirc_paths: elixirc_paths(Mix.env()),
-      compilers: [:phoenix, :gettext] ++ Mix.compilers(),
+      lockfile: "../../mix.lock",
       start_permanent: Mix.env() == :prod,
-      aliases: aliases(Mix.env()),
-      deps: deps(),
+      test_coverage: [tool: ExCoveralls],
       preferred_cli_env: [
         coveralls: :test,
         "coveralls.detail": :test,
         "coveralls.travis": :test,
         "coveralls.html": :test
       ],
-      test_coverage: [tool: ExCoveralls]
+      version: "0.0.1"
+    ]
+  end
+
+  defp aliases(:dev), do: []
+
+  defp aliases(_) do
+    [
+      compile: "compile --warnings-as-errors",
+      test: ["ecto.create --quiet", "ecto.migrate", "test"]
     ]
   end
 
@@ -34,10 +43,6 @@ defmodule BusDetectiveWeb.Mixfile do
       extra_applications: [:logger, :runtime_tools]
     ]
   end
-
-  # Specifies which paths to compile per environment.
-  defp elixirc_paths(:test), do: ["lib", "test/support"]
-  defp elixirc_paths(_), do: ["lib"]
 
   # Specifies your project dependencies.
   #
@@ -57,12 +62,7 @@ defmodule BusDetectiveWeb.Mixfile do
     ]
   end
 
-  defp aliases(:dev), do: []
-
-  defp aliases(_) do
-    [
-      compile: "compile --warnings-as-errors",
-      test: ["ecto.create --quiet", "ecto.migrate", "test"]
-    ]
-  end
+  # Specifies which paths to compile per environment.
+  defp elixirc_paths(:test), do: ["lib", "test/support"]
+  defp elixirc_paths(_), do: ["lib"]
 end

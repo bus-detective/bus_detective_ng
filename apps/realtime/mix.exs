@@ -1,10 +1,10 @@
-defmodule Importer.Mixfile do
+defmodule Realtime.MixProject do
   use Mix.Project
 
   def project do
     [
       aliases: aliases(Mix.env()),
-      app: :importer,
+      app: :realtime,
       build_path: "../../_build",
       config_path: "../../config/config.exs",
       deps: deps(),
@@ -20,7 +20,7 @@ defmodule Importer.Mixfile do
       ],
       start_permanent: Mix.env() == :prod,
       test_coverage: [tool: ExCoveralls],
-      version: "0.0.1"
+      version: "0.1.0"
     ]
   end
 
@@ -30,26 +30,18 @@ defmodule Importer.Mixfile do
     [compile: "compile --warnings-as-errors"]
   end
 
-  # Configuration for the OTP application.
-  #
-  # Type `mix help compile.app` for more information.
+  # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      mod: {Importer.Application, []},
-      extra_applications: [:logger, :runtime_tools]
+      extra_applications: [:logger],
+      mod: {Realtime.Application, []}
     ]
   end
 
-  # Specifies your project dependencies.
-  #
-  # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:briefly, "~> 0.3"},
-      {:bus_detective, in_umbrella: true},
-      {:csv, "~> 2.0.0"},
-      {:httpoison, "~> 0.12"},
-      {:timex, "~> 3.1"}
+      {:exprotobuf, "~> 1.2.9"},
+      {:httpoison, "~> 0.12"}
     ]
   end
 
