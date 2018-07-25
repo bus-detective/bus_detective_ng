@@ -8,7 +8,7 @@ defmodule Importer.ProjectedStopTimeImporter do
 
   import Ecto.Query
 
-  alias BusDetective.GTFS.{Agency, Feed, Service, ServiceException}
+  alias BusDetective.GTFS.{Agency, Feed, ProjectedStopTime, Service, ServiceException}
   alias BusDetective.Repo
   alias Timex.Timezone
   alias Timex.Interval, as: TimexInterval
@@ -60,6 +60,21 @@ defmodule Importer.ProjectedStopTimeImporter do
         Logger.debug(fn -> "Added #{num_rows}" end)
       end
     end
+
+    Logger.info("Done projecting stop times")
+    delete_old_projected_stop_times(Timex.shift(start_date, days: -1))
+  end
+
+  defp delete_old_projected_stop_times(delete_before_date) do
+    date = Timex.to_datetime(delete_before_date)
+
+    Repo.delete_all(
+      from(
+        pst in ProjectedStopTime,
+        where: pst.scheduled_departure_time < ^date
+      ),
+      timeout: 60_000
+    )
   end
 
   defp add_projected_stop_times_for_service_date(service_id, agency_id, start_of_day) do
@@ -83,6 +98,8 @@ defmodule Importer.ProjectedStopTimeImporter do
       INNER JOIN "routes" AS r2 ON r2."id" = t1."route_id"
       WHERE r2."agency_id" = $3 AND t1."service_id" = $4
     )
+    ON CONFLICT (stop_time_id, scheduled_arrival_time, scheduled_departure_time)
+    DO NOTHING
     RETURNING id
     """
 

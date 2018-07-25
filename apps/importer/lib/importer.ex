@@ -41,9 +41,13 @@ defmodule Importer do
 
   def import_feed(feed, file_hash, _, opts \\ [])
 
-  def import_feed(%Feed{last_file_hash: file_hash}, file_hash, _, _), do: nil
+  def import_feed(%Feed{last_file_hash: file_hash} = feed, file_hash, _, opts) do
+    Logger.info(fn -> "Skipping full import for #{feed.name}, file hash unchanged" end)
+    ProjectedStopTimeImporter.project_stop_times(feed, opts)
+    nil
+  end
 
-  def import_feed(%Feed{} = feed, _file_hash, file, opts) do
+  def import_feed(%Feed{} = feed, file_hash, file, opts) do
     with {:ok, tmp_path} <- Briefly.create(directory: true),
          {:ok, file_map} <- unzip_gtfs_file(file, tmp_path) do
       delete_data(feed)
@@ -62,6 +66,8 @@ defmodule Importer do
       import_stop_times(file_map["stop_times"], feed, stops, trips)
       GTFS.update_route_stops(feed)
       ProjectedStopTimeImporter.project_stop_times(feed, opts)
+
+      {:ok, _} = GTFS.update_feed(feed, %{last_file_hash: file_hash, last_updated: Timex.now()})
     else
       error -> error
     end
