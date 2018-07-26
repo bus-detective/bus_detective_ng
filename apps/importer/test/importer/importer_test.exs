@@ -10,6 +10,11 @@ defmodule Importer.ImporterTest do
     {:ok, gtfs_file: gtfs_file, updated_gtfs_file: updated_gtfs_file}
   end
 
+  test "it performs a partial update when the schedule file hasn't changed", %{gtfs_file: gtfs_file} do
+    assert {:ok, :full_update} = Importer.import_from_file("TEST", gtfs_file)
+    assert {:ok, :partial_update} = Importer.import_from_file("TEST", gtfs_file)
+  end
+
   test "it imports the correct number of agencies", %{gtfs_file: gtfs_file} do
     Importer.import_from_file("TEST", gtfs_file)
 

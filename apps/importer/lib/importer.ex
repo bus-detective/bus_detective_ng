@@ -15,14 +15,6 @@ defmodule Importer do
     import_from_file(name, tmp_file, opts)
   end
 
-  def file_hash(file) do
-    file
-    |> File.stream!([], 2048)
-    |> Enum.reduce(:crypto.hash_init(:sha256), fn line, acc -> :crypto.hash_update(acc, line) end)
-    |> :crypto.hash_final()
-    |> Base.encode16()
-  end
-
   def import_from_file(name, file, opts \\ []) do
     with file_hash <- file_hash(file) do
       feed =
@@ -44,7 +36,7 @@ defmodule Importer do
   def import_feed(%Feed{last_file_hash: file_hash} = feed, file_hash, _, opts) do
     Logger.info(fn -> "Skipping full import for #{feed.name}, file hash unchanged" end)
     ProjectedStopTimeImporter.project_stop_times(feed, opts)
-    nil
+    {:ok, :partial_update}
   end
 
   def import_feed(%Feed{} = feed, file_hash, file, opts) do
@@ -68,6 +60,7 @@ defmodule Importer do
       ProjectedStopTimeImporter.project_stop_times(feed, opts)
 
       {:ok, _} = GTFS.update_feed(feed, %{last_file_hash: file_hash, last_updated: Timex.now()})
+      {:ok, :full_update}
     else
       error -> error
     end
@@ -426,5 +419,13 @@ defmodule Importer do
     Logger.info("Done importing #{stop_times_count} stop times")
 
     stop_times
+  end
+
+  defp file_hash(file) do
+    file
+    |> File.stream!([], 2048)
+    |> Enum.reduce(:crypto.hash_init(:sha256), fn line, acc -> :crypto.hash_update(acc, line) end)
+    |> :crypto.hash_final()
+    |> Base.encode16()
   end
 end
