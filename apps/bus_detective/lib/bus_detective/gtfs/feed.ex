@@ -26,5 +26,6 @@ defmodule BusDetective.GTFS.Feed do
     feed
     |> cast(attrs, [:last_updated, :last_file_hash, :name])
     |> validate_required([:name])
+    |> unique_constraint(:name, name: :agencies_feed_id_remote_id_index)
   end
 end

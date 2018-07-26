@@ -7,7 +7,7 @@ config :realtime,
     }
   }
 
-file = "#{Mix.env()}.exs"
+file = Path.join(Path.dirname(__ENV__.file), "#{Mix.env()}.exs")
 
 if File.exists?(file) do
   import_config file

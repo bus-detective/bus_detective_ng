@@ -37,7 +37,7 @@ defmodule Realtime.TripUpdates do
 
     {:ok,
      %{
-       feed: args[:feed],
+       feed_name: args[:feed_name],
        trip_updates_url: args[:trip_updates_url],
        realtime_data: nil,
        last_fetched: nil
@@ -76,14 +76,14 @@ defmodule Realtime.TripUpdates do
   end
 
   def handle_info(:fetch_feed, state) do
-    Logger.info(fn -> "Updating realtime info for #{state.feed}" end)
+    Logger.info(fn -> "Updating realtime info for #{state.feed_name}" end)
 
     case HTTPoison.get(state.trip_updates_url) do
       {:ok, response} ->
         state = %{state | realtime_data: FeedMessage.decode(response.body), last_fetched: Timex.now()}
 
         Logger.info(fn ->
-          "Successfully refreshed realtime data for feed #{inspect(state.feed)} at #{inspect(state.last_fetched)}"
+          "Successfully refreshed realtime data for feed #{state.feed_name} at #{inspect(state.last_fetched)}"
         end)
 
         schedule_fetch(60_000)

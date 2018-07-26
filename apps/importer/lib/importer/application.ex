@@ -6,9 +6,20 @@ defmodule Importer.Application do
   """
   use Application
 
-  def start(_type, _args) do
-    import Supervisor.Spec, warn: false
+  alias Importer.ScheduledImporter
 
-    Supervisor.start_link([], strategy: :one_for_one, name: Importer.Supervisor)
+  def start(_type, _args) do
+    children =
+      schedule_feeds()
+      |> Enum.map(fn {feed_name, %{gtfs_schedule_url: gtfs_schedule_url}} ->
+        ScheduledImporter.child_spec(feed_name: feed_name, gtfs_schedule_url: gtfs_schedule_url, id: feed_name)
+      end)
+
+    opts = [strategy: :one_for_one, name: Importer.Supervisor]
+    Supervisor.start_link([{Registry, keys: :unique, name: ScheduledImporter} | children], opts)
+  end
+
+  defp schedule_feeds do
+    Application.get_env(:importer, :schedules)
   end
 end
