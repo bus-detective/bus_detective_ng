@@ -1,4 +1,5 @@
 <div>
+  <script>setTimeout(function(){ window.location.reload(); }, 15000);</script>
   <bd-stop-map latitude="<%= @stop.latitude %>" longitude="<%= @stop.longitude %>"></bd-stop-map>
   <!-- div id="stopMap" class="map" data-latitude="<%= @stop.latitude %>" data-longitude="<%= @stop.longitude %>" data-shape="<%= map_shapes(@departures) %>"></div -->
 
