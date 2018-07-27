@@ -24,8 +24,33 @@ defmodule Importer.GTFSImport do
   alias BusDetective.Repo
   alias Ecto.Adapters.SQL
 
-  def bulk_create_projected_stop_times(projected_stop_times) do
-    Repo.insert_all(ProjectedStopTime, projected_stop_times, returning: [:id], timeout: 60_000)
+  def add_projected_stop_times_for_service_date(service_id, agency_id, start_of_day) do
+    query = """
+    INSERT INTO projected_stop_times
+    (
+      "stop_time_id",
+      "scheduled_arrival_time",
+      "scheduled_departure_time",
+      "inserted_at",
+      "updated_at"
+    )
+    (
+      SELECT s0."id",
+             ($1 AT TIME ZONE 'UTC' + s0."arrival_time"),
+             ($2 AT TIME ZONE 'UTC' + s0."departure_time"),
+             now(),
+             now()
+      FROM "stop_times" AS s0
+      INNER JOIN "trips" AS t1 ON t1."id" = s0."trip_id"
+      INNER JOIN "routes" AS r2 ON r2."id" = t1."route_id"
+      WHERE r2."agency_id" = $3 AND t1."service_id" = $4
+    )
+    ON CONFLICT (stop_time_id, scheduled_arrival_time, scheduled_departure_time)
+    DO NOTHING
+    RETURNING id
+    """
+
+    Repo.query(query, [start_of_day, start_of_day, agency_id, service_id], timeout: 60_000)
   end
 
   def bulk_create_routes(routes) do
@@ -191,6 +216,18 @@ defmodule Importer.GTFSImport do
     |> Repo.insert()
   end
 
+  def delete_old_projected_stop_times(delete_before_date) do
+    date = Timex.to_datetime(delete_before_date)
+
+    Repo.delete_all(
+      from(
+        pst in ProjectedStopTime,
+        where: pst.scheduled_departure_time < ^date
+      ),
+      timeout: 60_000
+    )
+  end
+
   @doc """
   Deletes all service exceptions for a feed
   """
@@ -248,7 +285,33 @@ defmodule Importer.GTFSImport do
     Repo.one(
       from(
         feed in Feed,
-        where: feed.name == ^name
+        where: feed.name == ^name,
+        preload: :agencies
+      )
+    )
+  end
+
+  def preload_agencies(feed) do
+    Repo.preload(feed, :agencies, force: true)
+  end
+
+  def get_service_exceptions(feed_id, start_date, end_date) do
+    Repo.all(
+      from(
+        service_exception in ServiceException,
+        where: service_exception.date >= ^start_date,
+        where: service_exception.date <= ^end_date,
+        where: service_exception.feed_id == ^feed_id,
+        preload: [:service]
+      )
+    )
+  end
+
+  def get_services(feed_id) do
+    Repo.all(
+      from(
+        service in Service,
+        where: service.feed_id == ^feed_id
       )
     )
   end

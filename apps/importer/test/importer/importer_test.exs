@@ -323,7 +323,7 @@ defmodule Importer.ImporterTest do
         "TEST",
         gtfs_file,
         start_date: Timex.to_date(Timex.shift(start_time, days: -1)),
-        start_date: Timex.to_date(Timex.shift(end_time, days: 1))
+        end_date: Timex.to_date(Timex.shift(end_time, days: 1))
       )
 
       [feed] = Repo.all(from(feed in Feed))
@@ -353,7 +353,7 @@ defmodule Importer.ImporterTest do
         "TEST",
         gtfs_file,
         start_date: Timex.to_date(Timex.shift(start_time, days: -1)),
-        start_date: Timex.to_date(Timex.shift(end_time, days: 1))
+        end_date: Timex.to_date(Timex.shift(end_time, days: 1))
       )
 
       [feed] = Repo.all(from(feed in Feed))
@@ -383,7 +383,7 @@ defmodule Importer.ImporterTest do
         "TEST",
         gtfs_file,
         start_date: Timex.to_date(Timex.shift(start_time, days: -1)),
-        start_date: Timex.to_date(Timex.shift(end_time, days: 1))
+        end_date: Timex.to_date(Timex.shift(end_time, days: 1))
       )
 
       [feed] = Repo.all(from(feed in Feed))

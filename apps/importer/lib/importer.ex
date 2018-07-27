@@ -108,6 +108,7 @@ defmodule Importer do
       delete_data(feed)
 
       agencies = import_agencies(file_map["agency"], feed)
+      feed = GTFSImport.preload_agencies(feed)
       services_task = Task.async(fn -> import_services(file_map["calendar"], feed) end)
       routes_task = Task.async(fn -> import_routes(file_map["routes"], feed, agencies) end)
       stops_task = Task.async(fn -> import_stops(file_map["stops"], feed) end)

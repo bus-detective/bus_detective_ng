@@ -6,10 +6,8 @@ defmodule Importer.ProjectedStopTimeImporter do
 
   require Logger
 
-  import Ecto.Query
-
-  alias BusDetective.GTFS.{Agency, Feed, ProjectedStopTime, Service, ServiceException}
-  alias BusDetective.Repo
+  alias BusDetective.GTFS.{Agency, Feed, Service}
+  alias Importer.GTFSImport
   alias Timex.Timezone
   alias Timex.Interval, as: TimexInterval
 
@@ -19,8 +17,6 @@ defmodule Importer.ProjectedStopTimeImporter do
   def project_stop_times(feed_or_agency, opts \\ [])
 
   def project_stop_times(%Feed{} = feed, opts) do
-    feed = Repo.preload(feed, :agencies)
-
     feed.agencies
     |> Enum.each(fn agency -> project_stop_times(agency, opts) end)
   end
@@ -29,27 +25,10 @@ defmodule Importer.ProjectedStopTimeImporter do
     Logger.info("Projecting stop times")
     timezone = Timezone.get(tz)
 
-    services =
-      Repo.all(
-        from(
-          service in Service,
-          where: service.feed_id == ^feed_id
-        )
-      )
-
+    services = GTFSImport.get_services(feed_id)
     start_date = Keyword.get(opts, :start_date, Timex.now() |> Timex.shift(days: -1) |> Timex.to_date())
     end_date = Keyword.get(opts, :end_date, Timex.now() |> Timex.shift(days: 2) |> Timex.to_date())
-
-    service_exceptions =
-      Repo.all(
-        from(
-          service_exception in ServiceException,
-          where: service_exception.date >= ^start_date,
-          where: service_exception.date <= ^end_date,
-          where: service_exception.feed_id == ^feed_id,
-          preload: [:service]
-        )
-      )
+    service_exceptions = GTFSImport.get_service_exceptions(feed_id, start_date, end_date)
 
     for date <- %TimexInterval{from: start_date, until: end_date} do
       for service_id <- active_service_ids(date, services, service_exceptions) do
@@ -59,13 +38,15 @@ defmodule Importer.ProjectedStopTimeImporter do
           "Adding projected stop times for agency: #{remote_id}, for service: #{service_id} on #{date}"
         end)
 
-        {:ok, %{num_rows: num_rows}} = add_projected_stop_times_for_service_date(service_id, agency_id, start_of_day)
+        {:ok, %{num_rows: num_rows}} =
+          GTFSImport.add_projected_stop_times_for_service_date(service_id, agency_id, start_of_day)
+
         Logger.debug(fn -> "Added #{num_rows}" end)
       end
     end
 
     Logger.info("Done projecting stop times")
-    delete_old_projected_stop_times(Timex.shift(start_date, days: -1))
+    GTFSImport.delete_old_projected_stop_times(Timex.shift(start_date, days: -1))
   end
 
   defp active_service_ids(date, services, service_exceptions) do
@@ -90,47 +71,6 @@ defmodule Importer.ProjectedStopTimeImporter do
       (Enum.empty?(service_removals) && regular_service?) || Enum.count(service_additions) > 0
     end)
     |> Enum.map(& &1.id)
-  end
-
-  defp add_projected_stop_times_for_service_date(service_id, agency_id, start_of_day) do
-    query = """
-    INSERT INTO projected_stop_times
-    (
-      "stop_time_id",
-      "scheduled_arrival_time",
-      "scheduled_departure_time",
-      "inserted_at",
-      "updated_at"
-    )
-    (
-      SELECT s0."id",
-             ($1 AT TIME ZONE 'UTC' + s0."arrival_time"),
-             ($2 AT TIME ZONE 'UTC' + s0."departure_time"),
-             now(),
-             now()
-      FROM "stop_times" AS s0
-      INNER JOIN "trips" AS t1 ON t1."id" = s0."trip_id"
-      INNER JOIN "routes" AS r2 ON r2."id" = t1."route_id"
-      WHERE r2."agency_id" = $3 AND t1."service_id" = $4
-    )
-    ON CONFLICT (stop_time_id, scheduled_arrival_time, scheduled_departure_time)
-    DO NOTHING
-    RETURNING id
-    """
-
-    Repo.query(query, [start_of_day, start_of_day, agency_id, service_id], timeout: 60_000)
-  end
-
-  defp delete_old_projected_stop_times(delete_before_date) do
-    date = Timex.to_datetime(delete_before_date)
-
-    Repo.delete_all(
-      from(
-        pst in ProjectedStopTime,
-        where: pst.scheduled_departure_time < ^date
-      ),
-      timeout: 60_000
-    )
   end
 
   def start_of_agency_day_utc(date, agency_timezone) do
