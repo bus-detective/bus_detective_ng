@@ -38,7 +38,9 @@
           </div>
         <% end %>
       <% end %>
-      <div class="pager"><!----></div>
+      <%= if @results.total_entries > @results.page_size do %>
+      There were more than <%= @results.page_size %> results. Only the first <%= @results.page_size %> are shown here.
+      <% end %>
     </section>
   </div>
 </div>
