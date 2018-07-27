@@ -1,8 +1,11 @@
 defmodule Importer.ImporterTest do
   use BusDetective.DataCase
 
+  import Ecto.Query
+
   alias BusDetective.GTFS
-  alias BusDetective.GTFS.{Agency, Interval, Route, Service, ServiceException, Shape, Stop, StopTime, Trip}
+  alias BusDetective.GTFS.{Agency, Feed, Interval, Route, Service, ServiceException, Shape, Stop, StopTime, Trip}
+  alias BusDetective.Repo
 
   setup do
     gtfs_file = Path.join(File.cwd!(), "test/fixtures/google_transit_info.zip")
@@ -18,21 +21,21 @@ defmodule Importer.ImporterTest do
   test "it imports the correct number of agencies", %{gtfs_file: gtfs_file} do
     Importer.import_from_file("TEST", gtfs_file)
 
-    assert 1 == length(GTFS.list_agencies())
+    assert 1 == length(Repo.all(from(agency in Agency)))
   end
 
   test "it upserts the agency on subsequent import", %{gtfs_file: gtfs_file, updated_gtfs_file: updated_gtfs_file} do
     Importer.import_from_file("TEST", gtfs_file)
-    [%Agency{id: id}] = GTFS.list_agencies()
+    [%Agency{id: id}] = Repo.all(from(agency in Agency))
 
     Importer.import_from_file("TEST", updated_gtfs_file)
-    assert [%Agency{id: ^id, name: "Updated"}] = GTFS.list_agencies()
+    assert [%Agency{id: ^id, name: "Updated"}] = Repo.all(from(agency in Agency))
   end
 
   test "it imports the agency correctly", %{gtfs_file: gtfs_file} do
     Importer.import_from_file("TEST", gtfs_file)
 
-    feed = GTFS.list_agencies() |> List.first()
+    feed = Repo.all(from(agency in Agency)) |> List.first()
 
     assert %Agency{
              fare_url: "http://www.go-metro.com/fares-passes",
@@ -47,26 +50,28 @@ defmodule Importer.ImporterTest do
 
   test "it imports the correct number of services", %{gtfs_file: gtfs_file} do
     Importer.import_from_file("TEST", gtfs_file)
-    [feed] = GTFS.list_feeds()
+    [feed] = Repo.all(from(feed in Feed))
 
-    assert 3 == length(GTFS.list_services(feed))
+    assert 3 == length(Repo.all(from(s in Service, where: s.feed_id == ^feed.id)))
   end
 
   test "it upserts the services on subsequent import", %{gtfs_file: gtfs_file, updated_gtfs_file: updated_gtfs_file} do
     Importer.import_from_file("TEST", gtfs_file)
-    [feed] = GTFS.list_feeds()
-    %Service{id: id, monday: false} = GTFS.get_service(feed, "1")
+    [feed] = Repo.all(from(feed in Feed))
+    %Service{id: id, monday: false} = Repo.one(from(s in Service, where: s.feed_id == ^feed.id and s.remote_id == ^"1"))
 
     Importer.import_from_file("TEST", updated_gtfs_file)
-    [feed] = GTFS.list_feeds()
-    assert %Service{id: ^id, monday: true} = GTFS.get_service(feed, "1")
+    [feed] = Repo.all(from(feed in Feed))
+
+    assert %Service{id: ^id, monday: true} =
+             Repo.one(from(s in Service, where: s.feed_id == ^feed.id and s.remote_id == ^"1"))
   end
 
   test "it imports a service correctly", %{gtfs_file: gtfs_file} do
     Importer.import_from_file("TEST", gtfs_file)
 
-    [feed] = GTFS.list_feeds()
-    service = GTFS.get_service(feed, "1")
+    [feed] = Repo.all(from(feed in Feed))
+    service = Repo.one(from(s in Service, where: s.feed_id == ^feed.id and s.remote_id == ^"1"))
 
     assert %Service{
              monday: false,
@@ -83,10 +88,13 @@ defmodule Importer.ImporterTest do
 
   test "it imports the correct number of service exceptions", %{gtfs_file: gtfs_file} do
     Importer.import_from_file("TEST", gtfs_file)
-    [feed] = GTFS.list_feeds()
-    service = GTFS.get_service(feed, "1")
+    [feed] = Repo.all(from(feed in Feed))
+    service = Repo.one(from(s in Service, where: s.feed_id == ^feed.id and s.remote_id == ^"1"))
 
-    assert 1 == length(GTFS.list_service_exceptions(feed, service))
+    assert 1 ==
+             length(
+               Repo.all(from(se in ServiceException, where: se.feed_id == ^feed.id and se.service_id == ^service.id))
+             )
   end
 
   test "it re-imports the correct number of service exceptions on subsequent import", %{
@@ -95,18 +103,23 @@ defmodule Importer.ImporterTest do
   } do
     Importer.import_from_file("TEST", gtfs_file)
     Importer.import_from_file("TEST", updated_gtfs_file)
-    [feed] = GTFS.list_feeds()
-    service = GTFS.get_service(feed, "1")
+    [feed] = Repo.all(from(feed in Feed))
+    service = Repo.one(from(s in Service, where: s.feed_id == ^feed.id and s.remote_id == ^"1"))
 
-    assert 1 == length(GTFS.list_service_exceptions(feed, service))
+    assert 1 ==
+             length(
+               Repo.all(from(se in ServiceException, where: se.feed_id == ^feed.id and se.service_id == ^service.id))
+             )
   end
 
   test "it imports a service exception correctly", %{gtfs_file: gtfs_file} do
     Importer.import_from_file("TEST", gtfs_file)
 
-    [feed] = GTFS.list_feeds()
-    service = GTFS.get_service(feed, "1")
-    [service_exception] = GTFS.list_service_exceptions(feed, service)
+    [feed] = Repo.all(from(feed in Feed))
+    service = Repo.one(from(s in Service, where: s.feed_id == ^feed.id and s.remote_id == ^"1"))
+
+    [service_exception] =
+      Repo.all(from(se in ServiceException, where: se.feed_id == ^feed.id and se.service_id == ^service.id))
 
     assert %ServiceException{
              date: ~D[2015-05-25],
@@ -116,26 +129,28 @@ defmodule Importer.ImporterTest do
 
   test "it imports the correct number of routes", %{gtfs_file: gtfs_file} do
     Importer.import_from_file("TEST", gtfs_file)
-    [feed] = GTFS.list_feeds()
+    [feed] = Repo.all(from(feed in Feed))
 
-    assert 10 == length(GTFS.list_routes(feed))
+    assert 10 == length(Repo.all(from(r in Route, where: r.feed_id == ^feed.id)))
   end
 
   test "it upserts the routes on subsequent import", %{gtfs_file: gtfs_file, updated_gtfs_file: updated_gtfs_file} do
     Importer.import_from_file("TEST", gtfs_file)
-    [feed] = GTFS.list_feeds()
-    %Route{id: id} = GTFS.get_route(feed, "1")
+    [feed] = Repo.all(from(feed in Feed))
+    %Route{id: id} = Repo.one(from(r in Route, where: r.feed_id == ^feed.id and r.remote_id == ^"1"))
 
     Importer.import_from_file("TEST", updated_gtfs_file)
-    [feed] = GTFS.list_feeds()
-    assert %Route{id: ^id, long_name: "Updated"} = GTFS.get_route(feed, "1")
+    [feed] = Repo.all(from(feed in Feed))
+
+    assert %Route{id: ^id, long_name: "Updated"} =
+             Repo.one(from(r in Route, where: r.feed_id == ^feed.id and r.remote_id == ^"1"))
   end
 
   test "it imports a route correctly", %{gtfs_file: gtfs_file} do
     Importer.import_from_file("TEST", gtfs_file)
 
-    [feed] = GTFS.list_feeds()
-    route = GTFS.get_route(feed, "1")
+    [feed] = Repo.all(from(feed in Feed))
+    route = Repo.one(from(r in Route, where: r.feed_id == ^feed.id and r.remote_id == ^"1"))
 
     assert %Route{
              short_name: "1",
@@ -148,26 +163,28 @@ defmodule Importer.ImporterTest do
 
   test "it imports the correct number of stops", %{gtfs_file: gtfs_file} do
     Importer.import_from_file("TEST", gtfs_file)
-    [feed] = GTFS.list_feeds()
+    [feed] = Repo.all(from(feed in Feed))
 
-    assert 10 == length(GTFS.list_stops(feed))
+    assert 10 == length(Repo.all(from(s in Stop, where: s.feed_id == ^feed.id)))
   end
 
   test "it upserts the stops on subsequent import", %{gtfs_file: gtfs_file, updated_gtfs_file: updated_gtfs_file} do
     Importer.import_from_file("TEST", gtfs_file)
-    [feed] = GTFS.list_feeds()
-    %Stop{id: id} = GTFS.get_stop(feed, "EZZLINe")
+    [feed] = Repo.all(from(feed in Feed))
+    %Stop{id: id} = Repo.one(from(s in Stop, where: s.feed_id == ^feed.id and s.remote_id == ^"EZZLINe"))
 
     Importer.import_from_file("TEST", updated_gtfs_file)
-    [feed] = GTFS.list_feeds()
-    assert %Stop{id: ^id, name: "Updated"} = GTFS.get_stop(feed, "EZZLINe")
+    [feed] = Repo.all(from(feed in Feed))
+
+    assert %Stop{id: ^id, name: "Updated"} =
+             Repo.one(from(s in Stop, where: s.feed_id == ^feed.id and s.remote_id == ^"EZZLINe"))
   end
 
   test "it imports a stop correctly", %{gtfs_file: gtfs_file} do
     Importer.import_from_file("TEST", gtfs_file)
 
-    [feed] = GTFS.list_feeds()
-    stop = GTFS.get_stop(feed, "EZZLINe")
+    [feed] = Repo.all(from(feed in Feed))
+    stop = Repo.one(from(s in Stop, where: s.feed_id == ^feed.id and s.remote_id == ^"EZZLINe"))
 
     assert %Stop{
              code: 4451,
@@ -179,26 +196,26 @@ defmodule Importer.ImporterTest do
 
   test "it imports the correct number of shapes", %{gtfs_file: gtfs_file} do
     Importer.import_from_file("TEST", gtfs_file)
-    [feed] = GTFS.list_feeds()
+    [feed] = Repo.all(from(feed in Feed))
 
-    assert 1 == length(GTFS.list_shapes(feed))
+    assert 1 == length(Repo.all(from(s in Shape, where: s.feed_id == ^feed.id)))
   end
 
   test "it upserts the shapes on subsequent import", %{gtfs_file: gtfs_file, updated_gtfs_file: updated_gtfs_file} do
     Importer.import_from_file("TEST", gtfs_file)
-    [feed] = GTFS.list_feeds()
-    %Shape{id: id} = GTFS.get_shape(feed, "83146")
+    [feed] = Repo.all(from(feed in Feed))
+    %Shape{id: id} = Repo.one(from(s in Shape, where: s.feed_id == ^feed.id and s.remote_id == ^"83146"))
 
     Importer.import_from_file("TEST", updated_gtfs_file)
-    [feed] = GTFS.list_feeds()
-    assert %Shape{id: ^id} = GTFS.get_shape(feed, "83146")
+    [feed] = Repo.all(from(feed in Feed))
+    assert %Shape{id: ^id} = Repo.one(from(s in Shape, where: s.feed_id == ^feed.id and s.remote_id == ^"83146"))
   end
 
   test "it imports a shape correctly", %{gtfs_file: gtfs_file} do
     Importer.import_from_file("TEST", gtfs_file)
 
-    [feed] = GTFS.list_feeds()
-    shape = GTFS.get_shape(feed, "83146")
+    [feed] = Repo.all(from(feed in Feed))
+    shape = Repo.one(from(s in Shape, where: s.feed_id == ^feed.id and s.remote_id == ^"83146"))
 
     assert %Shape{
              geometry: %Geo.LineString{
@@ -221,30 +238,32 @@ defmodule Importer.ImporterTest do
 
   test "it imports the correct number of trips", %{gtfs_file: gtfs_file} do
     Importer.import_from_file("TEST", gtfs_file)
-    [feed] = GTFS.list_feeds()
+    [feed] = Repo.all(from(feed in Feed))
 
-    assert 10 == length(GTFS.list_trips(feed))
+    assert 10 == length(Repo.all(from(t in Trip, where: t.feed_id == ^feed.id)))
   end
 
   test "it upserts the trips on subsequent import", %{gtfs_file: gtfs_file, updated_gtfs_file: updated_gtfs_file} do
     Importer.import_from_file("TEST", gtfs_file)
-    [feed] = GTFS.list_feeds()
-    %Trip{id: id} = GTFS.get_trip(feed, "955305")
+    [feed] = Repo.all(from(feed in Feed))
+    %Trip{id: id} = Repo.one(from(t in Trip, where: t.feed_id == ^feed.id and t.remote_id == ^"955305"))
 
     Importer.import_from_file("TEST", updated_gtfs_file)
-    [feed] = GTFS.list_feeds()
-    assert %Trip{id: ^id, headsign: "Updated"} = GTFS.get_trip(feed, "955305")
+    [feed] = Repo.all(from(feed in Feed))
+
+    assert %Trip{id: ^id, headsign: "Updated"} =
+             Repo.one(from(t in Trip, where: t.feed_id == ^feed.id and t.remote_id == ^"955305"))
   end
 
   test "it imports a trip correctly", %{gtfs_file: gtfs_file} do
     Importer.import_from_file("TEST", gtfs_file)
 
-    [feed] = GTFS.list_feeds()
-    %Route{id: route_id} = GTFS.get_route(feed, "1")
-    %Service{id: service_id} = GTFS.get_service(feed, "1")
-    %Shape{id: shape_id} = GTFS.get_shape(feed, "83146")
+    [feed] = Repo.all(from(feed in Feed))
+    %Route{id: route_id} = Repo.one(from(r in Route, where: r.feed_id == ^feed.id and r.remote_id == ^"1"))
+    %Service{id: service_id} = Repo.one(from(s in Service, where: s.feed_id == ^feed.id and s.remote_id == ^"1"))
+    %Shape{id: shape_id} = Repo.one(from(s in Shape, where: s.feed_id == ^feed.id and s.remote_id == ^"83146"))
 
-    trip = GTFS.get_trip(feed, "955305")
+    trip = Repo.one(from(t in Trip, where: t.feed_id == ^feed.id and t.remote_id == ^"955305"))
 
     assert %Trip{
              route_id: ^route_id,
@@ -257,9 +276,9 @@ defmodule Importer.ImporterTest do
 
   test "it imports the correct number of stop times", %{gtfs_file: gtfs_file} do
     Importer.import_from_file("TEST", gtfs_file)
-    [feed] = GTFS.list_feeds()
+    [feed] = Repo.all(from(feed in Feed))
 
-    assert 10 == length(GTFS.list_stop_times(feed))
+    assert 10 == length(Repo.all(from(st in StopTime, where: st.feed_id == ^feed.id)))
   end
 
   test "it re-imports the correct number of stop times on subsequent import", %{
@@ -268,19 +287,25 @@ defmodule Importer.ImporterTest do
   } do
     Importer.import_from_file("TEST", gtfs_file)
     Importer.import_from_file("TEST", updated_gtfs_file)
-    [feed] = GTFS.list_feeds()
+    [feed] = Repo.all(from(feed in Feed))
 
-    assert 10 == length(GTFS.list_stop_times(feed))
+    assert 10 == length(Repo.all(from(st in StopTime, where: st.feed_id == ^feed.id)))
   end
 
   test "it imports a stop time correctly", %{gtfs_file: gtfs_file} do
     Importer.import_from_file("TEST", gtfs_file)
 
-    [feed] = GTFS.list_feeds()
-    stop = GTFS.get_stop(feed, "EZZLINw")
-    trip = GTFS.get_trip(feed, "955305")
+    [feed] = Repo.all(from(feed in Feed))
+    stop = Repo.one(from(s in Stop, where: s.feed_id == ^feed.id and s.remote_id == ^"EZZLINw"))
+    trip = Repo.one(from(t in Trip, where: t.feed_id == ^feed.id and t.remote_id == ^"955305"))
 
-    stop_time = GTFS.get_stop_time(feed, stop, 2, trip)
+    stop_time =
+      Repo.one(
+        from(
+          st in StopTime,
+          where: st.feed_id == ^feed.id and st.trip_id == ^trip.id and st.stop_id == ^stop.id and st.stop_sequence == ^2
+        )
+      )
 
     assert %StopTime{
              shape_dist_traveled: 0.3616,
@@ -301,10 +326,18 @@ defmodule Importer.ImporterTest do
         start_date: Timex.to_date(Timex.shift(end_time, days: 1))
       )
 
-      [feed] = GTFS.list_feeds()
-      stop = GTFS.get_stop(feed, "EZZLINw")
-      trip = GTFS.get_trip(feed, "955305")
-      stop_time = GTFS.get_stop_time(feed, stop, 2, trip)
+      [feed] = Repo.all(from(feed in Feed))
+      stop = Repo.one(from(s in Stop, where: s.feed_id == ^feed.id and s.remote_id == ^"EZZLINw"))
+      trip = Repo.one(from(t in Trip, where: t.feed_id == ^feed.id and t.remote_id == ^"955305"))
+
+      stop_time =
+        Repo.one(
+          from(
+            st in StopTime,
+            where:
+              st.feed_id == ^feed.id and st.trip_id == ^trip.id and st.stop_id == ^stop.id and st.stop_sequence == ^2
+          )
+        )
 
       result = GTFS.projected_stop_times_for_stop(stop, start_time, end_time)
 
@@ -323,10 +356,18 @@ defmodule Importer.ImporterTest do
         start_date: Timex.to_date(Timex.shift(end_time, days: 1))
       )
 
-      [feed] = GTFS.list_feeds()
-      stop = GTFS.get_stop(feed, "EZZLINw")
-      trip = GTFS.get_trip(feed, "955305")
-      stop_time = GTFS.get_stop_time(feed, stop, 2, trip)
+      [feed] = Repo.all(from(feed in Feed))
+      stop = Repo.one(from(s in Stop, where: s.feed_id == ^feed.id and s.remote_id == ^"EZZLINw"))
+      trip = Repo.one(from(t in Trip, where: t.feed_id == ^feed.id and t.remote_id == ^"955305"))
+
+      stop_time =
+        Repo.one(
+          from(
+            st in StopTime,
+            where:
+              st.feed_id == ^feed.id and st.trip_id == ^trip.id and st.stop_id == ^stop.id and st.stop_sequence == ^2
+          )
+        )
 
       result = GTFS.projected_stop_times_for_stop(stop, start_time, end_time)
 
@@ -345,10 +386,18 @@ defmodule Importer.ImporterTest do
         start_date: Timex.to_date(Timex.shift(end_time, days: 1))
       )
 
-      [feed] = GTFS.list_feeds()
-      stop = GTFS.get_stop(feed, "EZZLINw")
-      trip = GTFS.get_trip(feed, "955305")
-      stop_time = GTFS.get_stop_time(feed, stop, 2, trip)
+      [feed] = Repo.all(from(feed in Feed))
+      stop = Repo.one(from(s in Stop, where: s.feed_id == ^feed.id and s.remote_id == ^"EZZLINw"))
+      trip = Repo.one(from(t in Trip, where: t.feed_id == ^feed.id and t.remote_id == ^"955305"))
+
+      stop_time =
+        Repo.one(
+          from(
+            st in StopTime,
+            where:
+              st.feed_id == ^feed.id and st.trip_id == ^trip.id and st.stop_id == ^stop.id and st.stop_sequence == ^2
+          )
+        )
 
       result = GTFS.projected_stop_times_for_stop(stop, start_time, end_time)
 

@@ -23,18 +23,18 @@ defmodule Realtime.StopTimeUpdate do
 
   def from_message(_), do: nil
 
+  defp delay(arrival_and_departure) do
+    arrival_and_departure
+    |> Enum.filter(&(!is_nil(&1)))
+    |> Enum.map(& &1.delay)
+    |> Enum.max()
+  end
+
   defp departure_time(arrival_and_departure) do
     arrival_and_departure
     |> Enum.filter(&(!is_nil(&1)))
     |> Enum.map(& &1.time)
     |> Enum.max()
     |> DateTime.from_unix()
-  end
-
-  defp delay(arrival_and_departure) do
-    arrival_and_departure
-    |> Enum.filter(&(!is_nil(&1)))
-    |> Enum.map(& &1.delay)
-    |> Enum.max()
   end
 end

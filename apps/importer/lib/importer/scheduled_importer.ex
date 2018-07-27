@@ -8,25 +8,6 @@ defmodule Importer.ScheduledImporter do
 
   require Logger
 
-  def start_link(args) do
-    feed_name = Keyword.get(args, :feed_name)
-    gtfs_schedule_url = Keyword.get(args, :gtfs_schedule_url)
-    name = via_tuple(feed_name)
-    Logger.info(fn -> "Starting Scheduled Importer process for #{feed_name} using url: #{gtfs_schedule_url}" end)
-    GenServer.start_link(__MODULE__, args, name: name)
-  end
-
-  def via_tuple(feed_name) do
-    {:via, Registry, {__MODULE__, feed_name}}
-  end
-
-  def init(args) do
-    feed_name = Keyword.get(args, :feed_name)
-    gtfs_schedule_url = Keyword.get(args, :gtfs_schedule_url)
-    schedule_work(5_000)
-    {:ok, %{feed_name: feed_name, gtfs_schedule_url: gtfs_schedule_url}}
-  end
-
   def child_spec(args) do
     %{
       id: args[:id],
@@ -35,6 +16,21 @@ defmodule Importer.ScheduledImporter do
       shutdown: 5000,
       type: :worker
     }
+  end
+
+  def start_link(args) do
+    feed_name = Keyword.get(args, :feed_name)
+    gtfs_schedule_url = Keyword.get(args, :gtfs_schedule_url)
+    name = via_tuple(feed_name)
+    Logger.info(fn -> "Starting Scheduled Importer process for #{feed_name} using url: #{gtfs_schedule_url}" end)
+    GenServer.start_link(__MODULE__, args, name: name)
+  end
+
+  def init(args) do
+    feed_name = Keyword.get(args, :feed_name)
+    gtfs_schedule_url = Keyword.get(args, :gtfs_schedule_url)
+    schedule_work(5_000)
+    {:ok, %{feed_name: feed_name, gtfs_schedule_url: gtfs_schedule_url}}
   end
 
   def handle_info(:work, state) do
@@ -52,7 +48,10 @@ defmodule Importer.ScheduledImporter do
   end
 
   defp schedule_work(delay) do
-    # In 2 hours
     Process.send_after(self(), :work, delay)
+  end
+
+  defp via_tuple(feed_name) do
+    {:via, Registry, {__MODULE__, feed_name}}
   end
 end

@@ -5,6 +5,7 @@ defmodule BusDetective.GTFS.Feed do
   """
 
   use Ecto.Schema
+
   import Ecto.Changeset
 
   alias BusDetective.GTFS.{Agency, Service, Shape}

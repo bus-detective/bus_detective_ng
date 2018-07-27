@@ -2,6 +2,7 @@ defmodule BusDetective.GTFS.Agency do
   @moduledoc false
 
   use Ecto.Schema
+
   import Ecto.Changeset
 
   alias BusDetective.GTFS.{Feed, Route}

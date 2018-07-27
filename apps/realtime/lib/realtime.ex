@@ -1,18 +1,5 @@
 defmodule Realtime do
   @moduledoc """
-  Documentation for Realtime.
+  Base module for the Realtime GTFS feed application
   """
-
-  @doc """
-  Hello world.
-
-  ## Examples
-
-      iex> Realtime.hello
-      :world
-
-  """
-  def hello do
-    :world
-  end
 end

@@ -10,14 +10,6 @@ defmodule Realtime.TripUpdates do
   alias Realtime.Messages.FeedMessage
   alias Realtime.StopTimeUpdateFinder
 
-  def start_link(args) do
-    feed_name = Keyword.get(args, :feed_name)
-    trip_updates_url = Keyword.get(args, :trip_updates_url)
-    name = via_tuple(feed_name)
-    Logger.info(fn -> "Starting TripUpdates realtime process for #{feed_name} using url: #{trip_updates_url}" end)
-    GenServer.start_link(__MODULE__, args, name: name)
-  end
-
   def child_spec(args) do
     %{
       id: args[:id],
@@ -28,8 +20,12 @@ defmodule Realtime.TripUpdates do
     }
   end
 
-  def via_tuple(feed_name) do
-    {:via, Registry, {__MODULE__, feed_name}}
+  def start_link(args) do
+    feed_name = Keyword.get(args, :feed_name)
+    trip_updates_url = Keyword.get(args, :trip_updates_url)
+    name = via_tuple(feed_name)
+    Logger.info(fn -> "Starting TripUpdates realtime process for #{feed_name} using url: #{trip_updates_url}" end)
+    GenServer.start_link(__MODULE__, args, name: name)
   end
 
   def init(args) do
@@ -103,5 +99,9 @@ defmodule Realtime.TripUpdates do
 
   defp schedule_fetch(time_ms) do
     Process.send_after(self(), :fetch_feed, time_ms)
+  end
+
+  defp via_tuple(feed_name) do
+    {:via, Registry, {__MODULE__, feed_name}}
   end
 end

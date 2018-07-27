@@ -6,6 +6,14 @@ defmodule Realtime.StopTimeUpdateFinder do
   alias Realtime.Messages.{FeedEntity, FeedMessage, TripDescriptor, TripUpdate}
   alias Realtime.StopTimeUpdate
 
+  def find_exact_trip(%FeedMessage{} = feed, remote_id) do
+    feed
+    |> Map.get(:entity)
+    |> Enum.filter(&exact_trip_match?(&1, remote_id))
+    |> Enum.map(& &1.trip_update)
+    |> Enum.at(0)
+  end
+
   def find_stop_time_update(%FeedMessage{} = feed, trip_remote_id, stop_sequence) do
     with %TripUpdate{} = trip_update <- find_exact_trip(feed, trip_remote_id),
          %StopTimeUpdate{} = stop_time_update <- find_exact_stop_time_update(trip_update, stop_sequence) do
@@ -13,14 +21,6 @@ defmodule Realtime.StopTimeUpdateFinder do
     else
       _ -> nil
     end
-  end
-
-  def find_exact_trip(%FeedMessage{} = feed, remote_id) do
-    feed
-    |> Map.get(:entity)
-    |> Enum.filter(&exact_trip_match?(&1, remote_id))
-    |> Enum.map(& &1.trip_update)
-    |> Enum.at(0)
   end
 
   defp exact_trip_match?(

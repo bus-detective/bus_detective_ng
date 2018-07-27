@@ -13,6 +13,9 @@ defmodule Importer.ProjectedStopTimeImporter do
   alias Timex.Timezone
   alias Timex.Interval, as: TimexInterval
 
+  @service_addition 1
+  @service_removal 2
+
   def project_stop_times(feed_or_agency, opts \\ [])
 
   def project_stop_times(%Feed{} = feed, opts) do
@@ -65,16 +68,28 @@ defmodule Importer.ProjectedStopTimeImporter do
     delete_old_projected_stop_times(Timex.shift(start_date, days: -1))
   end
 
-  defp delete_old_projected_stop_times(delete_before_date) do
-    date = Timex.to_datetime(delete_before_date)
+  defp active_service_ids(date, services, service_exceptions) do
+    weekday_name = date |> Timex.format!("{WDfull}")
 
-    Repo.delete_all(
-      from(
-        pst in ProjectedStopTime,
-        where: pst.scheduled_departure_time < ^date
-      ),
-      timeout: 60_000
-    )
+    services
+    |> Enum.filter(fn service ->
+      regular_service? = Service.weekday_schedule(service)[weekday_name]
+
+      service_removals =
+        service_exceptions
+        |> Enum.filter(fn exception ->
+          exception.date == date && exception.exception == @service_removal && exception.service_id == service.id
+        end)
+
+      service_additions =
+        service_exceptions
+        |> Enum.filter(fn exception ->
+          exception.date == date && exception.exception == @service_addition && exception.service_id == service.id
+        end)
+
+      (Enum.empty?(service_removals) && regular_service?) || Enum.count(service_additions) > 0
+    end)
+    |> Enum.map(& &1.id)
   end
 
   defp add_projected_stop_times_for_service_date(service_id, agency_id, start_of_day) do
@@ -106,30 +121,16 @@ defmodule Importer.ProjectedStopTimeImporter do
     Repo.query(query, [start_of_day, start_of_day, agency_id, service_id], timeout: 60_000)
   end
 
-  @addition 1
-  @removal 2
-  defp active_service_ids(date, services, service_exceptions) do
-    weekday_name = date |> Timex.format!("{WDfull}")
+  defp delete_old_projected_stop_times(delete_before_date) do
+    date = Timex.to_datetime(delete_before_date)
 
-    services
-    |> Enum.filter(fn service ->
-      regular_service? = Service.weekday_schedule(service)[weekday_name]
-
-      service_removals =
-        service_exceptions
-        |> Enum.filter(fn exception ->
-          exception.date == date && exception.exception == @removal && exception.service_id == service.id
-        end)
-
-      service_additions =
-        service_exceptions
-        |> Enum.filter(fn exception ->
-          exception.date == date && exception.exception == @addition && exception.service_id == service.id
-        end)
-
-      (Enum.empty?(service_removals) && regular_service?) || Enum.count(service_additions) > 0
-    end)
-    |> Enum.map(& &1.id)
+    Repo.delete_all(
+      from(
+        pst in ProjectedStopTime,
+        where: pst.scheduled_departure_time < ^date
+      ),
+      timeout: 60_000
+    )
   end
 
   def start_of_agency_day_utc(date, agency_timezone) do
