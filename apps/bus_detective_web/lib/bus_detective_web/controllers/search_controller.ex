@@ -8,6 +8,11 @@ defmodule BusDetectiveWeb.SearchController do
     render(conn, "index.html", results: results)
   end
 
+  def index(conn, %{"latitude" => latitude, "longitude" => longitude} = params) do
+    results = GTFS.search_stops(Keyword.merge(paging_params(params), latitude: latitude, longitude: longitude))
+    render(conn, "index.html", results: results)
+  end
+
   defp paging_params(params) do
     [
       page: params["page"],

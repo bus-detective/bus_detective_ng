@@ -15,7 +15,7 @@
           </button>
         <% end %>
       </div>
-      <a href="/stops/nearby" class="nav__button button push-top"><i class="bd-icon bd-icon--pin"></i>Nearby</a>
+      <bd-nearby-search></bd-nearby-search>
     </div>
 
     <div class="list--home push-sides">

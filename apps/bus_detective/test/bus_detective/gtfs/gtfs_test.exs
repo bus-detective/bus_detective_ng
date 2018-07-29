@@ -2,6 +2,8 @@ defmodule BusDetective.GTFSTest do
   use BusDetective.DataCase
 
   alias BusDetective.GTFS
+  alias BusDetective.GTFS.Stop
+  alias Geo.Point
 
   describe "search_stops/1" do
     setup do
@@ -28,6 +30,18 @@ defmodule BusDetective.GTFSTest do
 
       assert 1 == Enum.count(results)
       assert stop.id == Enum.at(results, 0).id
+    end
+
+    test "searching with a latitude and longitude returns correct results", %{feed: feed} do
+      %Stop{id: far_stop_id} =
+        insert(:stop, feed: feed, location: %Point{coordinates: {-85.511653, 38.104836}, srid: 4326})
+
+      %Stop{id: near_stop_id} =
+        insert(:stop, feed: feed, location: %Point{coordinates: {-84.511653, 39.104836}, srid: 4326})
+
+      results = GTFS.search_stops(longitude: -84.5118910, latitude: 39.1043200)
+
+      assert [near_stop_id, far_stop_id] == Enum.map(results, & &1.id)
     end
 
     test "it pages correctly", %{feed: feed} do
