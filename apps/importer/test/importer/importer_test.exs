@@ -189,8 +189,10 @@ defmodule Importer.ImporterTest do
     assert %Stop{
              code: 4451,
              name: "Ezzard Charles Dr & Linn St",
-             latitude: 39.109286,
-             longitude: -84.527882
+             location: %Geo.Point{
+               coordinates: {-84.527882, 39.109286},
+               srid: 4326
+             }
            } = stop
   end
 

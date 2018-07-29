@@ -329,6 +329,13 @@ defmodule Importer do
         {:ok, code} = maybe_cast(:integer, raw_stop["stop_code"])
         {:ok, latitude} = maybe_cast(:float, raw_stop["stop_lat"])
         {:ok, longitude} = maybe_cast(:float, raw_stop["stop_lon"])
+
+        location =
+          case is_nil(latitude) or is_nil(longitude) do
+            true -> nil
+            false -> %Geo.Point{coordinates: {longitude, latitude}, srid: 4326}
+          end
+
         {:ok, location_type} = maybe_cast(:integer, raw_stop["location_type"])
         {:ok, wheelchair_boarding} = maybe_cast(:integer, raw_stop["wheelchair_boarding"])
         {:ok, zone_id} = maybe_cast(:integer, raw_stop["zone_id"])
@@ -339,8 +346,7 @@ defmodule Importer do
           code: code,
           name: StringFunctions.titleize(raw_stop["stop_name"]),
           description: StringFunctions.titleize(raw_stop["stop_desc"]),
-          latitude: latitude,
-          longitude: longitude,
+          location: location,
           zone_id: zone_id,
           url: raw_stop["stop_url"],
           location_type: location_type,

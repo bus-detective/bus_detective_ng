@@ -83,8 +83,10 @@ defmodule BusDetective.Factory do
       feed: build(:feed),
       remote_id: sequence(:stop_remote_id, &"STOP#{&1}"),
       name: sequence(:stop_remote_id, &"5th and Walnut & #{&1} North St"),
-      latitude: Float.round(39 + :rand.uniform(), 6),
-      longitude: Float.round(-84 - :rand.uniform(), 6)
+      location: %Geo.Point{
+        coordinates: {Float.round(-84 - :rand.uniform(), 6), Float.round(39 + :rand.uniform(), 6)},
+        srid: 4326
+      }
     }
   end
 

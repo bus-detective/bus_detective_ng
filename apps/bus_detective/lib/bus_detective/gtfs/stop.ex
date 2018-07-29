@@ -20,9 +20,8 @@ defmodule BusDetective.GTFS.Stop do
 
     field(:code, :integer)
     field(:description, :string)
-    field(:latitude, :float)
+    field(:location, Geo.PostGIS.Geometry)
     field(:location_type, :integer)
-    field(:longitude, :float)
     field(:name, :string)
     field(:parent_station, :string)
     field(:remote_id, :string)
