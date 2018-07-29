@@ -20,22 +20,13 @@
         <p class="text-center">No stops found</p>
       <% else %>
         <%= for stop <- @results do %>
-          <div class="stop-item" data-test="stop_item">
-            <div class="flex__container">
-              <div class="flex__cell flex__cell--large">
-                <%= link to: stop_path(@conn, :show, stop.id), class: "unstyled" do %>
-                  <button class="stop-item__toggle-favorite toggle-favorite ember-view"><i class="bd-icon bd-icon--heart-o"></i>
-                  </button>
-                  <h1 class="list-item__title"><%=  stop.name %><small class="light"><%= BusDetective.GTFS.Stop.direction(stop) %></small></h1>
-                  <div class="list-item__details">
-                    <%= for route <- stop.routes do %>
-                      <span class="tag" style="background-color: #<%= route.color %>; color: <%= route.text_color %>"><%= route.short_name %></span>
-                    <% end %>
-                  </div>
-                <% end %>
-              </div>
-            </div>
-          </div>
+          <bd-stop name="<%= stop.name %>" direction="<%= BusDetective.GTFS.Stop.direction(stop) %>" url="<%= stop_path(@conn, :show, stop.id) %>">
+            <span slot="routes">
+              <%= for route <- stop.routes do %>
+                <bd-route bg-color="<%= route.color %>" color="<%= route.text_color %>" name="<%= route.short_name %>"></bd-route>
+              <% end %>
+            </span>
+          </bd-stop>
         <% end %>
       <% end %>
       <%= if @results.total_entries > @results.page_size do %>
