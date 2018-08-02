@@ -286,7 +286,7 @@ defmodule Importer do
       file
       |> File.stream!()
       |> CSV.decode(headers: true, strip_fields: true)
-      |> Enum.map(fn {:ok, raw_stop_time} ->
+      |> Stream.map(fn {:ok, raw_stop_time} ->
         stop_id = stops[raw_stop_time["stop_id"]]
         trip_id = trips[raw_stop_time["trip_id"]]
 
@@ -307,7 +307,7 @@ defmodule Importer do
           updated_at: Ecto.DateTime.utc()
         }
       end)
-      |> Enum.chunk_every(1000)
+      |> Stream.chunk_every(1000)
       |> Enum.reduce({0, []}, fn batch, {count, inserted} ->
         {added, stop_times} = GTFSImport.bulk_create_stop_times(batch)
         {count + added, inserted ++ stop_times}
@@ -325,7 +325,7 @@ defmodule Importer do
       file
       |> File.stream!()
       |> CSV.decode(headers: true, strip_fields: true)
-      |> Enum.map(fn {:ok, raw_stop} ->
+      |> Stream.map(fn {:ok, raw_stop} ->
         {:ok, code} = maybe_cast(:integer, raw_stop["stop_code"])
         {:ok, latitude} = maybe_cast(:float, raw_stop["stop_lat"])
         {:ok, longitude} = maybe_cast(:float, raw_stop["stop_lon"])
@@ -357,7 +357,7 @@ defmodule Importer do
           updated_at: Ecto.DateTime.utc()
         }
       end)
-      |> Enum.chunk_every(1000)
+      |> Stream.chunk_every(1000)
       |> Enum.reduce({0, []}, fn batch, {count, inserted} ->
         {added, stops} = GTFSImport.bulk_create_stops(batch)
         {count + added, inserted ++ stops}
@@ -377,7 +377,7 @@ defmodule Importer do
       file
       |> File.stream!()
       |> CSV.decode(headers: true, strip_fields: true)
-      |> Enum.map(fn {:ok, raw_trip} ->
+      |> Stream.map(fn {:ok, raw_trip} ->
         route_id = routes[raw_trip["route_id"]]
         service_id = services[raw_trip["service_id"]]
         shape_id = shapes[raw_trip["shape_id"]]
@@ -398,7 +398,7 @@ defmodule Importer do
           updated_at: Ecto.DateTime.utc()
         }
       end)
-      |> Enum.chunk_every(1000)
+      |> Stream.chunk_every(1000)
       |> Enum.reduce({0, []}, fn batch, {count, inserted} ->
         {added, trips} = GTFSImport.bulk_create_trips(batch)
         {count + added, inserted ++ trips}
