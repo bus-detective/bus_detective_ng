@@ -136,7 +136,7 @@ defmodule BusDetective.Factory do
       route: build(:route, feed: feed),
       service: build(:service, feed: feed),
       shape: build(:shape, feed: feed),
-      block_id: sequence(:trip_block_id, & &1)
+      block_id: sequence(:trip_block_id, &"#{&1}")
     }
   end
 

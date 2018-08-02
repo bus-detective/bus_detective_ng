@@ -272,7 +272,7 @@ defmodule Importer.ImporterTest do
              service_id: ^service_id,
              shape_id: ^shape_id,
              headsign: "Mt Adams - Eden Park",
-             block_id: 125_647
+             block_id: "125647"
            } = trip
   end
 

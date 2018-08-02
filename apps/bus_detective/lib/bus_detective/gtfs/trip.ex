@@ -13,7 +13,7 @@ defmodule BusDetective.GTFS.Trip do
     belongs_to(:shape, Shape)
 
     field(:bikes_allowed, :integer)
-    field(:block_id, :integer)
+    field(:block_id, :string)
     field(:direction_id, :integer)
     field(:headsign, :string)
     field(:remote_id, :string)

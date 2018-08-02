@@ -11,7 +11,7 @@ defmodule BusDetective.Repo.Migrations.CreateTrips do
       add(:headsign, :string)
       add(:short_name, :string)
       add(:direction_id, :integer)
-      add(:block_id, :integer)
+      add(:block_id, :string)
       add(:wheelchair_accessible, :integer)
       add(:bikes_allowed, :integer)
 

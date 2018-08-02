@@ -391,7 +391,7 @@ defmodule Importer do
           headsign: StringFunctions.titleize_headsign(raw_trip["trip_headsign"]),
           short_name: raw_trip["trip_short_name"],
           direction_id: raw_trip["direction_id"] |> String.to_integer(),
-          block_id: raw_trip["block_id"] |> String.to_integer(),
+          block_id: raw_trip["block_id"],
           wheelchair_accessible: raw_trip["wheelchair_accessible"] |> String.to_integer(),
           bikes_allowed: raw_trip["bikes_allowed"] |> String.to_integer(),
           inserted_at: Ecto.DateTime.utc(),
