@@ -398,7 +398,11 @@ defmodule Importer do
           updated_at: Ecto.DateTime.utc()
         }
       end)
-      |> GTFSImport.bulk_create_trips()
+      |> Enum.chunk_every(1000)
+      |> Enum.reduce({0, []}, fn batch, {count, inserted} ->
+        {added, trips} = GTFSImport.bulk_create_trips(batch)
+        {count + added, inserted ++ trips}
+      end)
 
     Logger.info("Done importing #{trips_count} trips")
 
