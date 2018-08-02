@@ -135,7 +135,7 @@ defmodule Importer.GTFSImport do
   end
 
   def bulk_create_stop_times(stop_times) do
-    Repo.insert_all(StopTime, stop_times, returning: true)
+    Repo.insert_all(StopTime, stop_times, returning: [:id], timeout: 60_000)
   end
 
   def bulk_create_stops(stops) do
