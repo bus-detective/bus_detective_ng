@@ -242,16 +242,11 @@ defmodule Importer do
     {shapes_count, shapes} =
       file
       |> File.stream!()
-      |> CSV.decode(headers: true, strip_fields: true)
-      |> Enum.reduce(%{}, fn {:ok, shape}, acc ->
-        {_, new_acc} =
-          Map.get_and_update(acc, shape["shape_id"], fn current_value ->
-            {current_value, [shape | current_value || []]}
-          end)
+      |> CSV.decode!(headers: true, strip_fields: true)
+      |> Stream.chunk_by(fn %{"shape_id" => shape_id} -> shape_id end)
+      |> Stream.map(fn shapes ->
+        shape_id = Enum.at(shapes, 0)["shape_id"]
 
-        new_acc
-      end)
-      |> Enum.map(fn {shape_id, shapes} ->
         coordinates =
           shapes
           |> Enum.sort_by(fn shape -> String.to_integer(shape["shape_pt_sequence"]) end)
@@ -265,7 +260,7 @@ defmodule Importer do
           updated_at: Ecto.DateTime.utc()
         }
       end)
-      |> Enum.chunk_every(1000)
+      |> Stream.chunk_every(1000)
       |> Enum.reduce({0, []}, fn batch, {count, inserted} ->
         {added, shapes} = GTFSImport.bulk_create_shapes(batch)
         {count + added, inserted ++ shapes}
