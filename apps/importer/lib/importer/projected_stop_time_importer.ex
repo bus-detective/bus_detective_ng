@@ -25,13 +25,12 @@ defmodule Importer.ProjectedStopTimeImporter do
     Logger.info("Projecting stop times")
     timezone = Timezone.get(tz)
 
-    services = GTFSImport.get_services(feed_id)
     start_date = Keyword.get(opts, :start_date, Timex.now() |> Timex.shift(days: -1) |> Timex.to_date())
     end_date = Keyword.get(opts, :end_date, Timex.now() |> Timex.shift(days: 2) |> Timex.to_date())
     service_exceptions = GTFSImport.get_service_exceptions(feed_id, start_date, end_date)
 
     for date <- %TimexInterval{from: start_date, until: end_date} do
-      for service_id <- active_service_ids(date, services, service_exceptions) do
+      for service_id <- active_service_ids(date, feed_id, service_exceptions) do
         start_of_day = start_of_agency_day_utc(date, timezone)
 
         Logger.debug(fn ->
@@ -49,10 +48,11 @@ defmodule Importer.ProjectedStopTimeImporter do
     GTFSImport.delete_old_projected_stop_times(Timex.shift(start_date, days: -1))
   end
 
-  defp active_service_ids(date, services, service_exceptions) do
+  defp active_service_ids(date, feed_id, service_exceptions) do
     weekday_name = date |> Timex.format!("{WDfull}")
 
-    services
+    feed_id
+    |> GTFSImport.get_services(date)
     |> Enum.filter(fn service ->
       regular_service? = Service.weekday_schedule(service)[weekday_name]
 

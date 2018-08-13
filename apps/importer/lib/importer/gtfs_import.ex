@@ -306,11 +306,12 @@ defmodule Importer.GTFSImport do
     )
   end
 
-  def get_services(feed_id) do
+  def get_services(feed_id, date) do
     Repo.all(
       from(
         service in Service,
-        where: service.feed_id == ^feed_id
+        where: service.feed_id == ^feed_id,
+        where: service.start_date <= ^date and service.end_date >= ^date
       )
     )
   end

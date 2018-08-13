@@ -52,7 +52,7 @@ defmodule Importer.ImporterTest do
     Importer.import_from_file("TEST", gtfs_file)
     [feed] = Repo.all(from(feed in Feed))
 
-    assert 3 == length(Repo.all(from(s in Service, where: s.feed_id == ^feed.id)))
+    assert 6 == length(Repo.all(from(s in Service, where: s.feed_id == ^feed.id)))
   end
 
   test "it upserts the services on subsequent import", %{gtfs_file: gtfs_file, updated_gtfs_file: updated_gtfs_file} do
@@ -242,7 +242,7 @@ defmodule Importer.ImporterTest do
     Importer.import_from_file("TEST", gtfs_file)
     [feed] = Repo.all(from(feed in Feed))
 
-    assert 10 == length(Repo.all(from(t in Trip, where: t.feed_id == ^feed.id)))
+    assert 20 == length(Repo.all(from(t in Trip, where: t.feed_id == ^feed.id)))
   end
 
   test "it upserts the trips on subsequent import", %{gtfs_file: gtfs_file, updated_gtfs_file: updated_gtfs_file} do
@@ -280,7 +280,7 @@ defmodule Importer.ImporterTest do
     Importer.import_from_file("TEST", gtfs_file)
     [feed] = Repo.all(from(feed in Feed))
 
-    assert 10 == length(Repo.all(from(st in StopTime, where: st.feed_id == ^feed.id)))
+    assert 20 == length(Repo.all(from(st in StopTime, where: st.feed_id == ^feed.id)))
   end
 
   test "it re-imports the correct number of stop times on subsequent import", %{
