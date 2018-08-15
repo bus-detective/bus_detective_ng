@@ -18,25 +18,6 @@
       <bd-nearby-search></bd-nearby-search>
     </div>
 
-    <div class="list--home push-sides">
-      <section class="section push-top">
-        <h2 class="white pull--left">
-          <i class="bd-icon bd-icon--heart"></i>
-          Favorites
-        </h2>
-        <a href="/stops/favorites" class="ember-view">
-          <h2 class="pull--right button--small push-top-5">View All</h2>
-        </a>
-        <div class="clear">
-          <div class="list-item__container">
-            <div> <!----> </div>
-            <div class="text-center white shove-top">Hit the heart icon on your favorite bus stops, and they’ll show up right here.
-            </div>
-          </div>
-        </div>
-      </section>
-    </div>
-
     <div class="nav nav--fixed-bottom">
       <a href="/about" class="nav__attribution">
         <%= img_tag(static_path(@conn, "/images/gaslight-icon.png")) %><span>Made with love by Gaslight</span>

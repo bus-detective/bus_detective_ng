@@ -22,8 +22,6 @@ class Stop extends HTMLElement {
         <div class="flex__container">
           <div class="flex__cell flex__cell--large">
             <a href="${this.url}" class="unstyled">
-              <button class="stop-item__toggle-favorite toggle-favorite ember-view"><i class="bd-icon bd-icon--heart-o"></i>
-              </button>
               <h1 class="list-item__title">${this.name}<small class="light">${this.direction}</small></h1>
               <div class="list-item__details"><slot name="routes"></slot></div>
             </a>
