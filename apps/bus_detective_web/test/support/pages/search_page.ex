@@ -8,6 +8,6 @@ defmodule BusDetectiveWeb.SearchPage do
   import Wallaby.Query, only: [css: 2]
 
   def search_results(count: count) do
-    css("[data-test='stop_item']", count: count)
+    css("bd-stop", count: count)
   end
 end

@@ -18,7 +18,7 @@ class Stop extends HTMLElement {
 
     template.innerHTML = `
       <link rel="stylesheet" href="/css/app.css">
-      <div class="stop-item" data-test="stop_item">
+      <div class="stop-item">
         <div class="flex__container">
           <div class="flex__cell flex__cell--large">
             <a href="${this.url}" class="unstyled">
