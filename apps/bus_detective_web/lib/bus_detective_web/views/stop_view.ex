@@ -3,7 +3,6 @@ defmodule BusDetectiveWeb.StopView do
 
   alias BusDetective.GTFS.Stop
   alias Geo.Point
-  alias Timex.Timezone
 
   def map_shapes(nil), do: "[]"
 
@@ -18,12 +17,6 @@ defmodule BusDetectiveWeb.StopView do
       "[" <> coords <> "]"
     end)
     |> Enum.join(", ")
-  end
-
-  def departure_time(time, agency_timezone) do
-    time
-    |> Timezone.convert(agency_timezone)
-    |> Timex.format!("{h12}:{m}{am}")
   end
 
   def latitude(%Stop{location: %Point{coordinates: {_, latitude}}}), do: latitude
