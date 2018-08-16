@@ -31,13 +31,14 @@ script:
   --mode development
 - cd $TRAVIS_BUILD_DIR
 deploy:
-  matrix:
   - provider: heroku
     app:
       master: busdetective-ng-staging
     on:
       repo: bus-detective/bus_detective_ng
     run: mix ecto.migrate
+    api_key:
+      secure: qg4n2cOa0lIXA6GYauVMY94eJVkynAPXqm0y1hBva1bgEMwPl8e9RShNsTfj8Tmd+yGKUk6qvBUubE98Tc6WYxsRJ+GoP91xs4g3+l68ZMXRkaHsLMnM5tG7TlQ/digwC7yICluINaweTPh1FHIjEU1sAfywYrh3VoRBBPQKQ8TkyC9nGEez8cjAr954knCTI9/VgoVAS87Sqa2KvumW76zz4Axndxflk0Pm3s0sZvWYOCTp6etZjMrqnjYPDzHl8IK4MkepRYbfpQ9j1mo5Tg/P1PhfSpBR50LdAcxLMEYKfKU8bB9jxaF0ildb/w++FH+fcxilVZNEXQ1/2KFCi80gj0GDUPPfj4tE/TrYrn6GE14KQePOZfS6QmeAHtEFg/k+0WD4j348sGqbtVoqulCWui3iS883Nj1KB6dnhZzUeMTLXP0tRRI1cRdKnGgcvTCG4m619ijV2/9q/WOzTRghPBtRqmjjTjY43tWpUuJshDCUg1AugwhJViI+rPU0A8eFpIUnq3M9wqsQjO61czaMLJz/mY6BQ675gZRh5XRduTPM+ky1dIjS7doMJz7ZXuhy1sSwafpcBTV5z0Qs7HF224A2AodEdxy93yt1c5bs9I5QgBEquZ7xtKB+vj9905ljHR6RtD/aaHyL+/wZ8Q0SVaoYwxREsRsVCdpl/CM=
   - provider: heroku
     app: busdetective-ng
     on:
@@ -45,5 +46,5 @@ deploy:
       all_branches: true
       condition: "$TRAVIS_TAG =~ ^v[0-9]+\\.[0-9]+\\.[0-9]+"
     run: mix ecto.migrate
-  api_key:
-    secure: qg4n2cOa0lIXA6GYauVMY94eJVkynAPXqm0y1hBva1bgEMwPl8e9RShNsTfj8Tmd+yGKUk6qvBUubE98Tc6WYxsRJ+GoP91xs4g3+l68ZMXRkaHsLMnM5tG7TlQ/digwC7yICluINaweTPh1FHIjEU1sAfywYrh3VoRBBPQKQ8TkyC9nGEez8cjAr954knCTI9/VgoVAS87Sqa2KvumW76zz4Axndxflk0Pm3s0sZvWYOCTp6etZjMrqnjYPDzHl8IK4MkepRYbfpQ9j1mo5Tg/P1PhfSpBR50LdAcxLMEYKfKU8bB9jxaF0ildb/w++FH+fcxilVZNEXQ1/2KFCi80gj0GDUPPfj4tE/TrYrn6GE14KQePOZfS6QmeAHtEFg/k+0WD4j348sGqbtVoqulCWui3iS883Nj1KB6dnhZzUeMTLXP0tRRI1cRdKnGgcvTCG4m619ijV2/9q/WOzTRghPBtRqmjjTjY43tWpUuJshDCUg1AugwhJViI+rPU0A8eFpIUnq3M9wqsQjO61czaMLJz/mY6BQ675gZRh5XRduTPM+ky1dIjS7doMJz7ZXuhy1sSwafpcBTV5z0Qs7HF224A2AodEdxy93yt1c5bs9I5QgBEquZ7xtKB+vj9905ljHR6RtD/aaHyL+/wZ8Q0SVaoYwxREsRsVCdpl/CM=
+    api_key:
+      secure: qg4n2cOa0lIXA6GYauVMY94eJVkynAPXqm0y1hBva1bgEMwPl8e9RShNsTfj8Tmd+yGKUk6qvBUubE98Tc6WYxsRJ+GoP91xs4g3+l68ZMXRkaHsLMnM5tG7TlQ/digwC7yICluINaweTPh1FHIjEU1sAfywYrh3VoRBBPQKQ8TkyC9nGEez8cjAr954knCTI9/VgoVAS87Sqa2KvumW76zz4Axndxflk0Pm3s0sZvWYOCTp6etZjMrqnjYPDzHl8IK4MkepRYbfpQ9j1mo5Tg/P1PhfSpBR50LdAcxLMEYKfKU8bB9jxaF0ildb/w++FH+fcxilVZNEXQ1/2KFCi80gj0GDUPPfj4tE/TrYrn6GE14KQePOZfS6QmeAHtEFg/k+0WD4j348sGqbtVoqulCWui3iS883Nj1KB6dnhZzUeMTLXP0tRRI1cRdKnGgcvTCG4m619ijV2/9q/WOzTRghPBtRqmjjTjY43tWpUuJshDCUg1AugwhJViI+rPU0A8eFpIUnq3M9wqsQjO61czaMLJz/mY6BQ675gZRh5XRduTPM+ky1dIjS7doMJz7ZXuhy1sSwafpcBTV5z0Qs7HF224A2AodEdxy93yt1c5bs9I5QgBEquZ7xtKB+vj9905ljHR6RtD/aaHyL+/wZ8Q0SVaoYwxREsRsVCdpl/CM=
