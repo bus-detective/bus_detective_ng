@@ -33,7 +33,7 @@ class Departure extends HTMLElement {
             <slot name="route"></slot>
 
             <span class="event__relative-time">
-              ${this.realtime ? 'scheduled' : ''} <bd-timestamp timestamp="${this.departureTime}"></bd-timestamp>
+              ${this.realtime ? '' : 'scheduled'} <bd-timestamp timestamp="${this.departureTime}"></bd-timestamp>
             </span>
             <p class="event__title">${this.headsign}</p>
           </div>
