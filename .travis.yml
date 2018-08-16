@@ -9,7 +9,8 @@ addons:
   postgresql: '9.5'
   chrome: stable
 install:
-- wget -N http://chromedriver.storage.googleapis.com/2.40/chromedriver_linux64.zip -P ~/
+- wget -N http://chromedriver.storage.googleapis.com/2.40/chromedriver_linux64.zip
+  -P ~/
 - unzip ~/chromedriver_linux64.zip -d ~/
 - rm ~/chromedriver_linux64.zip
 - sudo mv -f ~/chromedriver /usr/local/share/
@@ -24,15 +25,25 @@ script:
 - mix format --check-formatted && mix credo --strict
 - MIX_ENV=test mix do ecto.create, ecto.migrate && mix coveralls.travis --umbrella
 - cd $TRAVIS_BUILD_DIR/apps/bus_detective_web/assets && npm install
-- cd $TRAVIS_BUILD_DIR/apps/bus_detective_web/assets && ./node_modules/.bin/eslint js/**/*.js
-- cd $TRAVIS_BUILD_DIR/apps/bus_detective_web/assets && node node_modules/webpack/bin/webpack.js --mode development
+- cd $TRAVIS_BUILD_DIR/apps/bus_detective_web/assets && ./node_modules/.bin/eslint
+  js/**/*.js
+- cd $TRAVIS_BUILD_DIR/apps/bus_detective_web/assets && node node_modules/webpack/bin/webpack.js
+  --mode development
 - cd $TRAVIS_BUILD_DIR
 deploy:
-  provider: heroku
+  matrix:
+  - provider: heroku
+    app:
+      master: busdetective-ng-staging
+    on:
+      repo: bus-detective/bus_detective_ng
+    run: mix ecto.migrate
+  - provider: heroku
+    app: busdetective-ng
+    on:
+      repo: bus-detective/bus_detective_ng
+      all_branches: true
+      condition: "$TRAVIS_TAG =~ ^v[0-9]+\\.[0-9]+\\.[0-9]+"
+    run: mix ecto.migrate
   api_key:
-    secure: mCaAH41QErmYnfJAxjPxrIbs2oob3FMSrjh/XzU5zJekkrNXi6C2ztWrygjfnxkULDl03Sdcth+uOYeoIMn1+GhyFhWk5lBz+3noPW/qjsM4+nsIDqmufq6rE6sz/jYV67y5541BVtmPWG/zBRFkBErmg0ezTV4d5+zf+K3QsnkY3285GrXK1C30YhVbQpNKuqoj+ZAy433EcTWULpwTHbrcfwYZWr8V5s4UEker9EMZ3fedk/hiE51wwZwDt+JRWalcfs/ZbUeQzUqxKiL30Xa6dLmBtal5Iad0sYg15Lw7HJ7cDm99z9iO4raFo90ir6QFJES9sZMy3EzrI0o+jsnXImKkk666ckwFBH4jK6hl1/jNnQJ+tESrIE4moN+M18qe5Oe9rL3c57EauFHu+jHKU8BpfKt29p2uu66G/dgeP7u2WHj/9dzixd+0BzbP0f1Kut+YzVnFgbnHxSqnoL/CTsPhabqleVgxvht91UrRR9LcsJH+LGTGxJKju2fQcOYXOeJPSdAg0ZFN2OveGdOxhKnnlaxk6ZRtXT/lVEZmXXnz2cSOJkA015Vvv8tePNMyfLGmr4+Q9SwT3PrwCtE38z8eKlNFydsOwlU12uF3sGSmkRHkBYezf6NUwPna21Tv8EB6pXZOBoZTvmt5r1B9u+vN1vYfyG7v1ZdIouc=
-  app:
-    master: busdetective-ng-staging
-  on:
-    repo: bus-detective/bus_detective_ng
-  run: mix ecto.migrate
+    secure: qg4n2cOa0lIXA6GYauVMY94eJVkynAPXqm0y1hBva1bgEMwPl8e9RShNsTfj8Tmd+yGKUk6qvBUubE98Tc6WYxsRJ+GoP91xs4g3+l68ZMXRkaHsLMnM5tG7TlQ/digwC7yICluINaweTPh1FHIjEU1sAfywYrh3VoRBBPQKQ8TkyC9nGEez8cjAr954knCTI9/VgoVAS87Sqa2KvumW76zz4Axndxflk0Pm3s0sZvWYOCTp6etZjMrqnjYPDzHl8IK4MkepRYbfpQ9j1mo5Tg/P1PhfSpBR50LdAcxLMEYKfKU8bB9jxaF0ildb/w++FH+fcxilVZNEXQ1/2KFCi80gj0GDUPPfj4tE/TrYrn6GE14KQePOZfS6QmeAHtEFg/k+0WD4j348sGqbtVoqulCWui3iS883Nj1KB6dnhZzUeMTLXP0tRRI1cRdKnGgcvTCG4m619ijV2/9q/WOzTRghPBtRqmjjTjY43tWpUuJshDCUg1AugwhJViI+rPU0A8eFpIUnq3M9wqsQjO61czaMLJz/mY6BQ675gZRh5XRduTPM+ky1dIjS7doMJz7ZXuhy1sSwafpcBTV5z0Qs7HF224A2AodEdxy93yt1c5bs9I5QgBEquZ7xtKB+vj9905ljHR6RtD/aaHyL+/wZ8Q0SVaoYwxREsRsVCdpl/CM=
