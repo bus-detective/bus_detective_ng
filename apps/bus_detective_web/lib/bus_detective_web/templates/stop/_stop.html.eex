@@ -1,0 +1,14 @@
+<div class="stop-item" data-test="stop_item">
+  <div class="flex__container">
+    <div class="flex__cell flex__cell--large">
+      <a href="<%= stop_path(@conn, :show, @stop) %>" class="unstyled">
+        <h1 class="list-item__title"><%= @stop.name %><small class="light"><%= BusDetective.GTFS.Stop.direction(@stop) %></small></h1>
+        <div class="list-item__details">
+          <%= for route <- @stop.routes do %>
+            <bd-route bg-color="<%= route.color %>" color="<%= route.text_color %>" name="<%= route.short_name %>"></bd-route>
+          <% end %>
+        </div>
+      </a>
+    </div>
+  </div>
+</div>

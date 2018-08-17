@@ -20,13 +20,7 @@
         <p class="text-center">No stops found</p>
       <% else %>
         <%= for stop <- @results do %>
-          <bd-stop name="<%= stop.name %>" direction="<%= BusDetective.GTFS.Stop.direction(stop) %>" url="<%= stop_path(@conn, :show, stop.id) %>">
-            <span slot="routes">
-              <%= for route <- stop.routes do %>
-                <bd-route bg-color="<%= route.color %>" color="<%= route.text_color %>" name="<%= route.short_name %>"></bd-route>
-              <% end %>
-            </span>
-          </bd-stop>
+          <%= render BusDetectiveWeb.StopView, "_stop.html", conn: @conn, stop: stop %>
         <% end %>
       <% end %>
       <%= if @results.total_entries > @results.page_size do %>
