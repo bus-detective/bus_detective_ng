@@ -16,6 +16,6 @@ defmodule BusDetectiveWeb.StopPage do
   end
 
   def departure_results(count: count) do
-    css("bd-departure", count: count)
+    css("[data-test='departure_item']", count: count)
   end
 end
