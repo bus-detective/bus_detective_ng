@@ -12,8 +12,7 @@ class Stop extends HTMLElement {
     return this.getAttribute('url');
   }
 
-  constructor () {
-    super();
+  connectedCallback () {
     const template = document.createElement('template');
 
     template.innerHTML = `

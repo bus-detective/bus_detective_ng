@@ -19,8 +19,7 @@ class Departure extends HTMLElement {
     return this.getAttribute('realtime') === 'true';
   }
 
-  constructor () {
-    super();
+  connectedCallback () {
     const template = document.createElement('template');
 
     template.innerHTML = `
@@ -43,9 +42,7 @@ class Departure extends HTMLElement {
 
     this.attachShadow({ mode: 'open' });
     this.shadowRoot.appendChild(template.content.cloneNode(true));
-  }
 
-  connectedCallback () {
     const update = () => {
       let rootDiv = this.shadowRoot.querySelector('#departure-item');
       if (this.isPast()) {
