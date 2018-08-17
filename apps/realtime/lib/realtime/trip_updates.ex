@@ -87,7 +87,7 @@ defmodule Realtime.TripUpdates do
 
       error ->
         Logger.error(fn ->
-          "Failed to fetch realtime data for feed #{inspect(state.feed)} at #{inspect(Timex.now())}, error: #{
+          "Failed to fetch realtime data for feed #{inspect(state.feed_name)} at #{inspect(Timex.now())}, error: #{
             inspect(error)
           }"
         end)
