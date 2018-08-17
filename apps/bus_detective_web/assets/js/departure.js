@@ -1,5 +1,4 @@
 /* global HTMLElement */
-import moment from 'moment';
 
 class Departure extends HTMLElement {
   get departureTime () {
