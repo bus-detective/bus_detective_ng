@@ -1,7 +1,6 @@
 <div class="stop">
   <script>setTimeout(function(){ window.location.reload(); }, 15000);</script>
   <bd-stop-map latitude="<%= latitude(@stop) %>" longitude="<%= longitude(@stop) %>"></bd-stop-map>
-  <!-- div id="stopMap" class="map" data-latitude="<%= latitude(@stop) %>" data-longitude="<%= longitude(@stop) %>" data-shape="<%= map_shapes(@departures) %>"></div -->
 
   <div class="action-banner">
     <!-- {{bd-back-button}} -->
@@ -23,11 +22,7 @@
         <p class="text-center">No departures found</p>
       <% else %>
         <%= for departure <- @departures do %>
-          <bd-departure departure-time="<%= Timex.format!(departure.time, "{ISO:Extended}") %>" realtime="<%= departure.realtime? %>" headsign="<%= departure.trip.headsign %>">
-            <span slot="route">
-              <bd-route bg-color="<%= departure.route.color %>" color="<%= departure.route.text_color %>" name="<%= departure.route.short_name %>"></bd-route>
-            </span>
-          </bd-departure>
+          <%= render BusDetectiveWeb.DepartureView, "_departure.html", departure: departure %>
         <% end %>
       <% end %>
     </div>

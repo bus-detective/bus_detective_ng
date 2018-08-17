@@ -19,7 +19,7 @@ class Timestamp extends HTMLElement {
   connectedCallback () {
     const update = () => {
       this.innerHTML = this.displayedTimestamp;
-      setTimeout(update, 5000);
+      setTimeout(update, 1000);
     };
     update();
   }
