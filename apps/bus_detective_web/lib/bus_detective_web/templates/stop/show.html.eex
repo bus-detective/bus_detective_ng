@@ -3,8 +3,8 @@
   <bd-stop-map latitude="<%= latitude(@stop) %>" longitude="<%= longitude(@stop) %>"></bd-stop-map>
 
   <div class="action-banner">
-    <!-- {{bd-back-button}} -->
     <%= link "", to: home_page_path(@conn, :index), class: "button button--home" %>
+    <!-- {{bd-back-button}} -->
   </div>
 
   <div class="detail-header">

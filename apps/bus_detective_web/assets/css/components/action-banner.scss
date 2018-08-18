@@ -20,24 +20,31 @@
   box-shadow: 0 0px 2px 2px transparentize($bd-dark-gray, 0.85);
   width: 100%;
   z-index: 10;
-  .search {
-    float: left;
-    width: calc(100% - 90px);
-  }
-  .search__query {
-    box-shadow: none;
-  }
-  .button {
-    box-shadow: none;
-  }
+  display: flex;
+  padding: 0;
 
   .button--home {
     background-size: 55%;
-    border-left: 1px solid $bd-light-gray;
-    height: 100%;
-    position: absolute;
-    right: 0;
-    top: 0;
-    width: 60px;
+    border-right: 1px solid $bd-light-gray;
+    height: 60px;
+    flex-basis: 60px;
+  }
+
+  .button--return {
+    flex-basis: 40px;
+    margin: 10px;
+  }
+
+  .search {
+    flex-basis: calc(100% - 100px);
+    margin: 10px;
+
+    .search__query {
+      box-shadow: none;
+    }
+  }
+
+  .button {
+    box-shadow: none;
   }
 }

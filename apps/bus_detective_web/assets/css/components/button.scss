@@ -18,7 +18,6 @@
 .button--return {
   color: #fff;
   background-color: transparentize($bd-blue, 0.15);
-  float: left;
 }
 
 .button--fav {
@@ -35,7 +34,7 @@
   background-repeat: no-repeat;
   background-size: 80%;
   background-position: center;
-  float: right;
+  float: left;
 }
 
 .button--load-more {

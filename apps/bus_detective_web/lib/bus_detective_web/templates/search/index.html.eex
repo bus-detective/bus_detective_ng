@@ -1,6 +1,7 @@
 
 <div>
   <div class="action-banner action-banner--fixed-top">
+    <%= link "", to: home_page_path(@conn, :index), class: "button button--home" %>
     <%= link to: home_page_path(@conn, :index), class: "button button--return" do %>
       <i class="bd-icon bd-icon--arrow-left "></i>
     <% end %>
@@ -10,7 +11,6 @@
         <i class="bd-icon bd-icon--search"></i>
       </button>
     <% end %>
-    <%= link "", to: home_page_path(@conn, :index), class: "button button--home" %>
   </div>
 
   <div class="list">
