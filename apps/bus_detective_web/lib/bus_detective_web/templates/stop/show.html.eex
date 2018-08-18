@@ -4,7 +4,9 @@
 
   <div class="action-banner">
     <%= link "", to: home_page_path(@conn, :index), class: "button button--home" %>
-    <!-- {{bd-back-button}} -->
+    <a class="button button--return" href="javascript:history.back()">
+      <i class="bd-icon bd-icon--arrow-left "></i>
+    </a>
   </div>
 
   <div class="detail-header">
