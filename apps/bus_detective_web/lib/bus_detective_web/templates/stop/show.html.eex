@@ -7,6 +7,7 @@
     <a class="button button--return" href="javascript:history.back()">
       <i class="bd-icon bd-icon--arrow-left "></i>
     </a>
+    <bd-expand-map></bd-expand-map>
   </div>
 
   <div class="detail-header">
