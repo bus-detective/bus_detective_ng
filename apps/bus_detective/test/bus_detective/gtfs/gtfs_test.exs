@@ -42,15 +42,25 @@ defmodule BusDetective.GTFSTest do
       assert stop.id == Enum.at(results, 0).id
     end
 
-    # test "by query with a spelled out street it returns only the matching stop", %{feed: feed} do
-    #   stop = insert(:stop, feed: feed, name: "8th & Walnut", code: "1234")
-    #   insert(:stop, feed: feed, name: "7th & Main", code: "456")
+    test "by query with a spelled out street it returns only the matching stop", %{feed: feed} do
+      stop = insert(:stop, feed: feed, name: "8th & Walnut", code: "1234")
+      insert(:stop, feed: feed, name: "7th & Main", code: "456")
 
-    #   results = GTFS.search_stops(query: "eight")
+      results = GTFS.search_stops(query: "eight")
 
-    #   assert 1 == Enum.count(results)
-    #   assert stop.id == Enum.at(results, 0).id
-    # end
+      assert 1 == Enum.count(results)
+      assert stop.id == Enum.at(results, 0).id
+    end
+
+    test "by query with a number for the street it returns only the matching stop", %{feed: feed} do
+      stop = insert(:stop, feed: feed, name: "8th & Walnut", code: "1234")
+      insert(:stop, feed: feed, name: "7th & Main", code: "456")
+
+      results = GTFS.search_stops(query: "8")
+
+      assert 1 == Enum.count(results)
+      assert stop.id == Enum.at(results, 0).id
+    end
 
     test "by query with a stop code it returns only the matching stop", %{feed: feed} do
       stop = insert(:stop, feed: feed, name: "8th & Walnut", code: "1234")
