@@ -12,21 +12,51 @@ defmodule BusDetective.GTFSTest do
       {:ok, feed: feed}
     end
 
-    test "search is case-insensitive", %{feed: feed} do
-      insert(:stop, feed: feed, name: "unrelated")
-      stop = insert(:stop, feed: feed, name: "BIG TIME STOP")
+    test "by query with a single word it returns only the matching stop", %{feed: feed} do
+      stop = insert(:stop, feed: feed, name: "8th & Walnut", code: "1234")
+      insert(:stop, feed: feed, name: "7th & Main", code: "456")
 
-      results = GTFS.search_stops(query: "big time")
+      results = GTFS.search_stops(query: "walnut")
 
       assert 1 == Enum.count(results)
       assert stop.id == Enum.at(results, 0).id
     end
 
-    test "searching by partial name returns the correct results", %{feed: feed} do
-      insert(:stop, feed: feed, name: "unrelated")
-      stop = insert(:stop, feed: feed, name: "This is a stop & it's great")
+    test "by query with multiple words it returns only the matching stop", %{feed: feed} do
+      stop = insert(:stop, feed: feed, name: "8th & Walnut", code: "1234")
+      insert(:stop, feed: feed, name: "7th & Main", code: "456")
 
-      results = GTFS.search_stops(query: "great")
+      results = GTFS.search_stops(query: "walnut 8th")
+
+      assert 1 == Enum.count(results)
+      assert stop.id == Enum.at(results, 0).id
+    end
+
+    test "by query with a 'and' instead of '&' it returns only the matching stop", %{feed: feed} do
+      stop = insert(:stop, feed: feed, name: "8th & Walnut", code: "1234")
+      insert(:stop, feed: feed, name: "7th & Main", code: "456")
+
+      results = GTFS.search_stops(query: "8th and walnut")
+
+      assert 1 == Enum.count(results)
+      assert stop.id == Enum.at(results, 0).id
+    end
+
+    # test "by query with a spelled out street it returns only the matching stop", %{feed: feed} do
+    #   stop = insert(:stop, feed: feed, name: "8th & Walnut", code: "1234")
+    #   insert(:stop, feed: feed, name: "7th & Main", code: "456")
+
+    #   results = GTFS.search_stops(query: "eight")
+
+    #   assert 1 == Enum.count(results)
+    #   assert stop.id == Enum.at(results, 0).id
+    # end
+
+    test "by query with a stop code it returns only the matching stop", %{feed: feed} do
+      stop = insert(:stop, feed: feed, name: "8th & Walnut", code: "1234")
+      insert(:stop, feed: feed, name: "7th & Main", code: "456")
+
+      results = GTFS.search_stops(query: "1234")
 
       assert 1 == Enum.count(results)
       assert stop.id == Enum.at(results, 0).id

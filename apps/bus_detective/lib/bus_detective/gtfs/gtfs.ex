@@ -5,7 +5,6 @@ defmodule BusDetective.GTFS do
   """
 
   import Ecto.Query
-  import Geo.PostGIS, only: [st_distance: 2]
 
   require Logger
 
@@ -14,6 +13,7 @@ defmodule BusDetective.GTFS do
     Feed,
     ProjectedStopTime,
     Stop,
+    StopSearch,
     StopTime,
     Trip
   }
@@ -79,30 +79,17 @@ defmodule BusDetective.GTFS do
   end
 
   def search_stops(options) do
-    query = Keyword.get(options, :query)
+    search_string = Keyword.get(options, :query)
     latitude = Keyword.get(options, :latitude)
     longitude = Keyword.get(options, :longitude)
 
     pagination_options = options
 
-    query =
-      from(
-        s in Stop,
-        where: fragment("? ILIKE ?", s.name, ^"%#{query}%"),
-        preload: [:routes, :feed]
-      )
-
-    query =
-      case is_nil(latitude) or is_nil(longitude) do
-        true ->
-          query
-
-        false ->
-          location = %Geo.Point{coordinates: {longitude, latitude}, srid: 4326}
-          from(s in query, order_by: st_distance(s.location, ^location))
-      end
-
-    Repo.paginate(query, pagination_options)
+    Stop
+    |> preload([:routes, :feed])
+    |> StopSearch.query_string(search_string)
+    |> StopSearch.query_nearby(latitude, longitude)
+    |> Repo.paginate(pagination_options)
   end
 
   def get_stop!(id) do
