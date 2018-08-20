@@ -1,4 +1,7 @@
 defmodule BusDetectiveWeb.FavoritesChannel do
+  @moduledoc """
+  Channel to manage favorite stops
+  """
   use Phoenix.Channel
 
   alias BusDetective.GTFS
@@ -13,15 +16,15 @@ defmodule BusDetectiveWeb.FavoritesChannel do
     stops =
       stop_ids
       |> GTFS.get_stops()
-      |> Enum.map(fn(stop) ->
-      View.render_to_string(
-        StopView,
-        "_stop.html",
-        stop: stop
-      )
-    end)
+      |> Enum.map(fn stop ->
+        View.render_to_string(
+          StopView,
+          "_stop.html",
+          stop: stop
+        )
+      end)
 
-    push socket, "favorites_list", %{stops: stops}
+    push(socket, "favorites_list", %{stops: stops})
     {:noreply, socket}
   end
 end
