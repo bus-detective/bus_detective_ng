@@ -1,6 +1,5 @@
 /* global HTMLElement */
 class ExpandMap extends HTMLElement {
-
   connectedCallback () {
     this.innerHTML = `
       <button class="map__toggle-expanded button qa-toggle-expanded" id="toggleButton">
@@ -11,8 +10,8 @@ class ExpandMap extends HTMLElement {
     let toggleButton = this.querySelector('#toggleButton');
     let toggleButtonIcon = toggleButton.querySelector('.bd-icon');
 
-    toggleButton.addEventListener('click', function(event) {
-      if(toggleButtonIcon.classList.contains('bd-icon--expand')) {
+    toggleButton.addEventListener('click', function (event) {
+      if (toggleButtonIcon.classList.contains('bd-icon--expand')) {
         toggleButtonIcon.classList.remove('bd-icon--expand');
         toggleButtonIcon.classList.add('bd-icon--contract');
       } else {

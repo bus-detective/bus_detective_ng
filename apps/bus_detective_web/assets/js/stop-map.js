@@ -32,7 +32,7 @@ class StopMap extends HTMLElement {
 
     let toggleButton = document.querySelector('#toggleButton');
 
-    toggleButton.addEventListener('click', function(event) {
+    toggleButton.addEventListener('click', function (event) {
       document.querySelector('#stopMap').classList.toggle('map--expanded');
       map.invalidateSize();
     });
