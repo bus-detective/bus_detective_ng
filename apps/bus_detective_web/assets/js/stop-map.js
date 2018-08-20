@@ -29,6 +29,13 @@ class StopMap extends HTMLElement {
     map.addLayer(Leaflet.tileLayer(TILE_URL, {detectRetina: true}));
     Leaflet.layerGroup().addTo(map);
     Leaflet.marker(center).addTo(map);
+
+    let toggleButton = document.querySelector('#toggleButton');
+
+    toggleButton.addEventListener('click', function (event) {
+      document.querySelector('#stopMap').classList.toggle('map--expanded');
+      map.invalidateSize();
+    });
   }
 }
 
