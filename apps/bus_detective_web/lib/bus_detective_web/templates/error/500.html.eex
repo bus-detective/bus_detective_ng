@@ -1,0 +1,10 @@
+<section class="push text-center">
+  <div class="hero-header">
+    <div class="hero-header__logo--no-circle">
+      <img class="" src="/images/500.png"/>
+    </div>
+  </div>
+  <h1 class="push--bottom">Yikes. The bus detective broke down.</h1>
+  <p>We called our trusty mechanic and expect to be up and running again soon.</p>
+  <p>In the meantime, try cruising over to the <%= link "homepage", to: home_page_path(@conn, :index) %> instead.</p>
+</section>

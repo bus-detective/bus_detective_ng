@@ -1,0 +1,9 @@
+<section class="push text-center">
+  <div class="hero-header">
+    <div class="hero-header__logo">
+      <img class="" src="/images/404.png"/>
+    </div>
+  </div>
+  <h1 class="push--bottom">Even the bus detective couldn’t find that page.</h1>
+  <p>Try cruising over to the <%= link "homepage", to: home_page_path(@conn, :index) %> instead.</p>
+</section>

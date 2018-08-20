@@ -92,9 +92,30 @@ defmodule BusDetective.GTFS do
     |> Repo.paginate(pagination_options)
   end
 
-  def get_stop!(id) do
-    Stop
-    |> Repo.get!(id)
-    |> Repo.preload([:feed, :routes])
+  def get_stop(id) do
+    case Repo.get(Stop, id) do
+      nil ->
+        {:error, :not_found}
+
+      stop ->
+        {:ok, Repo.preload(stop, [:feed, :routes])}
+    end
+  end
+
+  def get_stop(feed_id, stop_remote_id) do
+    query =
+      from(
+        s in Stop,
+        where: s.feed_id == ^feed_id and s.remote_id == ^stop_remote_id,
+        preload: [:feed, :routes]
+      )
+
+    case Repo.one(query) do
+      nil ->
+        {:error, :not_found}
+
+      stop ->
+        {:ok, stop}
+    end
   end
 end
