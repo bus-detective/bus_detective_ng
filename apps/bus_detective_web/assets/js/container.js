@@ -1,6 +1,9 @@
 
 export const subscribers = {
-  "bd-stop-map": ({ mapExpanded }, element) => {
+  'bd-stop-map': ({ mapExpanded }, element) => {
+    element.setAttribute("expanded", mapExpanded);
+  },
+  'bd-expand-map': ({ mapExpanded }, element) => {
     element.setAttribute("expanded", mapExpanded);
   }
 }

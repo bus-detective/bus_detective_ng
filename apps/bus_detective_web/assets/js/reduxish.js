@@ -5,8 +5,8 @@ export const dispatch = (event, payload) => {
   }));
 }
 
-export const connect = (reducers, subscribers, initialState = {}) => {
-  let state = initialState;
+export const connect = (reducers, subscribers) => {
+  let state = window.localStorage.bdState ? JSON.parse(window.localStorage.bdState) : {};
 
   Object.keys(reducers).forEach((key) => {
     document.addEventListener(key, ({ detail }) => {
@@ -23,5 +23,11 @@ export const connect = (reducers, subscribers, initialState = {}) => {
       subscribers[key](state, element);
     });
   });
+
+  document.addEventListener("stateChange", ({detail: state}) => {
+    window.localStorage.bdState = JSON.stringify(state);
+  });
+
+  document.dispatchEvent(new CustomEvent("stateChange", {detail: state}));
 
 }
