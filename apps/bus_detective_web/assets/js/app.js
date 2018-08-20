@@ -9,6 +9,8 @@ import NearbySearch from './nearby-search.js';
 import StopMap from './stop-map.js';
 import Route from './route.js';
 import Timestamp from './timestamp.js';
+import { connect } from './reduxish.js';
+import { subscribers, reducers } from './container';
 
 customElements.define('bd-departure', Departure);
 customElements.define('bd-favorite', Favorite);
@@ -18,3 +20,5 @@ customElements.define('bd-nearby-search', NearbySearch);
 customElements.define('bd-stop-map', StopMap);
 customElements.define('bd-timestamp', Timestamp);
 customElements.define('bd-route', Route);
+
+connect(reducers, subscribers);

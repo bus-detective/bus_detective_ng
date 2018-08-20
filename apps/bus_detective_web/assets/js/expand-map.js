@@ -1,4 +1,6 @@
 /* global HTMLElement */
+import { dispatch } from './reduxish';
+
 class ExpandMap extends HTMLElement {
   connectedCallback () {
     this.innerHTML = `
@@ -14,9 +16,11 @@ class ExpandMap extends HTMLElement {
       if (toggleButtonIcon.classList.contains('bd-icon--expand')) {
         toggleButtonIcon.classList.remove('bd-icon--expand');
         toggleButtonIcon.classList.add('bd-icon--contract');
+        dispatch("expandMap", {mapExpanded: true});
       } else {
         toggleButtonIcon.classList.remove('bd-icon--contract');
         toggleButtonIcon.classList.add('bd-icon--expand');
+        dispatch("expandMap", {mapExpanded: false});
       }
     });
   }
