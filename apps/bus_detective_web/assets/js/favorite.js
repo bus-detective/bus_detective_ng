@@ -25,7 +25,6 @@ class Favorite extends HTMLElement {
     } else {
       favoriteService.add(this.stopId);
     }
-    console.log(favoriteService.all());
     this.updateClasses();
     return false;
   }
