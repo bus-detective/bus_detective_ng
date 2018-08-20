@@ -127,7 +127,7 @@ defmodule BusDetective.GTFS do
 
     query =
       stop_ids
-      |> Enum.map(&(String.split(&1, "-")))
+      |> Enum.map(&(String.split(&1, "-", parts: 2)))
       |> Enum.group_by(&(Enum.at(&1, 0)), &(Enum.at(&1, 1)))
       |> Enum.reduce(query, fn({feed_id, remote_ids}, query) ->
         from(stop in query, or_where: stop.feed_id == ^feed_id and stop.remote_id in ^remote_ids)

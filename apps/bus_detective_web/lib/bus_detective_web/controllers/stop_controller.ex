@@ -40,7 +40,7 @@ defmodule BusDetectiveWeb.StopController do
   defguardp is_id(split_params) when is_list(split_params) and length(split_params) > 0 and length(split_params) < 3
 
   defp parse_params(%{"id" => stop_id_str} = params) do
-    with id_params when is_id(id_params) <- String.split(stop_id_str, "-"),
+    with id_params when is_id(id_params) <- String.split(stop_id_str, "-", parts: 2),
          {_, ""} <- Integer.parse(hd(id_params)),
          {duration, ""} <- Integer.parse(Map.get(params, "duration", "1")) do
       {:ok, id_params, duration: duration}
