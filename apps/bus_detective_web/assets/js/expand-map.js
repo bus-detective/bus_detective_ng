@@ -2,16 +2,15 @@
 import { dispatch } from './reduxish';
 
 class ExpandMap extends HTMLElement {
-
-  get expanded() {
-    return this.getAttribute("expanded") == "true";
+  get expanded () {
+    return this.getAttribute('expanded') === 'true';
   }
 
-  static get observedAttributes() {
-    return ["expanded"];
+  static get observedAttributes () {
+    return ['expanded'];
   }
 
-  attributeChangedCallback() {
+  attributeChangedCallback () {
     let toggleButtonIcon = this.querySelector('.bd-icon');
     if (this.expanded) {
       toggleButtonIcon.classList.remove('bd-icon--expand');
@@ -33,9 +32,9 @@ class ExpandMap extends HTMLElement {
 
     toggleButton.addEventListener('click', (event) => {
       if (this.expanded) {
-        dispatch("expandMap", {mapExpanded: false});
+        dispatch('expandMap', {mapExpanded: false});
       } else {
-        dispatch("expandMap", {mapExpanded: true});
+        dispatch('expandMap', {mapExpanded: true});
       }
     });
   }

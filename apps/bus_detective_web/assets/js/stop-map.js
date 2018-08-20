@@ -13,19 +13,19 @@ class StopMap extends HTMLElement {
     return this.getAttribute('longitude');
   }
 
-  get expanded() {
-    return this.getAttribute("expanded") == "true";
+  get expanded () {
+    return this.getAttribute('expanded') === 'true';
   }
 
-  static get observedAttributes() {
-    return ["expanded"];
+  static get observedAttributes () {
+    return ['expanded'];
   }
 
-  attributeChangedCallback() {
+  attributeChangedCallback () {
     if (this.expanded) {
-      this.querySelector("#stopMap").classList.add('map--expanded');
+      this.querySelector('#stopMap').classList.add('map--expanded');
     } else {
-      this.querySelector("#stopMap").classList.remove('map--expanded');
+      this.querySelector('#stopMap').classList.remove('map--expanded');
     }
     this.map.invalidateSize();
   }
