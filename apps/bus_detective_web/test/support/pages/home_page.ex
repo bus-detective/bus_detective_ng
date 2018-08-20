@@ -7,6 +7,12 @@ defmodule BusDetectiveWeb.HomePage do
 
   import Wallaby.Query, only: [css: 1]
 
+  alias BusDetective.GTFS.Stop
+
+  def favorite(%Stop{} = stop) do
+    css("[data-test='stop_item'][data-id='#{Phoenix.Param.to_param(stop)}']")
+  end
+
   def visit_page(session) do
     visit(session, "/")
   end
