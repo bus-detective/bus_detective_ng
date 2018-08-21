@@ -1,3 +1,5 @@
+/* global CustomEvent */
+
 export const dispatch = (event, payload) => {
   document.dispatchEvent(new CustomEvent(event, {
     bubbles: true,
