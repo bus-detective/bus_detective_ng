@@ -12,6 +12,14 @@
     line-height: 1.7;
     padding-left: 55px;
   }
+
+  .stop-item__toggle-favorite {
+    @extend .button, .button--fav;
+
+    .bd-icon--heart {
+      color: #fff;
+    }
+  }
 }
 
 .action-banner--fixed-top {

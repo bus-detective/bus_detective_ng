@@ -1,7 +1,8 @@
-<div class="stop-item" data-test="stop_item">
+<div class="stop-item" data-test="stop_item" data-id="<%= Phoenix.Param.to_param(@stop) %>">
   <div class="flex__container">
     <div class="flex__cell flex__cell--large">
-      <a href="<%= stop_path(@conn, :show, @stop) %>" class="unstyled">
+      <a href="<%= stop_path(BusDetectiveWeb.Endpoint, :show, @stop) %>" class="unstyled">
+        <bd-favorite stop-id="<%= Phoenix.Param.to_param(@stop) %>"></bd-favorite>
         <h1 class="list-item__title"><%= @stop.name %><small class="light"><%= BusDetective.GTFS.Stop.direction(@stop) %></small></h1>
         <div class="list-item__details">
           <%= for route <- @stop.routes do %>

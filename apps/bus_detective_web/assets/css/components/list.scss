@@ -9,7 +9,7 @@
     background-color: none;
 
     & .list-item__container {
-      height: calc(75vh - 260px);
+      min-height: calc(75vh - 260px);
       overflow: scroll;
 
       @media screen and (max-width: 480px) {

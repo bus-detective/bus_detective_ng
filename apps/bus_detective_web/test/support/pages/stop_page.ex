@@ -11,8 +11,8 @@ defmodule BusDetectiveWeb.StopPage do
   alias BusDetective.GTFS.Stop
   alias BusDetectiveWeb.Endpoint
 
-  def visit_page(session, %Stop{id: stop_id}, duration \\ 1) do
-    visit(session, stop_path(Endpoint, :show, stop_id, duration: duration))
+  def visit_page(session, %Stop{} = stop, duration \\ 1) do
+    visit(session, stop_path(Endpoint, :show, stop, duration: duration))
   end
 
   def departure_results(count: count) do
