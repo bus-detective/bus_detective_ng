@@ -13,6 +13,7 @@ defmodule FavoritingAStopTest do
     session
     |> HomePage.visit_page()
     |> HomePage.search(stop.name)
+    |> assert_has(SearchPage.search_results(count: 1))
     |> SearchPage.favorite_stop(stop)
     |> HomePage.visit_page()
     |> assert_has(HomePage.favorite(stop))
