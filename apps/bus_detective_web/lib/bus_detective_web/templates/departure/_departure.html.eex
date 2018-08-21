@@ -5,7 +5,7 @@
     <div>
       <bd-route bg-color="<%= @departure.route.color %>" color="<%= @departure.route.text_color %>" name="<%= @departure.route.short_name %>"></bd-route>
       <span class="event__relative-time">
-        <%= if @departure.realtime? do %>
+        <%= unless @departure.realtime? do %>
           scheduled
         <% end %>
         <bd-timestamp timestamp="<%= Timex.format!(@departure.time, "{ISO:Extended}") %>"></bd-timestamp>
