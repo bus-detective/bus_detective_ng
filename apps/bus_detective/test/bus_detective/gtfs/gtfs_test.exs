@@ -97,4 +97,16 @@ defmodule BusDetective.GTFSTest do
       assert 7 == results.page_size
     end
   end
+
+  describe "get_stops/1" do
+    setup do
+      insert(:stop)
+
+      :ok
+    end
+
+    test "when given an empty list it returns and empty list of results" do
+      assert [] == GTFS.get_stops([])
+    end
+  end
 end

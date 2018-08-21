@@ -119,6 +119,8 @@ defmodule BusDetective.GTFS do
     end
   end
 
+  def get_stops([]), do: []
+
   def get_stops(stop_ids) do
     query =
       from(
