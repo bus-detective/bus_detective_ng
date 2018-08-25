@@ -24,7 +24,7 @@ defmodule Realtime.Application do
     Application.get_env(:realtime, :feeds)
   end
 
-  defp trip_updates_children() do
+  defp trip_updates_children do
     case Application.get_env(:realtime, TripUpdates)[:enabled] do
       true ->
         realtime_feeds()
@@ -41,7 +41,7 @@ defmodule Realtime.Application do
     end
   end
 
-  defp vehicle_positions_children() do
+  defp vehicle_positions_children do
     case Application.get_env(:realtime, VehiclePositions)[:enabled] do
       true ->
         realtime_feeds()

@@ -26,7 +26,7 @@ customElements.define('bd-route', Route);
 connect(reducers, subscribers);
 
 if (window.stopId) {
-  let channel = socket.channel('stops', {stop_id: window.stopId});
+  let channel = socket.channel(`stops:${window.stopId}`);
 
   channel.on('trip_updates', message => {
     console.log('Received Trip Updates', message);

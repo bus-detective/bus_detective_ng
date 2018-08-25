@@ -92,6 +92,8 @@ defmodule BusDetective.GTFS do
     |> Repo.paginate(pagination_options)
   end
 
+  def get_stop(nil), do: nil
+
   def get_stop(id) do
     case Repo.get(Stop, id) do
       nil ->

@@ -9,7 +9,7 @@ defmodule BusDetectiveWeb.StopChannel do
 
   intercept(["vehicle_positions"])
 
-  def join("stops", %{"stop_id" => stop_id}, socket) do
+  def join("stops:" <> stop_id, _, socket) do
     with {:ok, stop} <- GTFS.get_stop(stop_id),
          start_time <- Timex.shift(Timex.now(), minutes: -10),
          end_time <- Timex.shift(Timex.now(), hours: 1) do
