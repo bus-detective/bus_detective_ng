@@ -50,7 +50,10 @@ class StopMap extends HTMLElement {
     const busIcon = L.icon({ iconUrl: this.busIconUrl });
     this.busMarkers.forEach((marker) => marker.removeFrom(this.map));
     this.busMarkers = this.vehiclePositions.map((vehiclePosition) => {
-       const busMarker = L.marker([vehiclePosition.latitude, vehiclePosition.longitude], {icon: busIcon});
+       const busMarker = L.marker([vehiclePosition.latitude, vehiclePosition.longitude], {
+         icon: busIcon
+       });
+       busMarker.bindPopup(`${vehiclePosition.route_name} - ${vehiclePosition.headsign}`);
        busMarker.addTo(this.map);
        return busMarker;
     });
@@ -61,10 +64,10 @@ class StopMap extends HTMLElement {
       <div id="stopMap" class="map"></div>
     `;
 
-    const TILE_URL = 'https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png';
+    const TILE_URL = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
     this.map = Leaflet.map(this.querySelector('#stopMap'), {
       scrollWheelZoom: false,
-      zoomControl: false
+      zoomControl: true
     });
 
     var center = [this.latitude, this.longitude];
