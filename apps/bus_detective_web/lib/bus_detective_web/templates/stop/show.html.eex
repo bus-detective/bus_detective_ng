@@ -1,5 +1,5 @@
 <div class="stop">
-  <script>setTimeout(function(){ window.location.reload(); }, 15000);</script>
+  <script>window.stopId = '<%= @stop.id %>';</script>
   <bd-stop-map latitude="<%= latitude(@stop) %>" longitude="<%= longitude(@stop) %>"></bd-stop-map>
 
   <div class="action-banner">

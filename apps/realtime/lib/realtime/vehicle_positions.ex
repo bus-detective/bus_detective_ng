@@ -8,6 +8,7 @@ defmodule Realtime.VehiclePositions do
   require Logger
 
   alias Realtime.Messages.FeedMessage
+  alias Realtime.VehiclePositionFinder
 
   def child_spec(args) do
     %{
@@ -43,7 +44,7 @@ defmodule Realtime.VehiclePositions do
      }}
   end
 
-  def find_stop_time(feed_name, trip_remote_id) do
+  def find_vehicle_position(feed_name, trip_remote_id) do
     case Registry.lookup(__MODULE__, feed_name) do
       [_ | _] ->
         GenServer.call(
@@ -60,11 +61,11 @@ defmodule Realtime.VehiclePositions do
     do: {:reply, {:error, :no_data}, state}
 
   def handle_call(
-        {:find_vehicle_position, _trip_remote_id},
+        {:find_vehicle_position, trip_remote_id},
         _,
-        %{realtime_data: _realtime_data} = state
+        %{realtime_data: realtime_data} = state
       ) do
-    vehicle_position = nil
+    vehicle_position = VehiclePositionFinder.find_vehicle_position(realtime_data, trip_remote_id)
 
     {:reply, {:ok, vehicle_position}, state}
   end
@@ -82,7 +83,13 @@ defmodule Realtime.VehiclePositions do
           }"
         end)
 
-        schedule_fetch(60_000)
+        Registry.dispatch(Registry.Realtime, :vehicle_positions, fn entries ->
+          for {pid, _} <- entries do
+            send(pid, {:realtime, :vehicle_positions})
+          end
+        end)
+
+        schedule_fetch(15_000)
         {:noreply, state}
 
       error ->

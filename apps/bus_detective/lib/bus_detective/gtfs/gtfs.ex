@@ -138,4 +138,9 @@ defmodule BusDetective.GTFS do
 
     Repo.all(query)
   end
+
+  def subscribe_to_realtime(event_type) when event_type in [:trip_updates, :vehicle_positions] do
+    Registry.register(Registry.Realtime, event_type, [])
+    :ok
+  end
 end

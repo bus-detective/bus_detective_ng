@@ -26,10 +26,16 @@ defmodule Realtime.Application do
       end)
       |> List.flatten()
 
+    registry_children = [
+      {Registry, keys: :unique, name: TripUpdates},
+      {Registry, keys: :unique, name: VehiclePositions},
+      {Registry, keys: :duplicate, name: Registry.Realtime, id: Registry.Realtime}
+    ]
+
     opts = [strategy: :one_for_one, name: Realtime.Supervisor]
 
     Supervisor.start_link(
-      [{Registry, keys: :unique, name: TripUpdates}, {Registry, keys: :unique, name: VehiclePositions}] ++ children,
+      registry_children ++ children,
       opts
     )
   end

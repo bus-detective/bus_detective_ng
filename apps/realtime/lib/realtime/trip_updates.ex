@@ -84,6 +84,12 @@ defmodule Realtime.TripUpdates do
           }"
         end)
 
+        Registry.dispatch(Registry.Realtime, :trip_updates, fn entries ->
+          for {pid, _} <- entries do
+            send(pid, {:realtime, :trip_updates})
+          end
+        end)
+
         schedule_fetch(60_000)
         {:noreply, state}
 

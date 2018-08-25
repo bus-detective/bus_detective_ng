@@ -2,6 +2,7 @@ defmodule BusDetectiveWeb.UserSocket do
   use Phoenix.Socket
 
   channel("favorites:*", BusDetectiveWeb.FavoritesChannel)
+  channel("stops", BusDetectiveWeb.StopChannel)
 
   transport(:websocket, Phoenix.Transports.WebSocket, timeout: 45_000)
 

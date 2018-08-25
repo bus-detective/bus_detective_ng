@@ -12,6 +12,8 @@ import Timestamp from './timestamp.js';
 import { connect } from './reduxish.js';
 import { subscribers, reducers } from './container';
 
+import socket from './socket.js';
+
 customElements.define('bd-departure', Departure);
 customElements.define('bd-favorite', Favorite);
 customElements.define('bd-favorites-list', FavoritesList);
@@ -22,3 +24,19 @@ customElements.define('bd-timestamp', Timestamp);
 customElements.define('bd-route', Route);
 
 connect(reducers, subscribers);
+
+if (window.stopId) {
+  let channel = socket.channel('stops', {stop_id: window.stopId});
+
+  channel.on('trip_updates', message => {
+    console.log('Received Trip Updates', message);
+  });
+
+  channel.on('vehicle_positions', message => {
+    console.log('Received Vehicle Positions', message);
+  });
+
+  channel.join()
+    .receive('ok', resp => { console.log('Joined successfully', resp); })
+    .receive('error', resp => { console.log('Unable to join', resp); });
+}
