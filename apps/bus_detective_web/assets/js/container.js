@@ -1,14 +1,12 @@
 
 export const subscribers = {
-  'bd-stop-map': ({ mapExpanded }, element) => {
+  'bd-stop-map': ({ mapExpanded, vehiclePositions }, element) => {
     element && element.setAttribute('expanded', mapExpanded);
+    element && vehiclePositions &&
+      element.setAttribute('vehicle-positions', JSON.stringify(vehiclePositions));
   },
   'bd-expand-map': ({ mapExpanded }, element) => {
     element && element.setAttribute('expanded', mapExpanded);
-  },
-  'bd-stop-map': ({ vehiclePositions }, element) => {
-    element && vehiclePositions &&
-      element.setAttribute('vehicle-positions', JSON.stringify(vehiclePositions));
   }
 };
 
