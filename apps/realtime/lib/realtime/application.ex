@@ -9,38 +9,52 @@ defmodule Realtime.Application do
 
   def start(_type, _args) do
     children =
-      realtime_feeds()
-      |> Enum.map(fn {feed_name, %{trip_updates_url: trip_updates_url, vehicle_positions_url: vehicle_positions_url}} ->
-        [
+      [
+        {Registry, keys: :unique, name: TripUpdates},
+        {Registry, keys: :unique, name: VehiclePositions},
+        {Registry, keys: :duplicate, name: Registry.Realtime, id: Registry.Realtime}
+      ] ++ trip_updates_children() ++ vehicle_positions_children()
+
+    opts = [strategy: :one_for_one, name: Realtime.Supervisor]
+
+    Supervisor.start_link(children, opts)
+  end
+
+  defp realtime_feeds do
+    Application.get_env(:realtime, :feeds)
+  end
+
+  defp trip_updates_children() do
+    case Application.get_env(:realtime, TripUpdates)[:enabled] do
+      true ->
+        realtime_feeds()
+        |> Enum.map(fn {feed_name, %{trip_updates_url: trip_updates_url}} ->
           TripUpdates.child_spec(
             feed_name: feed_name,
             trip_updates_url: trip_updates_url,
             id: "#{feed_name}-TripUpdates"
-          ),
+          )
+        end)
+
+      _ ->
+        []
+    end
+  end
+
+  defp vehicle_positions_children() do
+    case Application.get_env(:realtime, VehiclePositions)[:enabled] do
+      true ->
+        realtime_feeds()
+        |> Enum.map(fn {feed_name, %{vehicle_positions_url: vehicle_positions_url}} ->
           VehiclePositions.child_spec(
             feed_name: feed_name,
             vehicle_positions_url: vehicle_positions_url,
             id: "#{feed_name}-VehiclePositions"
           )
-        ]
-      end)
-      |> List.flatten()
+        end)
 
-    registry_children = [
-      {Registry, keys: :unique, name: TripUpdates},
-      {Registry, keys: :unique, name: VehiclePositions},
-      {Registry, keys: :duplicate, name: Registry.Realtime, id: Registry.Realtime}
-    ]
-
-    opts = [strategy: :one_for_one, name: Realtime.Supervisor]
-
-    Supervisor.start_link(
-      registry_children ++ children,
-      opts
-    )
-  end
-
-  defp realtime_feeds do
-    Application.get_env(:realtime, :feeds)
+      _ ->
+        []
+    end
   end
 end

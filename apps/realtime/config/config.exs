@@ -8,6 +8,10 @@ config :realtime,
     }
   }
 
+config :realtime, Realtime.TripUpdates, enabled: true
+
+config :realtime, Realtime.VehiclePositions, enabled: true
+
 file = Path.join(Path.dirname(__ENV__.file), "#{Mix.env()}.exs")
 
 if File.exists?(file) do
