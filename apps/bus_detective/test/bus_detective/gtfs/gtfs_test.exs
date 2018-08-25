@@ -96,6 +96,10 @@ defmodule BusDetective.GTFSTest do
       assert 1 == results.page_number
       assert 7 == results.page_size
     end
+
+    test "searching with a number above 100 doesn't error" do
+      assert Enum.empty?(GTFS.search_stops(query: "105"))
+    end
   end
 
   describe "get_stops/1" do
