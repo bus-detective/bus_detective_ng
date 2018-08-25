@@ -6,6 +6,8 @@ config :bus_detective_web, BusDetectiveWeb.Endpoint,
   http: [port: 4001],
   server: true
 
+config :bus_detective_web, :vehicle_positions_source, BusDetectiveWeb.VehiclePositionsMock
+
 config :bus_detective, :sql_sandbox, true
 
 config :wallaby,

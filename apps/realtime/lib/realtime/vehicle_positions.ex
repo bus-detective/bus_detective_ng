@@ -8,7 +8,9 @@ defmodule Realtime.VehiclePositions do
   require Logger
 
   alias Realtime.Messages.FeedMessage
-  alias Realtime.VehiclePositionFinder
+  alias Realtime.{VehiclePositionFinder, VehiclePositionsSource}
+
+  @behaviour VehiclePositionsSource
 
   def child_spec(args) do
     %{
@@ -32,6 +34,7 @@ defmodule Realtime.VehiclePositions do
     GenServer.start_link(__MODULE__, args, name: name)
   end
 
+  @impl GenServer
   def init(args) do
     schedule_fetch(500)
 
@@ -44,6 +47,7 @@ defmodule Realtime.VehiclePositions do
      }}
   end
 
+  @impl VehiclePositionsSource
   def find_vehicle_position(feed_name, trip_remote_id) do
     case Registry.lookup(__MODULE__, feed_name) do
       [_ | _] ->
@@ -53,10 +57,11 @@ defmodule Realtime.VehiclePositions do
         )
 
       _ ->
-        {:reply, :no_realtime_process}
+        {:reply, {:error, :no_realtime_process}}
     end
   end
 
+  @impl GenServer
   def handle_call({:find_vehicle_position, _, _}, _, %{realtime_data: nil} = state),
     do: {:reply, {:error, :no_data}, state}
 
@@ -65,11 +70,16 @@ defmodule Realtime.VehiclePositions do
         _,
         %{realtime_data: realtime_data} = state
       ) do
-    vehicle_position = VehiclePositionFinder.find_vehicle_position(realtime_data, trip_remote_id)
+    case VehiclePositionFinder.find_vehicle_position(realtime_data, trip_remote_id) do
+      nil ->
+        {:reply, {:error, :no_position_data}, state}
 
-    {:reply, {:ok, vehicle_position}, state}
+      position ->
+        {:reply, {:ok, position}, state}
+    end
   end
 
+  @impl GenServer
   def handle_info(:fetch_feed, state) do
     Logger.info(fn -> "Updating VehiclePositions realtime info for #{state.feed_name}" end)
 

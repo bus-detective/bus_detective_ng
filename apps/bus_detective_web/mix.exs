@@ -52,6 +52,7 @@ defmodule BusDetectiveWeb.Mixfile do
       {:bus_detective, in_umbrella: true},
       {:cowboy, "~> 1.0"},
       {:gettext, "~> 0.11"},
+      {:mox, "~> 0.4", only: :test},
       {:phoenix, "~> 1.3.3"},
       {:phoenix_ecto, "~> 3.2"},
       {:phoenix_html, "~> 2.10"},

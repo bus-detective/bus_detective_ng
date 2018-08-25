@@ -1,9 +1,20 @@
 defmodule ViewingADepartureTest do
   use BusDetectiveWeb.FeatureCase
 
+  import Mox
+
   alias BusDetectiveWeb.StopPage
+  alias Realtime.VehiclePosition
+
+  setup :set_mox_global
+  setup :verify_on_exit!
 
   setup do
+    BusDetectiveWeb.VehiclePositionsMock
+    |> stub(:find_vehicle_position, fn _feed_name, trip_remote_id ->
+      {:ok, %VehiclePosition{trip_id: trip_remote_id, latitude: 1.9, longitude: 1.9}}
+    end)
+
     feed = insert(:feed)
     agency = :agency |> build(feed: feed) |> insert()
     service = :service |> build() |> with_feed(feed) |> insert()

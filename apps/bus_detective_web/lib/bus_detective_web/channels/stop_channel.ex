@@ -32,23 +32,29 @@ defmodule BusDetectiveWeb.StopChannel do
     {:noreply, socket}
   end
 
-  defp trip_ids(departures) do
-    Enum.map(departures, fn departure -> departure.trip.remote_id end)
-  end
-
   defp update_vehicle_positions(socket) do
     vehicle_positions =
       socket.assigns
       |> Map.get(:departures)
-      |> trip_ids()
-      |> Enum.map(fn trip_remote_id ->
-        case VehiclePositions.find_vehicle_position(socket.assigns[:feed].name, trip_remote_id) do
-          {:ok, position} -> position
-          _ -> nil
+      |> Enum.map(fn departure ->
+        trip_remote_id = departure.trip.remote_id
+
+        case vehicle_positions_source().find_vehicle_position(socket.assigns[:feed].name, trip_remote_id) do
+          {:ok, position} ->
+            position
+            |> Map.take([:latitude, :longitude, :trip_id, :vehicle_label])
+            |> Map.merge(%{headsign: departure.trip.headsign, route_name: departure.route.short_name})
+
+          _ ->
+            nil
         end
       end)
       |> Enum.reject(&is_nil/1)
 
     push(socket, "vehicle_positions", %{vehicle_positions: vehicle_positions})
+  end
+
+  defp vehicle_positions_source do
+    Application.get_env(:bus_detective_web, :vehicle_positions_source) || VehiclePositions
   end
 end
