@@ -1,6 +1,6 @@
 <div class="stop">
   <script>window.stopId = '<%= @stop.id %>';</script>
-  <bd-stop-map latitude="<%= latitude(@stop) %>" longitude="<%= longitude(@stop) %>"></bd-stop-map>
+  <bd-stop-map bus-icon-url="/images/bus.png" latitude="<%= latitude(@stop) %>" longitude="<%= longitude(@stop) %>"></bd-stop-map>
 
   <div class="action-banner">
     <%= link "", to: home_page_path(@conn, :index), class: "button button--home" %>

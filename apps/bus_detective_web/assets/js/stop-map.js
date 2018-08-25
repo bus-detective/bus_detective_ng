@@ -5,6 +5,12 @@ Leaflet.Control.Attribution.prototype.options.prefix = ' Leaflet';
 Leaflet.Icon.Default.imagePath = '/images/';
 
 class StopMap extends HTMLElement {
+
+  constructor() {
+    super();
+    this.busMarkers = [];
+  }
+
   get latitude () {
     return this.getAttribute('latitude');
   }
@@ -17,17 +23,37 @@ class StopMap extends HTMLElement {
     return this.getAttribute('expanded') === 'true';
   }
 
+  get vehiclePositions () {
+    return this.getAttribute('vehicle-positions') ?
+      JSON.parse(this.getAttribute('vehicle-positions')) : [];
+  }
+
+  get busIconUrl () {
+    return this.getAttribute('bus-icon-url');
+  }
+
   static get observedAttributes () {
-    return ['expanded'];
+    return ['expanded', 'vehicle-positions'];
   }
 
   attributeChangedCallback () {
+    this.displayVehicles();
     if (this.expanded) {
       this.querySelector('#stopMap').classList.add('map--expanded');
     } else {
       this.querySelector('#stopMap').classList.remove('map--expanded');
     }
     this.map.invalidateSize();
+  }
+
+  displayVehicles() {
+    const busIcon = L.icon({ iconUrl: this.busIconUrl });
+    this.busMarkers.forEach((marker) => marker.removeFrom(this.map));
+    this.busMarkers = this.vehiclePositions.map((vehiclePosition) => {
+       const busMarker = L.marker([vehiclePosition.latitude, vehiclePosition.longitude], {icon: busIcon});
+       busMarker.addTo(this.map);
+       return busMarker;
+    });
   }
 
   connectedCallback () {
@@ -46,6 +72,7 @@ class StopMap extends HTMLElement {
     this.map.addLayer(Leaflet.tileLayer(TILE_URL, {detectRetina: true}));
     Leaflet.layerGroup().addTo(this.map);
     Leaflet.marker(center).addTo(this.map);
+    this.displayVehicles();
   }
 }
 

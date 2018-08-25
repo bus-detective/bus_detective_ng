@@ -9,7 +9,7 @@ import NearbySearch from './nearby-search.js';
 import StopMap from './stop-map.js';
 import Route from './route.js';
 import Timestamp from './timestamp.js';
-import { connect } from './reduxish.js';
+import { connect, dispatch } from './reduxish.js';
 import { subscribers, reducers } from './container';
 
 import socket from './socket.js';
@@ -33,6 +33,7 @@ if (window.stopId) {
   });
 
   channel.on('vehicle_positions', message => {
+    dispatch('updateVehiclePositions', message.vehicle_positions);
     console.log('Received Vehicle Positions', message);
   });
 
