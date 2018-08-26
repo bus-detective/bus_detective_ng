@@ -73,7 +73,12 @@ defmodule BusDetectiveWeb.StopChannel do
           {:ok, position} ->
             position
             |> Map.take([:latitude, :longitude, :trip_id, :vehicle_label])
-            |> Map.merge(%{headsign: departure.trip.headsign, route_name: departure.route.short_name})
+            |> Map.merge(%{
+              headsign: departure.trip.headsign,
+              route_name: departure.route.short_name,
+              route_color: departure.route.color,
+              route_text_color: departure.route.text_color
+            })
 
           _ ->
             nil
