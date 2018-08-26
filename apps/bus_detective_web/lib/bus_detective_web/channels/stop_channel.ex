@@ -9,11 +9,15 @@ defmodule BusDetectiveWeb.StopChannel do
   alias Phoenix.View
   alias Realtime.VehiclePositions
 
-  intercept(["vehicle_positions"])
+  intercept(["vehicle_positions", "trip_updates"])
 
-  def join("stops:" <> stop_id, _, socket) do
+  def join("stops", %{"stop_id" => stop_id}, socket) do
     Process.send_after(self(), :update_departures, 100)
     {:ok, assign(socket, :stop_id, stop_id)}
+  end
+
+  def handle_in("reload_departures", _, socket) do
+    {:noreply, update_departures(socket)}
   end
 
   def handle_info(:update_departures, socket) do
@@ -22,6 +26,10 @@ defmodule BusDetectiveWeb.StopChannel do
 
   def handle_info(:update_vehicle_positions, socket) do
     {:noreply, update_vehicle_positions(socket)}
+  end
+
+  def handle_out("trip_updates", %{}, socket) do
+    {:noreply, update_departures(socket)}
   end
 
   def handle_out("vehicle_positions", %{}, socket) do

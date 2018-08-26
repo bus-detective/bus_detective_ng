@@ -29,13 +29,25 @@ defmodule BusDetectiveWeb.StopChannelTest do
     stop_time = :stop_time |> build(trip: trip, stop: stop) |> with_feed(feed) |> insert()
     insert(:projected_stop_time, stop_time: stop_time)
 
-    {:ok, _, socket} = subscribe_and_join(socket(), StopChannel, "stops:#{stop.id}")
+    {:ok, _, socket} = subscribe_and_join(socket(), StopChannel, "stops", %{"stop_id" => stop.id})
 
     {:ok, socket: socket, stop: stop, route_name: route_name, headsign: headsign}
   end
 
   test "it updates departures right after join" do
     assert_push("departures", %{departures: _}, 1000)
+  end
+
+  test "it updates departures when client requests", %{socket: socket} do
+    assert_push("departures", %{departures: _}, 1000)
+    push(socket, "reload_departures", %{})
+    assert_push("departures", %{departures: _})
+  end
+
+  test "it updates departures after trip updates broadcast", %{socket: socket} do
+    assert_push("departures", %{departures: _}, 1000)
+    broadcast_from!(socket, "trip_updates", %{})
+    assert_push("departures", %{departures: _})
   end
 
   test "it updates vehicle positions right after join" do
