@@ -54,7 +54,7 @@ class StopMap extends HTMLElement {
       });
       busMarker.bindTooltip(
         `
-          <div class="map-bus-label" style="background-color: ${vehiclePosition.route_color}; color: ${vehiclePosition.route_text_color};">
+          <div class="map-bus-label" style="background-color: #${vehiclePosition.route_color}; color: #${vehiclePosition.route_text_color};">
             ${vehiclePosition.route_name}
           </div>
         `,
