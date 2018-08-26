@@ -5,8 +5,7 @@ Leaflet.Control.Attribution.prototype.options.prefix = ' Leaflet';
 Leaflet.Icon.Default.imagePath = '/images/';
 
 class StopMap extends HTMLElement {
-
-  constructor() {
+  constructor () {
     super();
     this.busMarkers = [];
   }
@@ -24,8 +23,8 @@ class StopMap extends HTMLElement {
   }
 
   get vehiclePositions () {
-    return this.getAttribute('vehicle-positions') ?
-      JSON.parse(this.getAttribute('vehicle-positions')) : [];
+    return this.getAttribute('vehicle-positions')
+      ? JSON.parse(this.getAttribute('vehicle-positions')) : [];
   }
 
   get busIconUrl () {
@@ -46,16 +45,16 @@ class StopMap extends HTMLElement {
     this.map.invalidateSize();
   }
 
-  displayVehicles() {
-    const busIcon = L.icon({ iconUrl: this.busIconUrl });
+  displayVehicles () {
+    const busIcon = Leaflet.icon({ iconUrl: this.busIconUrl });
     this.busMarkers.forEach((marker) => marker.removeFrom(this.map));
     this.busMarkers = this.vehiclePositions.map((vehiclePosition) => {
-       const busMarker = L.marker([vehiclePosition.latitude, vehiclePosition.longitude], {
-         icon: busIcon
-       });
-       busMarker.bindPopup(`${vehiclePosition.route_name} - ${vehiclePosition.headsign}`);
-       busMarker.addTo(this.map);
-       return busMarker;
+      const busMarker = Leaflet.marker([vehiclePosition.latitude, vehiclePosition.longitude], {
+        icon: busIcon
+      });
+      busMarker.bindPopup(`${vehiclePosition.route_name} - ${vehiclePosition.headsign}`);
+      busMarker.addTo(this.map);
+      return busMarker;
     });
   }
 

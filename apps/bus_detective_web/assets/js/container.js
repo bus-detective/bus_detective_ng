@@ -16,6 +16,6 @@ const expandMap = (state, { mapExpanded }) => {
 
 const updateVehiclePositions = (state, vehiclePositions) => {
   return Object.assign(state, { vehiclePositions });
-}
+};
 
 export const reducers = { expandMap, updateVehiclePositions };

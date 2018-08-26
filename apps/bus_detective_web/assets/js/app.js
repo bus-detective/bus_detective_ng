@@ -31,7 +31,7 @@ if (window.stopId) {
   channel.on('departures', message => {
     console.log('Received Departures', message);
     let departuresList = document.querySelector('[data-selector="departures-list"]');
-    if(message.departures.length > 0) {
+    if (message.departures.length > 0) {
       departuresList.innerHTML = message.departures.join('');
     } else {
       departuresList.innerHTML = '<p class="text-center">No departures found</p>';
