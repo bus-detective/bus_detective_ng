@@ -49,7 +49,7 @@ defmodule Realtime.TripUpdates do
         )
 
       _ ->
-        {:reply, :no_realtime_process}
+        {:reply, {:error, :no_realtime_process}}
     end
   end
 
@@ -90,7 +90,7 @@ defmodule Realtime.TripUpdates do
           end
         end)
 
-        schedule_fetch(60_000)
+        schedule_fetch(17_000)
         {:noreply, state}
 
       error ->

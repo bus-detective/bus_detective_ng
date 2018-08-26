@@ -5,9 +5,22 @@ defmodule Realtime.StopTimeUpdate do
 
   require Logger
 
-  defstruct [:departure_time, :delay, :stop_id, :stop_sequence]
-
   alias Realtime.Messages.TripUpdate.StopTimeUpdate, as: StopTimeUpdateMessage
+
+  @typedoc """
+  * `delay` - The delay of the departure in seconds
+  * `departure_time` - The estimated time of departure
+  * `stop_id` - the stop id as given by the source (relates to the remote_id of the Stop struct)
+  * `stop_sequence` - the sequence number of the stop on the trip
+  """
+  @type t :: %__MODULE__{
+          delay: integer(),
+          departure_time: DateTime.t(),
+          stop_id: String.t(),
+          stop_sequence: non_neg_integer()
+        }
+
+  defstruct [:delay, :departure_time, :stop_id, :stop_sequence]
 
   def from_message(%StopTimeUpdateMessage{} = message) do
     with {:ok, departure_time} <- departure_time([message.arrival, message.departure]),

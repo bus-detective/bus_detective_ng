@@ -28,8 +28,14 @@ connect(reducers, subscribers);
 if (window.stopId) {
   let channel = socket.channel(`stops:${window.stopId}`);
 
-  channel.on('trip_updates', message => {
-    console.log('Received Trip Updates', message);
+  channel.on('departures', message => {
+    console.log('Received Departures', message);
+    let departuresList = document.querySelector('[data-selector="departures-list"]');
+    if(message.departures.length > 0) {
+      departuresList.innerHTML = message.departures.join('');
+    } else {
+      departuresList.innerHTML = '<p class="text-center">No departures found</p>';
+    }
   });
 
   channel.on('vehicle_positions', message => {

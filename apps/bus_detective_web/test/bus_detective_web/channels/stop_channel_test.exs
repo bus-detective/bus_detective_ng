@@ -10,7 +10,12 @@ defmodule BusDetectiveWeb.StopChannelTest do
   setup :verify_on_exit!
 
   setup do
-    BusDetectiveWeb.VehiclePositionsMock
+    Realtime.TripUpdatesMock
+    |> stub(:find_stop_time, fn _feed_name, _stop_remote_id, _stop_sequence ->
+      {:error, :no_realtime_process}
+    end)
+
+    Realtime.VehiclePositionsMock
     |> stub(:find_vehicle_position, fn _feed_name, trip_remote_id ->
       {:ok, %VehiclePosition{trip_id: trip_remote_id}}
     end)
@@ -27,6 +32,10 @@ defmodule BusDetectiveWeb.StopChannelTest do
     {:ok, _, socket} = subscribe_and_join(socket(), StopChannel, "stops:#{stop.id}")
 
     {:ok, socket: socket, stop: stop, route_name: route_name, headsign: headsign}
+  end
+
+  test "it updates departures right after join" do
+    assert_push("departures", %{departures: _}, 1000)
   end
 
   test "it updates vehicle positions right after join" do

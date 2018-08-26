@@ -21,7 +21,7 @@
   </div>
 
   <div>
-    <div class="timeline">
+    <div class="timeline" data-selector="departures-list">
       <%= if Enum.empty?(@departures) do %>
         <p class="text-center">No departures found</p>
       <% else %>

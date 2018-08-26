@@ -99,7 +99,7 @@ defmodule Realtime.VehiclePositions do
           end
         end)
 
-        schedule_fetch(15_000)
+        schedule_fetch(13_000)
         {:noreply, state}
 
       error ->
