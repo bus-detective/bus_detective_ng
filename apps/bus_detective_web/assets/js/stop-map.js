@@ -52,7 +52,13 @@ class StopMap extends HTMLElement {
       const busMarker = Leaflet.marker([vehiclePosition.latitude, vehiclePosition.longitude], {
         icon: busIcon
       });
-      busMarker.bindPopup(`${vehiclePosition.route_name} - ${vehiclePosition.headsign}`);
+      busMarker.bindTooltip(
+        `
+          <div class="map-bus-label" style="background-color: ${vehiclePosition.route_color}; color: ${vehiclePosition.route_text_color};">
+            ${vehiclePosition.route_name}
+          </div>
+        `,
+        {permanent: true, direction: 'top'});
       busMarker.addTo(this.map);
       return busMarker;
     });
