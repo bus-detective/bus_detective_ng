@@ -37,7 +37,7 @@ defmodule BusDetective.GTFS do
         }
       } = projected_stop_time
 
-      case TripUpdates.find_stop_time(feed_name, trip_remote_id, stop_sequence) do
+      case trip_updates_source().find_stop_time(feed_name, trip_remote_id, stop_sequence) do
         {:ok, %StopTimeUpdate{} = stop_time_update} ->
           %Departure{
             scheduled_time: projected_stop_time.scheduled_departure_time,
@@ -92,6 +92,8 @@ defmodule BusDetective.GTFS do
     |> Repo.paginate(pagination_options)
   end
 
+  def get_stop(nil), do: nil
+
   def get_stop(id) do
     case Repo.get(Stop, id) do
       nil ->
@@ -137,5 +139,14 @@ defmodule BusDetective.GTFS do
       end)
 
     Repo.all(query)
+  end
+
+  def subscribe_to_realtime(event_type) when event_type in [:trip_updates, :vehicle_positions] do
+    Registry.register(Registry.Realtime, event_type, [])
+    :ok
+  end
+
+  defp trip_updates_source do
+    Application.get_env(:realtime, :trip_updates_source) || TripUpdates
   end
 end

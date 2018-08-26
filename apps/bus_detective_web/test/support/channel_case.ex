@@ -20,6 +20,8 @@ defmodule BusDetectiveWeb.ChannelCase do
       # Import conveniences for testing with channels
       use Phoenix.ChannelTest
 
+      import BusDetective.Factory
+
       # The default endpoint for testing
       @endpoint BusDetectiveWeb.Endpoint
     end

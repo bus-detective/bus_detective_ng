@@ -5,6 +5,11 @@ Leaflet.Control.Attribution.prototype.options.prefix = ' Leaflet';
 Leaflet.Icon.Default.imagePath = '/images/';
 
 class StopMap extends HTMLElement {
+  constructor () {
+    super();
+    this.busMarkers = [];
+  }
+
   get latitude () {
     return this.getAttribute('latitude');
   }
@@ -17,11 +22,21 @@ class StopMap extends HTMLElement {
     return this.getAttribute('expanded') === 'true';
   }
 
+  get vehiclePositions () {
+    return this.getAttribute('vehicle-positions')
+      ? JSON.parse(this.getAttribute('vehicle-positions')) : [];
+  }
+
+  get busIconUrl () {
+    return this.getAttribute('bus-icon-url');
+  }
+
   static get observedAttributes () {
-    return ['expanded'];
+    return ['expanded', 'vehicle-positions'];
   }
 
   attributeChangedCallback () {
+    this.displayVehicles();
     if (this.expanded) {
       this.querySelector('#stopMap').classList.add('map--expanded');
     } else {
@@ -30,15 +45,28 @@ class StopMap extends HTMLElement {
     this.map.invalidateSize();
   }
 
+  displayVehicles () {
+    const busIcon = Leaflet.icon({ iconUrl: this.busIconUrl });
+    this.busMarkers.forEach((marker) => marker.removeFrom(this.map));
+    this.busMarkers = this.vehiclePositions.map((vehiclePosition) => {
+      const busMarker = Leaflet.marker([vehiclePosition.latitude, vehiclePosition.longitude], {
+        icon: busIcon
+      });
+      busMarker.bindPopup(`${vehiclePosition.route_name} - ${vehiclePosition.headsign}`);
+      busMarker.addTo(this.map);
+      return busMarker;
+    });
+  }
+
   connectedCallback () {
     this.innerHTML = `
       <div id="stopMap" class="map"></div>
     `;
 
-    const TILE_URL = 'https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png';
+    const TILE_URL = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
     this.map = Leaflet.map(this.querySelector('#stopMap'), {
       scrollWheelZoom: false,
-      zoomControl: false
+      zoomControl: true
     });
 
     var center = [this.latitude, this.longitude];
@@ -46,6 +74,7 @@ class StopMap extends HTMLElement {
     this.map.addLayer(Leaflet.tileLayer(TILE_URL, {detectRetina: true}));
     Leaflet.layerGroup().addTo(this.map);
     Leaflet.marker(center).addTo(this.map);
+    this.displayVehicles();
   }
 }
 

@@ -46,7 +46,7 @@ defmodule BusDetective.GTFS.StopSearch do
   defp expand_substitutions(lexeme) do
     case @substitutions do
       %{^lexeme => like_terms} ->
-        "(" <> Enum.join(like_terms, " | ") <> ")"
+        "('" <> Enum.join(like_terms, "' | '") <> "')"
 
       _ ->
         lexeme

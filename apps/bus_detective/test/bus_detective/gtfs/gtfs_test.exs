@@ -96,17 +96,69 @@ defmodule BusDetective.GTFSTest do
       assert 1 == results.page_number
       assert 7 == results.page_size
     end
+
+    test "searching with a number above 100 doesn't error" do
+      assert Enum.empty?(GTFS.search_stops(query: "105"))
+    end
+  end
+
+  describe "get_stop/1" do
+    setup do
+      stop = insert(:stop)
+      insert(:stop)
+
+      {:ok, stop: stop}
+    end
+
+    test "when given a nil it returns a nil result" do
+      assert is_nil(GTFS.get_stop(nil))
+    end
+
+    test "when given an existing id it returns the stop", %{stop: %Stop{id: stop_id}} do
+      assert {:ok, %Stop{id: ^stop_id}} = GTFS.get_stop(stop_id)
+    end
+  end
+
+  describe "get_stop/2" do
+    setup do
+      stop = insert(:stop)
+      insert(:stop)
+
+      {:ok, stop: stop}
+    end
+
+    test "when given a nil it returns a nil result" do
+      assert is_nil(GTFS.get_stop(nil))
+    end
+
+    test "when given an existing id it returns the stop", %{stop: %Stop{id: stop_id} = stop} do
+      assert {:ok, %Stop{id: ^stop_id}} = GTFS.get_stop(stop.feed_id, stop.remote_id)
+    end
   end
 
   describe "get_stops/1" do
     setup do
-      insert(:stop)
+      feed = insert(:feed)
+      stop = insert(:stop, feed: feed)
+      insert(:stop, feed: feed)
 
-      :ok
+      {:ok, stop: stop}
     end
 
     test "when given an empty list it returns and empty list of results" do
       assert [] == GTFS.get_stops([])
+    end
+
+    test "when given valid ids it returns the stops", %{stop: stop} do
+      actual = GTFS.get_stops(["#{stop.feed_id}-#{stop.remote_id}"])
+      assert 1 = Enum.count(actual)
+      assert stop.id == List.first([stop.id])
+    end
+  end
+
+  describe "subscribe_to_realtime/1" do
+    test "subscribing to registry events returns :ok" do
+      assert :ok == GTFS.subscribe_to_realtime(:trip_updates)
     end
   end
 end

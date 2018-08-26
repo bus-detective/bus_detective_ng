@@ -6,12 +6,6 @@ defmodule BusDetectiveWeb.FallbackController do
   """
   use BusDetectiveWeb, :controller
 
-  def call(conn, {:error, %Ecto.Changeset{} = changeset}) do
-    conn
-    |> put_status(:unprocessable_entity)
-    |> render(BusDetectiveWeb.ChangesetView, "error.json", changeset: changeset)
-  end
-
   def call(conn, {:error, :invalid_params}) do
     conn
     |> put_status(:unprocessable_entity)

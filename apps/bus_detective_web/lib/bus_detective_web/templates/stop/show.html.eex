@@ -1,6 +1,6 @@
 <div class="stop">
-  <script>setTimeout(function(){ window.location.reload(); }, 15000);</script>
-  <bd-stop-map latitude="<%= latitude(@stop) %>" longitude="<%= longitude(@stop) %>"></bd-stop-map>
+  <script>window.stopId = '<%= @stop.id %>';</script>
+  <bd-stop-map bus-icon-url="/images/bus.png" latitude="<%= latitude(@stop) %>" longitude="<%= longitude(@stop) %>"></bd-stop-map>
 
   <div class="action-banner">
     <%= link "", to: home_page_path(@conn, :index), class: "button button--home" %>
@@ -21,7 +21,7 @@
   </div>
 
   <div>
-    <div class="timeline">
+    <div class="timeline" data-selector="departures-list">
       <%= if Enum.empty?(@departures) do %>
         <p class="text-center">No departures found</p>
       <% else %>
