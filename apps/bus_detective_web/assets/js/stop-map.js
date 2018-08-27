@@ -8,6 +8,7 @@ class StopMap extends HTMLElement {
   constructor () {
     super();
     this.busMarkers = [];
+    this.shapeLayer = null;
   }
 
   get latitude () {
@@ -22,6 +23,11 @@ class StopMap extends HTMLElement {
     return this.getAttribute('expanded') === 'true';
   }
 
+  get tripShapes () {
+    return this.getAttribute('trip-shapes')
+      ? JSON.parse(this.getAttribute('trip-shapes')) : [];
+  }
+
   get vehiclePositions () {
     return this.getAttribute('vehicle-positions')
       ? JSON.parse(this.getAttribute('vehicle-positions')) : [];
@@ -32,17 +38,36 @@ class StopMap extends HTMLElement {
   }
 
   static get observedAttributes () {
-    return ['expanded', 'vehicle-positions'];
+    return ['expanded', 'vehicle-positions', 'trip-shapes'];
   }
 
   attributeChangedCallback () {
     this.displayVehicles();
+    this.displayTripShapes();
     if (this.expanded) {
       this.querySelector('#stopMap').classList.add('map--expanded');
     } else {
       this.querySelector('#stopMap').classList.remove('map--expanded');
     }
     this.map.invalidateSize();
+  }
+
+  displayTripShapes () {
+    this.shapeLayer.clearLayers();
+
+    let shapes = this.tripShapes.map((tripShape) => {
+      let shapeLine = Leaflet.polyline(tripShape.coordinates, { color: `#${tripShape.route_color}` });
+      shapeLine.bindTooltip(
+        `
+          <div class="map-bus-label" style="background-color: #${tripShape.route_color}; color: #${tripShape.route_text_color};">
+            ${tripShape.route_name}
+          </div>
+        `, {sticky: true, weight: 6}
+      );
+      return shapeLine;
+    });
+
+    this.shapeLayer.addLayer(Leaflet.layerGroup(shapes));
   }
 
   displayVehicles () {
@@ -80,7 +105,9 @@ class StopMap extends HTMLElement {
     this.map.addLayer(Leaflet.tileLayer(TILE_URL, {detectRetina: true}));
     Leaflet.layerGroup().addTo(this.map);
     Leaflet.marker(center).addTo(this.map);
+    this.shapeLayer = Leaflet.layerGroup().addTo(this.map);
     this.displayVehicles();
+    this.displayTripShapes();
   }
 }
 

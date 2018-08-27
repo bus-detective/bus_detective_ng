@@ -47,6 +47,11 @@ if (window.stopId) {
     reloadTimeout = window.setTimeout(reloadDepartures, 60000);
   });
 
+  channel.on('trip_shapes', message => {
+    dispatch('updateTripShapes', message.shapes);
+    console.log('Received Trip Shapes', message);
+  });
+
   channel.on('vehicle_positions', message => {
     dispatch('updateVehiclePositions', message.vehicle_positions);
     console.log('Received Vehicle Positions', message);

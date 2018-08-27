@@ -63,4 +63,22 @@ defmodule BusDetectiveWeb.StopChannelTest do
   test "vehicle positions include relevant trip information", %{route_name: route_name, headsign: headsign} do
     assert_push("vehicle_positions", %{vehicle_positions: [%{headsign: ^headsign, route_name: ^route_name}]}, 1000)
   end
+
+  test "it updates trip_shapes after trip updates broadcast", %{socket: socket} do
+    assert_push("trip_shapes", %{shapes: _}, 1000)
+    broadcast_from!(socket, "trip_updates", %{})
+    assert_push("trip_shapes", %{shapes: _})
+  end
+
+  test "it updates trip_shapes right after join" do
+    assert_push("trip_shapes", %{shapes: _}, 1000)
+  end
+
+  test "trip_shapes include relevant trip and shape information", %{route_name: route_name, headsign: headsign} do
+    assert_push(
+      "trip_shapes",
+      %{shapes: [%{headsign: ^headsign, route_name: ^route_name, coordinates: [_ | _], shape_id: _}]},
+      1000
+    )
+  end
 end

@@ -5,6 +5,7 @@ defmodule BusDetectiveWeb.StopChannel do
   use Phoenix.Channel
 
   alias BusDetective.GTFS
+  alias BusDetective.GTFS.Shape
   alias BusDetectiveWeb.DepartureView
   alias Phoenix.View
   alias Realtime.VehiclePositions
@@ -53,13 +54,38 @@ defmodule BusDetectiveWeb.StopChannel do
 
       push(socket, "departures", %{departures: rendered_departures})
 
+      socket =
+        socket
+        |> assign(:departures, departures)
+        |> assign(:feed, stop.feed)
+        |> update_trip_shapes()
+
       Process.send_after(self(), :update_vehicle_positions, 10)
 
-      socket |> assign(:departures, departures) |> assign(:feed, stop.feed)
+      socket
     else
       _ ->
         {:error, :stop_not_found}
     end
+  end
+
+  defp update_trip_shapes(socket) do
+    trip_shapes =
+      socket.assigns
+      |> Map.get(:departures)
+      |> Enum.map(fn departure ->
+        %{
+          coordinates: Shape.coordinates_to_map(departure.trip.shape),
+          headsign: departure.trip.headsign,
+          route_name: departure.route.short_name,
+          route_color: departure.route.color,
+          route_text_color: departure.route.text_color,
+          shape_id: departure.trip.shape_id
+        }
+      end)
+
+    push(socket, "trip_shapes", %{shapes: trip_shapes})
+    socket
   end
 
   defp update_vehicle_positions(socket) do

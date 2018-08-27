@@ -4,7 +4,7 @@ defmodule BusDetective.GTFS.Shape do
   use Ecto.Schema
   import Ecto.Changeset
 
-  alias BusDetective.GTFS.{Feed, Trip}
+  alias BusDetective.GTFS.{Feed, Shape, Trip}
 
   schema "shapes" do
     belongs_to(:feed, Feed)
@@ -24,4 +24,10 @@ defmodule BusDetective.GTFS.Shape do
     |> validate_required([:feed_id, :remote_id, :geometry])
     |> unique_constraint(:remote_id, name: :shapes_feed_id_remote_id_index)
   end
+
+  def coordinates_to_map(%Shape{geometry: %{coordinates: coordinates}}) do
+    Enum.map(coordinates, fn {latitude, longitude} -> [latitude, longitude] end)
+  end
+
+  def coordinates_to_map(_), do: nil
 end
