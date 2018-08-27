@@ -56,13 +56,13 @@ class StopMap extends HTMLElement {
     this.shapeLayer.clearLayers();
 
     let shapes = this.tripShapes.map((tripShape) => {
-      let shapeLine = Leaflet.polyline(tripShape.coordinates, { color: `#${tripShape.route_color}` });
+      let shapeLine = Leaflet.polyline(tripShape.coordinates, { color: `#${tripShape.route_color}`, weight: 6 });
       shapeLine.bindTooltip(
         `
           <div class="map-bus-label" style="background-color: #${tripShape.route_color}; color: #${tripShape.route_text_color};">
             ${tripShape.route_name}
           </div>
-        `, {sticky: true, weight: 6}
+        `, {sticky: true}
       );
       return shapeLine;
     });
