@@ -1,0 +1,36 @@
+.leaflet-top, .leaflet-left {
+  position: absolute;
+  left: unset;
+  right: 10px;
+  top: 50px;
+}
+
+.leaflet-bar {
+  width: 40px;
+
+  .leaflet-control-zoom-in {
+    color: $bd-gray;
+    width: 40px;
+    box-shadow: $box-shadow;
+  }
+
+  .leaflet-control-zoom-out {
+    color: $bd-gray;
+    width: 40px;
+    box-shadow: $box-shadow;
+  }
+}
+
+.leaflet-touch .leaflet-control-layers, .leaflet-touch .leaflet-bar {
+    border: none;
+}
+
+.leaflet-touch .leaflet-bar a {
+  width: 40px;
+  height: 40px;
+  line-height: 40px;
+}
+
+.leaflet-bar a, .leaflet-bar a:hover {
+    background-color: transparentize(#fff, 0.15);
+  }
