@@ -72,11 +72,13 @@ defmodule Realtime.TripUpdates do
   end
 
   def handle_info(:fetch_feed, state) do
-    Logger.info(fn -> "Updating TripUpdates realtime info for #{state.feed_name}" end)
+    Logger.debug(fn -> "Updating TripUpdates realtime info for #{state.feed_name}" end)
 
     case HTTPoison.get(state.trip_updates_url) do
       {:ok, response} ->
-        state = %{state | realtime_data: FeedMessage.decode(response.body), last_fetched: Timex.now()}
+        realtime = FeedMessage.decode(response.body)
+        old_realtime = state.realtime_data
+        state = %{state | realtime_data: realtime, last_fetched: Timex.now()}
 
         Logger.info(fn ->
           "Successfully refreshed TripUpdates realtime data for feed #{state.feed_name} at #{
@@ -84,11 +86,14 @@ defmodule Realtime.TripUpdates do
           }"
         end)
 
-        Registry.dispatch(Registry.Realtime, :trip_updates, fn entries ->
-          for {pid, _} <- entries do
-            send(pid, {:realtime, :trip_updates})
-          end
-        end)
+        case is_nil(old_realtime) || old_realtime.header.timestamp != realtime.header.timestamp do
+          true ->
+            Logger.info("Pushing trip updates event notification")
+            notify_subscribers()
+
+          false ->
+            Logger.debug("Realtime data timestamp matches old, skipping trip updates event notification")
+        end
 
         schedule_fetch(17_000)
         {:noreply, state}
@@ -103,6 +108,14 @@ defmodule Realtime.TripUpdates do
         schedule_fetch(5_000)
         {:noreply, state}
     end
+  end
+
+  defp notify_subscribers do
+    Registry.dispatch(Registry.Realtime, :trip_updates, fn entries ->
+      for {pid, _} <- entries do
+        send(pid, {:realtime, :trip_updates})
+      end
+    end)
   end
 
   defp schedule_fetch(time_ms) do
