@@ -11,6 +11,7 @@ import Route from './route.js';
 import Timestamp from './timestamp.js';
 import { connect, dispatch } from './reduxish.js';
 import { subscribers, reducers } from './container';
+import { debounce } from './debounce.js';
 
 import socket from './socket.js';
 
@@ -28,12 +29,12 @@ connect(reducers, subscribers);
 if (window.stopId) {
   let channel = socket.channel('stops', {stop_id: window.stopId});
   var reloadTimeout;
-  let reloadDepartures = function () {
+  let reloadDepartures = debounce(function () {
     window.clearTimeout(reloadTimeout);
     console.log(`Server didn't refresh departures in 60 seconds -- requesting departures.`);
     channel.push('reload_departures', {});
-    reloadTimeout = window.setTimeout(reloadDepartures);
-  };
+    reloadTimeout = window.setTimeout(reloadDepartures, 60000);
+  }, 1000);
 
   channel.on('departures', message => {
     window.clearTimeout(reloadTimeout);
