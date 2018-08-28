@@ -139,6 +139,7 @@ defmodule Importer do
       |> CSV.decode(headers: true, strip_fields: true)
       |> Enum.map(fn {:ok, raw_route} ->
         agency_id = agencies[raw_route["agency_id"]] || Enum.at(agencies, 0)
+        route_color = ColorFunctions.suitable_color(raw_route["route_color"])
 
         %{
           feed_id: feed_id,
@@ -149,8 +150,8 @@ defmodule Importer do
           description: StringFunctions.titleize(raw_route["route_desc"]),
           route_type: raw_route["route_type"],
           url: raw_route["route_url"],
-          color: raw_route["route_color"],
-          text_color: ColorFunctions.text_color_for_bg_color(raw_route["route_text_color"]),
+          color: route_color,
+          text_color: ColorFunctions.text_color_for_bg_color(route_color, raw_route["route_text_color"]),
           inserted_at: Ecto.DateTime.utc(),
           updated_at: Ecto.DateTime.utc()
         }
