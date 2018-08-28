@@ -7,6 +7,9 @@ config :importer,
     "SORTA" => %{
       gtfs_schedule_url: "http://www.go-metro.com/uploads/GTFS/google_transit_info.zip"
     }
+    # "King County" => %{
+    #   gtfs_schedule_url: "http://metro.kingcounty.gov/GTFS/google_transit.zip"
+    # }
   }
 
 file = Path.join(Path.dirname(__ENV__.file), "#{Mix.env()}.exs")
