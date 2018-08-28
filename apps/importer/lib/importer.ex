@@ -250,7 +250,7 @@ defmodule Importer do
         coordinates =
           shapes
           |> Enum.sort_by(fn shape -> String.to_integer(shape["shape_pt_sequence"]) end)
-          |> Enum.map(fn point -> {point["shape_pt_lat"], point["shape_pt_lon"]} end)
+          |> Enum.map(fn point -> {point["shape_pt_lon"], point["shape_pt_lat"]} end)
 
         %{
           feed_id: feed_id,

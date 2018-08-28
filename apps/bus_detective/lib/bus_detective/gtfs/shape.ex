@@ -26,7 +26,7 @@ defmodule BusDetective.GTFS.Shape do
   end
 
   def coordinates_to_map(%Shape{geometry: %{coordinates: coordinates}}) do
-    Enum.map(coordinates, fn {latitude, longitude} -> [latitude, longitude] end)
+    Enum.map(coordinates, fn {longitude, latitude} -> [latitude, longitude] end)
   end
 
   def coordinates_to_map(_), do: nil

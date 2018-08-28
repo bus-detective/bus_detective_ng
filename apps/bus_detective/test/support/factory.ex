@@ -97,8 +97,8 @@ defmodule BusDetective.Factory do
       geometry: %Geo.LineString{
         srid: 4326,
         coordinates: [
-          {39.109414, -84.536507},
-          {39.109431, -84.536437}
+          {-84.536507, 39.109414},
+          {-84.536437, 39.109431}
         ]
       }
     }
