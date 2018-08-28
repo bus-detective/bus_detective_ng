@@ -7,7 +7,7 @@ Leaflet.Icon.Default.imagePath = '/images/';
 class StopMap extends HTMLElement {
   constructor () {
     super();
-    this.busMarkers = [];
+    this.busMarkers = {};
     this.shapeLayer = null;
   }
 
@@ -72,20 +72,29 @@ class StopMap extends HTMLElement {
 
   displayVehicles () {
     const busIcon = Leaflet.icon({ iconUrl: this.busIconUrl });
-    this.busMarkers.forEach((marker) => marker.removeFrom(this.map));
-    this.busMarkers = this.vehiclePositions.map((vehiclePosition) => {
-      const busMarker = Leaflet.marker([vehiclePosition.latitude, vehiclePosition.longitude], {
-        icon: busIcon
-      });
-      busMarker.bindTooltip(
-        `
+
+    const updatedBusIds = this.vehiclePositions.map((vehiclePosition) => vehiclePosition.vehicle_label);
+    for (var busId in this.busMarkers) {
+      if (!updatedBusIds.includes(busId)) {
+        this.busMarkers[busId].removeFrom(this.map);
+      }
+    };
+
+    this.vehiclePositions.forEach((vehiclePosition) => {
+      if (vehiclePosition.vehicle_label in this.busMarkers) {
+        let newLatLng = new Leaflet.LatLng(vehiclePosition.latitude, vehiclePosition.longitude);
+        this.busMarkers[vehiclePosition.vehicle_label].setLatLng(newLatLng).update();
+      } else {
+        let busMarker = this.busMarkers[vehiclePosition.vehicle_label] = Leaflet.marker([vehiclePosition.latitude, vehiclePosition.longitude], {icon: busIcon});
+        busMarker.bindTooltip(
+          `
           <div class="map-bus-label" style="background-color: #${vehiclePosition.route_color}; color: #${vehiclePosition.route_text_color};">
             ${vehiclePosition.route_name}
           </div>
         `,
-        {permanent: true, direction: 'top'});
-      busMarker.addTo(this.map);
-      return busMarker;
+          {permanent: true, direction: 'top'});
+        busMarker.addTo(this.map);
+      }
     });
   }
 
