@@ -7,3 +7,5 @@ erl_crash.dump
 **/screenshots
 apps/bus_detective_web/assets/test/eslint/junit.xml
 **/cover/
+apps/importer/config/dev.secret.exs
+apps/realtime/config/dev.secret.exs
