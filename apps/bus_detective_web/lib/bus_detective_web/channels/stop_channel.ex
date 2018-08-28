@@ -97,13 +97,16 @@ defmodule BusDetectiveWeb.StopChannel do
 
         case vehicle_positions_source().find_vehicle_position(socket.assigns[:feed].name, trip_remote_id) do
           {:ok, position} ->
+            vehicle_label = position.vehicle_label || position.id
+
             position
-            |> Map.take([:latitude, :longitude, :trip_id, :vehicle_label])
+            |> Map.take([:latitude, :longitude, :trip_id])
             |> Map.merge(%{
               headsign: departure.trip.headsign,
               route_name: departure.route.short_name,
               route_color: departure.route.color,
-              route_text_color: departure.route.text_color
+              route_text_color: departure.route.text_color,
+              vehicle_label: vehicle_label
             })
 
           _ ->

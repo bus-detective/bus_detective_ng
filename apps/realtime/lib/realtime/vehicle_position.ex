@@ -10,18 +10,20 @@ defmodule Realtime.VehiclePosition do
   * `vehicle_label` - the vehicle label given in the realtime vehicle position feed
   """
   @type t :: %__MODULE__{
+          id: String.t(),
           latitude: float(),
           longitude: float(),
           trip_id: String.t(),
           vehicle_label: String.t()
         }
 
-  defstruct [:trip_id, :latitude, :longitude, :vehicle_label]
+  defstruct [:id, :latitude, :longitude, :trip_id, :vehicle_label]
 
   def from_message(%Realtime.Messages.FeedEntity{vehicle: nil}), do: nil
 
   def from_message(%Realtime.Messages.FeedEntity{vehicle: vehicle_position}) do
     %__MODULE__{
+      id: vehicle_position.vehicle.id,
       trip_id: vehicle_position.trip.trip_id,
       latitude: vehicle_position.position.latitude,
       longitude: vehicle_position.position.longitude,
