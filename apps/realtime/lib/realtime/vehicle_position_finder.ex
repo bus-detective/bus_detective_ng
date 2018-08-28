@@ -3,7 +3,7 @@ defmodule Realtime.VehiclePositionFinder do
   This is a module that contains functions to find realtime vehicle positions
   """
 
-  alias Realtime.Messages.FeedMessage
+  alias Realtime.Messages.{FeedEntity, FeedMessage, TripDescriptor}
   alias Realtime.VehiclePosition
 
   def find_vehicle_position(%FeedMessage{} = feed, trip_remote_id) do
@@ -14,11 +14,12 @@ defmodule Realtime.VehiclePositionFinder do
     |> Enum.at(0)
   end
 
-  def filter_by_trip(feed_entity, trip_remote_id) do
-    feed_entity
-    |> Map.get(:vehicle)
-    |> Map.get(:trip)
-    |> Map.get(:trip_id)
-    |> Kernel.==(trip_remote_id)
+  def filter_by_trip(
+        %FeedEntity{vehicle: %Realtime.Messages.VehiclePosition{trip: %TripDescriptor{trip_id: trip_id}}},
+        trip_remote_id
+      ) do
+    trip_id == trip_remote_id
   end
+
+  def filter_by_trip(_, _), do: false
 end
