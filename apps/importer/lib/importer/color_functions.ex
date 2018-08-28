@@ -63,7 +63,8 @@ defmodule Importer.ColorFunctions do
     "02A862",
     "0E70E7",
     "00D700",
-    "00B700"]
+    "00B700"
+  ]
   def suitable_color(color) when is_nil(color) or color == "" do
     Enum.random(@suitable_colors)
   end

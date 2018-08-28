@@ -50,8 +50,8 @@ defmodule Realtime.StopTimeUpdate do
     |> Enum.filter(&(!is_nil(&1)))
     |> Enum.max()
     |> case do
-         nil -> nil
-         datetime -> DateTime.from_unix(datetime)
+      nil -> nil
+      datetime -> DateTime.from_unix(datetime)
     end
   end
 end

@@ -421,7 +421,9 @@ defmodule Importer do
     case Integer.parse(value) do
       {val, ""} ->
         val
-      _ -> nil
+
+      _ ->
+        nil
     end
   end
 

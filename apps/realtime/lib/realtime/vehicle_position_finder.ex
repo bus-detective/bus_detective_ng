@@ -14,7 +14,10 @@ defmodule Realtime.VehiclePositionFinder do
     |> Enum.at(0)
   end
 
-  def filter_by_trip(%FeedEntity{vehicle: %Realtime.Messages.VehiclePosition{trip: %TripDescriptor{trip_id: trip_id}}}, trip_remote_id) do
+  def filter_by_trip(
+        %FeedEntity{vehicle: %Realtime.Messages.VehiclePosition{trip: %TripDescriptor{trip_id: trip_id}}},
+        trip_remote_id
+      ) do
     trip_id == trip_remote_id
   end
 
