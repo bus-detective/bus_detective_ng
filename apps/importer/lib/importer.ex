@@ -386,10 +386,10 @@ defmodule Importer do
           remote_id: raw_trip["trip_id"],
           headsign: StringFunctions.titleize_headsign(raw_trip["trip_headsign"]),
           short_name: raw_trip["trip_short_name"],
-          direction_id: raw_trip["direction_id"] |> String.to_integer(),
+          direction_id: to_integer(raw_trip["direction_id"]),
           block_id: raw_trip["block_id"],
-          wheelchair_accessible: raw_trip["wheelchair_accessible"] |> String.to_integer(),
-          bikes_allowed: raw_trip["bikes_allowed"] |> String.to_integer(),
+          wheelchair_accessible: to_integer(raw_trip["wheelchair_accessible"]),
+          bikes_allowed: to_integer(raw_trip["bikes_allowed"]),
           inserted_at: Ecto.DateTime.utc(),
           updated_at: Ecto.DateTime.utc()
         }
@@ -412,6 +412,16 @@ defmodule Importer do
       nil -> {:ok, nil}
       "" -> {:ok, nil}
       value -> Type.cast(type, value)
+    end
+  end
+
+  defp to_integer(nil), do: nil
+
+  defp to_integer(value) do
+    case Integer.parse(value) do
+      {val, ""} ->
+        val
+      _ -> nil
     end
   end
 
