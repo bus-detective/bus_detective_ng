@@ -47,7 +47,11 @@ defmodule Realtime.StopTimeUpdate do
     arrival_and_departure
     |> Enum.filter(&(!is_nil(&1)))
     |> Enum.map(& &1.time)
+    |> Enum.filter(&(!is_nil(&1)))
     |> Enum.max()
-    |> DateTime.from_unix()
+    |> case do
+         nil -> nil
+         datetime -> DateTime.from_unix(datetime)
+    end
   end
 end

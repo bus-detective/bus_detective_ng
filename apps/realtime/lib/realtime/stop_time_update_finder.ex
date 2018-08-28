@@ -36,7 +36,7 @@ defmodule Realtime.StopTimeUpdateFinder do
          stop_sequence
        ) do
     stop_time_updates
-    |> Enum.filter(&(&1.stop_sequence == stop_sequence))
+    |> Enum.filter(&(is_nil(&1.stop_sequence) || &1.stop_sequence == stop_sequence))
     |> Enum.at(0)
     |> StopTimeUpdate.from_message()
   end
