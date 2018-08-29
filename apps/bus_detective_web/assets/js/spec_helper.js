@@ -5,7 +5,7 @@ export function createSandbox() {
     document.body.appendChild(sandbox);
   });
   afterEach(() => {
-
+    sandbox.innerHTML = '';
   })
   return sandbox;
 }
