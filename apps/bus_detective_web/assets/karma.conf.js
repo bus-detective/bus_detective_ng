@@ -20,9 +20,11 @@ module.exports = function(config) {
     ],
 
     preprocessors: {
-      './js/spec.js': ['webpack']
+      './js/spec.js': ['webpack', 'sourcemap']
     },
-    webpack: {},
+    webpack: {
+      devtool: 'inline-source-map'
+    },
 
     // list of files / patterns to exclude
     exclude: [
