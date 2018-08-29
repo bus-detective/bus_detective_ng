@@ -1,11 +1,12 @@
 import Route from './route.js';
 import { expect } from 'chai';
+import { createSandbox } from './spec_helper.js';
+
 describe('Route', () => {
-  let sandbox
+  const sandbox = createSandbox();
+
   before(() => {
     customElements.define("bd-route", Route);
-    sandbox = document.createElement("div", {id: 'sandbox'});
-    document.body.appendChild(sandbox);
   });
 
   it('can be added to the page', () => {
