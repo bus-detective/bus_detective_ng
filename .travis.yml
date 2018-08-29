@@ -48,3 +48,12 @@ deploy:
     run: mix ecto.migrate
     api_key:
       secure: "nsDapZcs4ocuZ+yngUGa2gjHcbKxMhS2/mPY3mI6z6u4/g1vuYtr23xorbq9nqNPJI9pZGjAvvr28be3Kq1zlbMMUQapVF25IWKlZD+kufN7yHdxYBykde+juW6ua4BleAnlVi61tR8QYIWHBHlStYT1A6VLNFJNzSlz3SokEtWnGY5H1jML5+JFMcQ1CRWm8uzHgVIE7drTPESIEqLc05GYFzP+VpuTII1CoQnKKF8Z5tDUEYdd+xDmPGY+5EZBG7yNP05bfRlNzc2CTIOSuh0Mb0Uh0x3JxeG5wY++rfSsIVr99iJOJuR3DZ/N0A/VLMdd9fN/3rYQtrpQaFooNRkRs7IHFacILYjLiSNhRQ71vfh1ogf8eAtTk7sFrn0+1PCm/AY96wfgjALlJS7nkQGLWpEnA2NLEo2yjs6FAFfEMEX51VElAriD6FyA9guqkmbD+nvWD1BG/542EZZeoryPi04C+DCBD/MFM5KreKK/9stgE+PtwlOZCDNkPoPH8qQZz76awRSL3isZPZH5HJJPNNwy82XHRaNGUiH42Nz59VUHTeHGmaV4/QiB3uNHQcnwumci1ZvQaGLzSo8msm8EUJ0YYUtC8r1ivgU53nKNb5y3dZD4C0PPFoz/yHFTKqjTnb0kVOkQHyAss0C75w79vNWCAGYwaJ2lwGnphPw="
+  - provider: heroku
+    app: busdetective-ng-seattle
+    on:
+      repo: bus-detective/bus_detective_ng
+      all_branches: true
+      condition: "$TRAVIS_TAG =~ ^v[0-9]+\\.[0-9]+\\.[0-9]+"
+    run: mix ecto.migrate
+    api_key:
+      secure: "nsDapZcs4ocuZ+yngUGa2gjHcbKxMhS2/mPY3mI6z6u4/g1vuYtr23xorbq9nqNPJI9pZGjAvvr28be3Kq1zlbMMUQapVF25IWKlZD+kufN7yHdxYBykde+juW6ua4BleAnlVi61tR8QYIWHBHlStYT1A6VLNFJNzSlz3SokEtWnGY5H1jML5+JFMcQ1CRWm8uzHgVIE7drTPESIEqLc05GYFzP+VpuTII1CoQnKKF8Z5tDUEYdd+xDmPGY+5EZBG7yNP05bfRlNzc2CTIOSuh0Mb0Uh0x3JxeG5wY++rfSsIVr99iJOJuR3DZ/N0A/VLMdd9fN/3rYQtrpQaFooNRkRs7IHFacILYjLiSNhRQ71vfh1ogf8eAtTk7sFrn0+1PCm/AY96wfgjALlJS7nkQGLWpEnA2NLEo2yjs6FAFfEMEX51VElAriD6FyA9guqkmbD+nvWD1BG/542EZZeoryPi04C+DCBD/MFM5KreKK/9stgE+PtwlOZCDNkPoPH8qQZz76awRSL3isZPZH5HJJPNNwy82XHRaNGUiH42Nz59VUHTeHGmaV4/QiB3uNHQcnwumci1ZvQaGLzSo8msm8EUJ0YYUtC8r1ivgU53nKNb5y3dZD4C0PPFoz/yHFTKqjTnb0kVOkQHyAss0C75w79vNWCAGYwaJ2lwGnphPw="
