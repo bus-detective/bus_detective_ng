@@ -22,7 +22,7 @@ class Departure extends HTMLElement {
     };
     update();
     this.innerHTML = `
-    <div class="timeline__event event event--future" data-departure-time="${this.departure.time}">
+    <div>
       <div class="event__time">${this.departure.time}</div>
       <div class="event__event-details">
         <div class="event__marker"></div>
@@ -41,7 +41,7 @@ class Departure extends HTMLElement {
   }
 
   isPast () {
-    return new Date(this.departureTime) < new Date();
+    return new Date(this.departure.time) < new Date();
   }
 }
 
