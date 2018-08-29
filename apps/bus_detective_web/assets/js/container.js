@@ -9,6 +9,9 @@ export const subscribers = {
   },
   'bd-expand-map': ({ mapExpanded }, element) => {
     element && element.setAttribute('expanded', mapExpanded);
+  },
+  'bd-departure-list': ({ departures }, element) => {
+    element && element.setAttribute('departures', JSON.stringify(departures));
   }
 };
 
@@ -24,4 +27,8 @@ const updateVehiclePositions = (state, vehiclePositions) => {
   return Object.assign(state, { vehiclePositions });
 };
 
-export const reducers = { expandMap, updateTripShapes, updateVehiclePositions };
+const updateDepartures = (state, departures) => {
+  return Object.assign(state, { departures });
+};
+
+export const reducers = { expandMap, updateTripShapes, updateVehiclePositions, updateDepartures };

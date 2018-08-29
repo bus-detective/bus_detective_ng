@@ -11,19 +11,17 @@ describe('Departure', () => {
 
   it('can be added to the page', () => {
     const departure = {
-      route: {
-        color: 'blue',
-        text_color: 'taupe'
-      },
-      trip: {
-        headsign: "Head Sign"
-      }
+      route_name: 'Bob',
+      time: '2 oclock',
+      route_color: 'blue',
+      route_text_color: 'taupe',
+      headsign: 'Head Sign'
     };
     sandbox.innerHTML = `
       <bd-departure departure='${JSON.stringify(departure)}'></bd-departure>
     `;
     const bdDepartureElement = document.querySelector("bd-departure");
     expect(bdDepartureElement).to.exist;
-    expect(bdDepartureElement.innerHTML).to.contain(departure.trip.headsign);
+    expect(bdDepartureElement.innerHTML).to.contain(departure.headsign);
   });
 });

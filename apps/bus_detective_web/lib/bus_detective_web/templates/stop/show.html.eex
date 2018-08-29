@@ -22,13 +22,7 @@
 
   <div>
     <div class="timeline" data-selector="departures-list">
-      <%= if Enum.empty?(@departures) do %>
-        <p class="text-center">No departures found</p>
-      <% else %>
-        <%= for departure <- @departures do %>
-          <%= render BusDetectiveWeb.DepartureView, "_departure.html", departure: departure %>
-        <% end %>
-      <% end %>
+      <bd-departure-list></bd-departure-list>
     </div>
   </div>
 

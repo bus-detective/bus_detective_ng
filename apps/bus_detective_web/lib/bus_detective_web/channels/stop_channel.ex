@@ -45,11 +45,13 @@ defmodule BusDetectiveWeb.StopChannel do
 
       rendered_departures =
         Enum.map(departures, fn departure ->
-          View.render_to_string(
-            DepartureView,
-            "_departure.html",
-            departure: departure
-          )
+          %{
+            time: departure.time,
+            headsign: departure.trip.headsign,
+            route_name: departure.route.short_name,
+            route_color: departure.route.color,
+            route_text_color: departure.route.text_color
+          }
         end)
 
       push(socket, "departures", %{departures: rendered_departures})

@@ -9,6 +9,7 @@ import NearbySearch from './nearby-search.js';
 import StopMap from './stop-map.js';
 import Route from './route.js';
 import Timestamp from './timestamp.js';
+import DepartureList from './departure-list.js';
 import { connect, dispatch } from './reduxish.js';
 import { subscribers, reducers } from './container';
 import { debounce } from './debounce.js';
@@ -16,6 +17,7 @@ import { debounce } from './debounce.js';
 import socket from './socket.js';
 
 customElements.define('bd-departure', Departure);
+customElements.define('bd-departure-list', DepartureList);
 customElements.define('bd-favorite', Favorite);
 customElements.define('bd-favorites-list', FavoritesList);
 customElements.define('bd-expand-map', ExpandMap);
@@ -39,12 +41,7 @@ if (window.stopId) {
   channel.on('departures', message => {
     window.clearTimeout(reloadTimeout);
     console.log('Received Departures', message);
-    let departuresList = document.querySelector('[data-selector="departures-list"]');
-    if (message.departures.length > 0) {
-      departuresList.innerHTML = message.departures.join('');
-    } else {
-      departuresList.innerHTML = '<p class="text-center">No departures found</p>';
-    }
+    dispatch('updateDepartures', message.departures);
     reloadTimeout = window.setTimeout(reloadDepartures, 60000);
   });
 

@@ -2,15 +2,15 @@
 
 class DepartureList extends HTMLElement {
 
-  get departures() {
-    return this.getAttribute('departures') ? JSON.parse(this.getAttribute('departures')) : []
+  get departures () {
+    return this.getAttribute('departures') ? JSON.parse(this.getAttribute('departures')) : [];
   }
 
-  static get observedAttributes() {
+  static get observedAttributes () {
     return ['departures'];
   }
 
-  attributeChangedCallback() {
+  attributeChangedCallback () {
     this.render();
   }
 
@@ -18,7 +18,7 @@ class DepartureList extends HTMLElement {
     this.render();
   }
 
-  render() {
+  render () {
     this.innerHTML = this.departures.map((departure) => `
       <bd-departure departure='${JSON.stringify(departure)}'></bd-departure>
     `);
