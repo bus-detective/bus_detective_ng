@@ -6,6 +6,7 @@
   @include clearfix;
   display: block;
   position: relative;
+  transition: opacity 0.6s $ease;
   &:last-of-type .event__event-details {
     border-color: transparent;
   }
