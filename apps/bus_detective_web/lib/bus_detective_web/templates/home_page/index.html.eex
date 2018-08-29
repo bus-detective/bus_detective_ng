@@ -24,10 +24,13 @@
           <i class="bd-icon bd-icon--heart"></i>
           Favorites
         </h2>
+        <%= link to: favorite_path(@conn, :index) do %>
+        <h2 class="pull--right button--small push-top-5">View All</h2>
+        <% end %>
         <div class="clear">
           <div class="list-item__container">
             <div>
-              <bd-favorites-list></bd-favorites-list>
+              <bd-favorites-list count="5"></bd-favorites-list>
             </div>
             <div class="text-center white shove-top">Hit the heart icon on your favorite bus stops, and they’ll show up right here.
             </div>

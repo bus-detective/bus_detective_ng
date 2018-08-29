@@ -7,12 +7,17 @@ class FavoritesList extends HTMLElement {
     return favoriteService.all();
   }
 
+  get count () {
+    let count = parseInt(this.getAttribute('count'));
+    return (isNaN(count)) ? 1000 : count;
+  }
+
   constructor () {
     super();
     let channel = socket.channel('favorites:stops', {});
 
     channel.on('favorites_list', message => {
-      this.setFavorites(message.stops);
+      this.setFavorites(message.stops.slice(0, this.count));
     });
 
     channel.join()

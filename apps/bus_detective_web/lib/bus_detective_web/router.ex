@@ -14,6 +14,7 @@ defmodule BusDetectiveWeb.Router do
 
     get("/", HomePageController, :index)
 
+    resources("/favorites", FavoriteController, only: [:index])
     resources("/search", SearchController, only: [:index])
     resources("/stops", StopController, only: [:show])
   end
