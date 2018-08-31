@@ -13,6 +13,7 @@ defmodule BusDetectiveWeb.Router do
     pipe_through(:browser)
 
     get("/", HomePageController, :index)
+    get "/show-me-everything", HomePageController, :show_everything
 
     resources("/favorites", FavoriteController, only: [:index])
     resources("/search", SearchController, only: [:index])

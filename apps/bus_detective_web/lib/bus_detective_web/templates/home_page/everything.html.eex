@@ -1,0 +1,7 @@
+<div>
+  <bd-everything-map bus-icon-url="/images/bus.png"></bd-everything-map>
+
+  <div class="attribution">
+    <p>&copy; OpenStreetMap contributors, CC-BY-SA, Tiles courtesy of Humanitarian OpenStreetMap Team</p>
+  </div>
+</div>
