@@ -21,7 +21,7 @@ class DepartureList extends HTMLElement {
   render () {
     this.innerHTML = this.departures.map((departure) => `
       <bd-departure departure='${JSON.stringify(departure)}'></bd-departure>
-    `);
+    `).join('');
   }
 
   isPast () {

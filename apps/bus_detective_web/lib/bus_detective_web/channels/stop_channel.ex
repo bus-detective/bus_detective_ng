@@ -46,11 +46,13 @@ defmodule BusDetectiveWeb.StopChannel do
       rendered_departures =
         Enum.map(departures, fn departure ->
           %{
+            id: departure.trip.remote_id,
             time: departure.time,
             headsign: departure.trip.headsign,
             route_name: departure.route.short_name,
             route_color: departure.route.color,
-            route_text_color: departure.route.text_color
+            route_text_color: departure.route.text_color,
+            realtime: departure.realtime?
           }
         end)
 
