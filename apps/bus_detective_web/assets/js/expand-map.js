@@ -1,5 +1,5 @@
 /* global HTMLElement */
-import { dispatch } from './reduxish';
+import { dispatch } from 'wc-fluxish';
 
 class ExpandMap extends HTMLElement {
   get expanded () {

@@ -11,20 +11,20 @@ export const subscribers = {
     element && element.setAttribute('expanded', mapExpanded);
   },
   'bd-departure-list': ({ departures }, element) => {
-    element && element.setAttribute('departures', JSON.stringify(departures));
+    element && departures && element.setAttribute('departures', JSON.stringify(departures));
   }
 };
 
 export const expandMap = (state, { mapExpanded }) => {
-  return Object.assign(state, { mapExpanded });
+  return Object.assign({}, state, { mapExpanded });
 };
 
 export const updateTripShapes = (state, tripShapes) => {
-  return Object.assign(state, { tripShapes });
+  return Object.assign({}, state, { tripShapes });
 };
 
 export const updateVehiclePositions = (state, vehiclePositions) => {
-  return Object.assign(state, { vehiclePositions });
+  return Object.assign({}, state, { vehiclePositions });
 };
 
 export const updateDepartures = (state, departures) => {
@@ -38,9 +38,9 @@ export const updateDepartures = (state, departures) => {
     newDepartures.forEach((newDeparture) => {
       newDeparture.added = true;
     });
-    return Object.assign(state, { departures: removedDepartures.concat(departures) });
+    return Object.assign({}, state, { departures: removedDepartures.concat(departures) });
   }
-  return Object.assign(state, { departures });
+  return Object.assign({}, state, { departures });
 };
 
 export const reducers = { expandMap, updateTripShapes, updateVehiclePositions, updateDepartures };

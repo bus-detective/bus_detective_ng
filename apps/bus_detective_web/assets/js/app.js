@@ -10,7 +10,7 @@ import StopMap from './stop-map.js';
 import Route from './route.js';
 import Timestamp from './timestamp.js';
 import DepartureList from './departure-list.js';
-import { connect, dispatch } from './reduxish.js';
+import { connect, dispatch } from 'wc-fluxish';
 import { subscribers, reducers } from './container';
 import { debounce } from './debounce.js';
 
