@@ -4,6 +4,7 @@ import '../css/app.scss';
 import Departure from './departure.js';
 import Favorite from './favorite.js';
 import FavoritesList from './favorites-list.js';
+import FavoriteStop from './favorite-stop.js';
 import ExpandMap from './expand-map.js';
 import NearbySearch from './nearby-search.js';
 import StopMap from './stop-map.js';
@@ -15,10 +16,12 @@ import { subscribers, reducers } from './container';
 import { debounce } from './debounce.js';
 
 import socket from './socket.js';
+import favoriteService from './favorite-service';
 
 customElements.define('bd-departure', Departure);
 customElements.define('bd-departure-list', DepartureList);
 customElements.define('bd-favorite', Favorite);
+customElements.define('bd-favorite-stop', FavoriteStop);
 customElements.define('bd-favorites-list', FavoritesList);
 customElements.define('bd-expand-map', ExpandMap);
 customElements.define('bd-nearby-search', NearbySearch);
@@ -65,4 +68,17 @@ if (window.stopId) {
       }
     )
     .receive('error', resp => { console.log('Unable to join', resp); });
-}
+} else {
+  let channel = socket.channel('favorites:stops', {});
+
+  channel.on('favorites_list', message => {
+    console.log('Received Favorites', message);
+    dispatch('updateFavorites', message.stops);
+  });
+
+  channel.join()
+    .receive('ok', resp => { })
+    .receive('error', resp => { console.log('Unable to join', resp); });
+
+  channel.push('load_stops', {stop_ids: favoriteService.all()});
+};

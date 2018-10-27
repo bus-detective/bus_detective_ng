@@ -17,11 +17,19 @@ defmodule BusDetectiveWeb.FavoritesChannel do
       stop_ids
       |> GTFS.get_stops()
       |> Enum.map(fn stop ->
-        View.render_to_string(
-          StopView,
-          "_stop.html",
-          stop: stop
-        )
+        routes = Enum.map(stop.routes, fn route -> 
+          %{
+            short_name: route.short_name,
+            color: route.color,
+            text_color: route.text_color
+          }
+        end)
+        %{
+          id: Phoenix.Param.to_param(stop), 
+          name: stop.name,
+          direction: BusDetective.GTFS.Stop.direction(stop),
+          routes: routes 
+        }
       end)
 
     push(socket, "favorites_list", %{stops: stops})

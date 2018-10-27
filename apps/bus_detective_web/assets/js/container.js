@@ -12,6 +12,9 @@ export const subscribers = {
   },
   'bd-departure-list': ({ departures }, element) => {
     element && departures && element.setAttribute('departures', JSON.stringify(departures));
+  },
+  'bd-favorites-list': ({ favorites }, element) => {
+    element && favorites && element.setAttribute('favorites', JSON.stringify(favorites));
   }
 };
 
@@ -25,6 +28,10 @@ export const updateTripShapes = (state, tripShapes) => {
 
 export const updateVehiclePositions = (state, vehiclePositions) => {
   return Object.assign({}, state, { vehiclePositions });
+};
+
+export const updateFavorites = (state, favorites) => {
+  return Object.assign({}, state, { favorites });
 };
 
 export const updateDepartures = (state, departures) => {
@@ -43,4 +50,4 @@ export const updateDepartures = (state, departures) => {
   return Object.assign({}, state, { departures });
 };
 
-export const reducers = { expandMap, updateTripShapes, updateVehiclePositions, updateDepartures };
+export const reducers = { expandMap, updateTripShapes, updateVehiclePositions, updateDepartures, updateFavorites };
