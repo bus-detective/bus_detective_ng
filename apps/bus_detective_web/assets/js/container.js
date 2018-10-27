@@ -1,3 +1,4 @@
+import favoriteService from './favorite-service';
 
 export const subscribers = {
   'bd-stop-map': ({ mapExpanded, vehiclePositions, tripShapes }, element) => {
@@ -34,6 +35,15 @@ export const updateFavorites = (state, favorites) => {
   return Object.assign({}, state, { favorites });
 };
 
+export const moveFavorite = (state, { from, to, before }) => {
+  favoriteService.move(from, to, before);
+  const fromFavorite = state.favorites.find((stop) => stop.id === from);
+  const newFavorites = state.favorites.filter((stop) => stop.id !== from);
+  const indexOfTo = newFavorites.findIndex((stop) => stop.id === to);
+  newFavorites.splice(indexOfTo + (before ? 0 : 1), 0, fromFavorite);
+  return Object.assign({}, state, { favorites: newFavorites });
+};
+
 export const updateDepartures = (state, departures) => {
   if (state.departures) {
     const keepingDepartures = state.departures.filter(departure => !departure.removed);
@@ -50,4 +60,4 @@ export const updateDepartures = (state, departures) => {
   return Object.assign({}, state, { departures });
 };
 
-export const reducers = { expandMap, updateTripShapes, updateVehiclePositions, updateDepartures, updateFavorites };
+export const reducers = { expandMap, updateTripShapes, updateVehiclePositions, updateDepartures, updateFavorites, moveFavorite };

@@ -19,6 +19,13 @@ class FavoriteService {
     this.replaceStops(newStops);
   }
 
+  move (from, to, before) {
+    const newStops = this.all().filter((id) => id !== from);
+    const targetIndex = newStops.indexOf(to) + (before ? 0 : 1);
+    newStops.splice(targetIndex, 0, from);
+    this.replaceStops(newStops);
+  }
+
   hasStop (stopId) {
     return !!this.all().find((id) => id === stopId);
   }

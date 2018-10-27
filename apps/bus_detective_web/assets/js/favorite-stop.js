@@ -1,4 +1,6 @@
 /* global HTMLElement */
+import { dispatch } from 'wc-fluxish';
+
 class FavoriteStop extends HTMLElement {
   get favoriteStop () {
     return this.getAttribute('favorite-stop') ? JSON.parse(this.getAttribute('favorite-stop')) : {};
@@ -31,14 +33,11 @@ class FavoriteStop extends HTMLElement {
     this.addEventListener('drop', (event) => {
       const height = this.getBoundingClientRect().height;
       const draggingStop = event.dataTransfer.getData('text/plain');
-      if (event.offsetY < (height / 2)) {
-        console.log(`inserting ${draggingStop} before ${this.favoriteStop.id}`);
-      } else {
-        console.log(`inserting ${draggingStop} after ${this.favoriteStop.id}`);
-      }
-      // console.log('dropped', );
-      // console.log('drop offset height', event.offsetY);
-      // console.log('height of target', );
+      dispatch('moveFavorite', {
+        from: draggingStop,
+        to: this.favoriteStop.id,
+        before: event.offsetY < (height / 2)
+      });
     });
   }
 }
