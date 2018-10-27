@@ -6,8 +6,6 @@ defmodule BusDetectiveWeb.StopChannel do
 
   alias BusDetective.GTFS
   alias BusDetective.GTFS.Shape
-  alias BusDetectiveWeb.DepartureView
-  alias Phoenix.View
   alias Realtime.VehiclePositions
 
   intercept(["vehicle_positions", "trip_updates"])

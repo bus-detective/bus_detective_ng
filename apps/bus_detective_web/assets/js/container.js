@@ -32,15 +32,18 @@ export const updateVehiclePositions = (state, vehiclePositions) => {
 };
 
 export const updateFavorites = (state, favorites) => {
-  return Object.assign({}, state, { favorites });
+  // sort by user preferred order
+  const favoriteIds = favoriteService.all();
+  const sortedFavorites = favoriteIds.map((id) => favorites.find((stop) => stop.id === id));
+  return Object.assign({}, state, { favorites: sortedFavorites });
 };
 
 export const moveFavorite = (state, { from, to, before }) => {
-  favoriteService.move(from, to, before);
   const fromFavorite = state.favorites.find((stop) => stop.id === from);
   const newFavorites = state.favorites.filter((stop) => stop.id !== from);
   const indexOfTo = newFavorites.findIndex((stop) => stop.id === to);
   newFavorites.splice(indexOfTo + (before ? 0 : 1), 0, fromFavorite);
+  favoriteService.replaceStops(newFavorites.map((stop) => stop.id));
   return Object.assign({}, state, { favorites: newFavorites });
 };
 

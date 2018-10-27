@@ -11,8 +11,7 @@ defmodule Realtime.VehiclePositionFinderTest do
   end
 
   describe "find_vehicle_position/2" do
-    test "with a trip remote id that matches a realtime update",
-         %{feed: feed} do
+    test "with a trip remote id that matches a realtime update", %{feed: feed} do
       assert %{trip_id: "1090758", latitude: 39.1627197265625, longitude: -84.42084503173828, vehicle_label: "1323"} =
                VehiclePositionFinder.find_vehicle_position(feed, "1090758")
     end
