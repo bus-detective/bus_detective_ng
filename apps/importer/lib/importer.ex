@@ -116,7 +116,7 @@ defmodule Importer do
       services = Task.await(services_task, 300_000)
       import_service_exceptions(file_map["calendar_dates"], feed, services)
       routes = Task.await(routes_task, 300_000)
-      shapes = Task.await(shapes_task, 300_000)
+      shapes = Task.await(shapes_task, 600_000)
       trips = import_trips(file_map["trips"], feed, routes, services, shapes)
       stops = Task.await(stops_task, 300_000)
       import_stop_times(file_map["stop_times"], feed, stops, trips)
