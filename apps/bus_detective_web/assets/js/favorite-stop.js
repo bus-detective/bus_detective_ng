@@ -1,5 +1,5 @@
 /* global HTMLElement */
-import { dispatch } from 'wc-fluxish';
+import { dispatch } from 'wc-state-reducers';
 
 class FavoriteStop extends HTMLElement {
   get favoriteStop () {
@@ -33,7 +33,7 @@ class FavoriteStop extends HTMLElement {
     this.addEventListener('drop', (event) => {
       const height = this.getBoundingClientRect().height;
       const draggingStop = event.dataTransfer.getData('text/plain');
-      dispatch('moveFavorite', {
+      dispatch(document, 'moveFavorite', {
         from: draggingStop,
         to: this.favoriteStop.id,
         before: event.offsetY < (height / 2)

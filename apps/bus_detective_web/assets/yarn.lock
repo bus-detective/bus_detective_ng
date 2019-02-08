@@ -6838,9 +6838,10 @@ watchpack@^1.5.0:
     graceful-fs "^4.1.2"
     neo-async "^2.5.0"
 
-wc-fluxish@0.0.1:
-  version "0.0.1"
-  resolved "https://registry.yarnpkg.com/wc-fluxish/-/wc-fluxish-0.0.1.tgz#5014a5ee8e57a458b98b8307fdc05a0bb93328f5"
+wc-state-reducers@^0.0.4:
+  version "0.0.4"
+  resolved "https://registry.yarnpkg.com/wc-state-reducers/-/wc-state-reducers-0.0.4.tgz#f40e32f5bdc9adf55e7355a92812ae97bb96e3ab"
+  integrity sha512-uCbRlyG1ezhEKVwo/NAzG+1hLf/bsv4GmHyrv2QSkvaY+6t1qD7w9cCnxSMPbLckjNydI7fGM/1Xwr6S/WZecQ==
 
 webpack-addons@^1.1.5:
   version "1.1.5"

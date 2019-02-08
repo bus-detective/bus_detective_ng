@@ -1,5 +1,5 @@
 /* global HTMLElement */
-import { dispatch } from 'wc-fluxish';
+import { dispatch } from 'wc-state-reducers';
 
 class ExpandMap extends HTMLElement {
   get expanded () {
@@ -32,9 +32,9 @@ class ExpandMap extends HTMLElement {
 
     toggleButton.addEventListener('click', (event) => {
       if (this.expanded) {
-        dispatch('expandMap', {mapExpanded: false});
+        dispatch(document, 'expandMap', {mapExpanded: false});
       } else {
-        dispatch('expandMap', {mapExpanded: true});
+        dispatch(document, 'expandMap', {mapExpanded: true});
       }
     });
   }
