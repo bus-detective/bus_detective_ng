@@ -42,7 +42,7 @@ config :bus_detective_web, BusDetectiveWeb.Endpoint,
 config :bus_detective_web, BusDetectiveWeb.Endpoint,
   live_reload: [
     patterns: [
-      ~r{priv/static/.*(js|css|png|jpeg|jpg|gif|svg)$},
+      ~r{priv/static/.*(js|css|png|jpeg|jpg|gif|svg|json)$},
       ~r{priv/gettext/.*(po)$},
       ~r{lib/bus_detective_web/views/.*(ex)$},
       ~r{lib/bus_detective_web/templates/.*(eex)$}

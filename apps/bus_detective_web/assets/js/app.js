@@ -82,3 +82,7 @@ if (window.stopId) {
 
   channel.push('load_stops', {stop_ids: favoriteService.all()});
 };
+
+if('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js');
+};
