@@ -1,3 +1,4 @@
+/* global customElements, HTMLElement */
 import Departure from './departure.js';
 import { expect } from 'chai';
 import { createSandbox } from './spec_helper.js';
@@ -6,7 +7,7 @@ describe('Departure', () => {
   const sandbox = createSandbox();
 
   before(() => {
-    customElements.define("bd-departure", Departure);
+    customElements.define('bd-departure', Departure);
   });
 
   it('can be added to the page', () => {
@@ -20,8 +21,8 @@ describe('Departure', () => {
     sandbox.innerHTML = `
       <bd-departure departure='${JSON.stringify(departure)}'></bd-departure>
     `;
-    const bdDepartureElement = document.querySelector("bd-departure");
-    expect(bdDepartureElement).to.exist;
+    const bdDepartureElement = document.querySelector('bd-departure');
+    expect(bdDepartureElement).to.be.an.instanceOf(HTMLElement);
     expect(bdDepartureElement.innerHTML).to.contain(departure.headsign);
   });
 });

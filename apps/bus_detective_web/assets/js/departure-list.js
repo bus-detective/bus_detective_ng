@@ -1,7 +1,6 @@
 /* global HTMLElement */
 
 class DepartureList extends HTMLElement {
-
   get departures () {
     return this.getAttribute('departures') ? JSON.parse(this.getAttribute('departures')) : [];
   }

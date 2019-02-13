@@ -2,7 +2,6 @@ import { updateDepartures } from './container.js';
 import { expect } from 'chai';
 
 describe('updateDepartures', () => {
-
   let departures;
 
   beforeEach(() => {
@@ -31,7 +30,7 @@ describe('updateDepartures', () => {
   it('adds removed to departures that went away', () => {
     const { departures: updatedDepartures } = updateDepartures({ departures }, [ departures[0] ]);
     expect(updatedDepartures.length).to.equal(2);
-    expect(updatedDepartures[0].removed).to.be.true;
+    expect(updatedDepartures[0].removed).to.equal(true);
   });
 
   it('removes departures that were removing and went away', () => {
@@ -44,6 +43,6 @@ describe('updateDepartures', () => {
     const newDeparture = Object.assign({}, departures[1], { id: 3, headsign: 'Headsign 3' });
     const { departures: updatedDepartures } = updateDepartures({ departures }, [ ...departures, newDeparture ]);
     expect(updatedDepartures.length).to.equal(3);
-    expect(updatedDepartures[2].added).to.be.true;
+    expect(updatedDepartures[2].added).to.equal(true);
   });
-})
+});

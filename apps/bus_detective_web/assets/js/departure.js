@@ -1,4 +1,4 @@
-import moment from "moment";
+import moment from 'moment';
 import 'moment-timezone';
 
 /* global HTMLElement */
@@ -12,7 +12,7 @@ class Departure extends HTMLElement {
     return this.getAttribute('departure') ? JSON.parse(this.getAttribute('departure')) : {};
   }
 
-  get displayedTime() {
+  get displayedTime () {
     return moment(this.departure.time).format('hh:mm');
   }
 
