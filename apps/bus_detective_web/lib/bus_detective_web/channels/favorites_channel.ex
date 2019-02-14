@@ -5,6 +5,8 @@ defmodule BusDetectiveWeb.FavoritesChannel do
   use Phoenix.Channel
 
   alias BusDetective.GTFS
+  alias BusDetective.GTFS.Stop
+  alias Phoenix.Param
 
   def join("favorites:stops", _message, socket) do
     {:ok, socket}
@@ -25,9 +27,9 @@ defmodule BusDetectiveWeb.FavoritesChannel do
           end)
 
         %{
-          id: Phoenix.Param.to_param(stop),
+          id: Param.to_param(stop),
           name: stop.name,
-          direction: BusDetective.GTFS.Stop.direction(stop),
+          direction: Stop.direction(stop),
           routes: routes
         }
       end)
