@@ -4,6 +4,8 @@
 erl_crash.dump
 *.ez
 
+.elixir_ls
+
 **/screenshots
 apps/bus_detective_web/assets/test/eslint/junit.xml
 **/cover/

@@ -53,8 +53,7 @@ defmodule Realtime.TripUpdates do
     end
   end
 
-  def handle_call({:find_stop_time, _, _}, _, %{realtime_data: nil} = state),
-    do: {:reply, {:error, :no_data}, state}
+  def handle_call({:find_stop_time, _, _}, _, %{realtime_data: nil} = state), do: {:reply, {:error, :no_data}, state}
 
   def handle_call(
         {:find_stop_time, trip_remote_id, stop_sequence},

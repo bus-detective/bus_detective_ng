@@ -23,12 +23,13 @@ install:
 - mix deps.get
 script:
 - mix format --check-formatted && mix credo --strict
-- MIX_ENV=test mix do ecto.create, ecto.migrate && mix coveralls.travis --umbrella
 - cd $TRAVIS_BUILD_DIR/apps/bus_detective_web/assets && npm install
 - cd $TRAVIS_BUILD_DIR/apps/bus_detective_web/assets && ./node_modules/.bin/eslint
   js/**/*.js
 - cd $TRAVIS_BUILD_DIR/apps/bus_detective_web/assets && node node_modules/webpack/bin/webpack.js
   --mode development
+- cd $TRAVIS_BUILD_DIR
+- MIX_ENV=test mix do ecto.create, ecto.migrate && mix coveralls.travis --umbrella
 - cd $TRAVIS_BUILD_DIR
 deploy:
   - provider: heroku

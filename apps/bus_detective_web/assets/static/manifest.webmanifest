@@ -1,0 +1,13 @@
+{
+  "name": "Bus Detective",
+  "short_name": "Bus Detective",
+  "icons": [{
+    "src": "/images/icon-144x144.png",
+      "sizes": "144x144",
+      "type": "image/png"
+    }
+  ],
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#52AFE2"
+}
