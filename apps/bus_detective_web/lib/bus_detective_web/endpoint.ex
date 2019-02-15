@@ -16,7 +16,7 @@ defmodule BusDetectiveWeb.Endpoint do
     at: "/",
     from: :bus_detective_web,
     gzip: false,
-    only: ~w(css fonts images js sw.js favicon.ico robots.txt manifest.json)
+    only: ~w(css fonts images js sw.js favicon.ico robots.txt manifest.webmanifest)
   )
 
   # Code reloading can be explicitly enabled under the
