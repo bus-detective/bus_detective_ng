@@ -5,7 +5,12 @@ config :realtime,
     "SORTA" => %{
       trip_updates_url: "http://developer.go-metro.com/TMGTFSRealTimeWebService/TripUpdate/TripUpdates.pb",
       vehicle_positions_url: "http://developer.go-metro.com/TMGTFSRealTimeWebService/vehicle/VehiclePositions.pb"
+    },
+    "COTA" => %{
+      trip_updates_url: "http://realtime.cota.com/TMGTFSRealTimeWebService/TripUpdate/TripUpdates.pb",
+      vehicle_positions_url: "http://realtime.cota.com/TMGTFSRealTimeWebService/Vehicle/VehiclePositions.pb"
     }
+
   }
 
 file = Path.join(Path.dirname(__ENV__.file), "dev.secret.exs")

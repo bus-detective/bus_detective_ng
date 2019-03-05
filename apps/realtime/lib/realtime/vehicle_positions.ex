@@ -104,7 +104,7 @@ defmodule Realtime.VehiclePositions do
             Logger.debug("Realtime data timestamp matches old, skipping vehicle positions event notification")
         end
 
-        schedule_fetch(13_000)
+        schedule_fetch(5_000)
         {:noreply, state}
 
       error ->

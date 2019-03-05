@@ -1,8 +1,8 @@
 {
-  "name": "Bus Detective",
-  "short_name": "Bus Detective",
+  "name": "Colum-Bus Detective",
+  "short_name": "Colum-Bus Detective",
   "icons": [{
-    "src": "/images/icon-144x144.png",
+    "src": "/images/columbus-icon-144x144.png",
       "sizes": "144x144",
       "type": "image/png"
     }
