@@ -11,20 +11,20 @@ class ExpandMap extends HTMLElement {
   }
 
   attributeChangedCallback () {
-    let toggleButtonIcon = this.querySelector('.bd-icon');
+    let toggleButtonIcon = this.querySelector('.material-icons');
     if (this.expanded) {
-      toggleButtonIcon.classList.remove('bd-icon--expand');
-      toggleButtonIcon.classList.add('bd-icon--contract');
+      toggleButtonIcon.innerHTML = 'fullscreen';
+      toggleButtonIcon.innerHTML = 'fullscreen_exit';
     } else {
-      toggleButtonIcon.classList.remove('bd-icon--contract');
-      toggleButtonIcon.classList.add('bd-icon--expand');
+      toggleButtonIcon.innerHTML = 'fullscreen_exit';
+      toggleButtonIcon.innerHTML = 'fullscreen';
     }
   }
 
   connectedCallback () {
     this.innerHTML = `
       <button class="map__toggle-expanded button qa-toggle-expanded" id="toggleButton">
-        <i class="bd-icon bd-icon--expand"></i>
+        <i class="material-icons">fullscreen</i>
       </button>
     `;
 

@@ -33,13 +33,13 @@ class Favorite extends HTMLElement {
     if (this.isFavorite) {
       this.button.classList.remove('toggle-favorite');
       this.button.classList.add('toggle-favorite--favorite');
-      this.image.classList.remove('bd-icon--heart-o');
-      this.image.classList.add('bd-icon--heart');
+      this.image.innerHTML = 'favorite_border';
+      this.image.innerHTML = 'favorite';
     } else {
       this.button.classList.remove('toggle-favorite--favorite');
       this.button.classList.add('toggle-favorite');
-      this.image.classList.remove('bd-icon--heart');
-      this.image.classList.add('bd-icon--heart-o');
+      this.image.innerHTML = 'favorite';
+      this.image.innerHTML = 'favorite_border';
     }
   }
 
@@ -48,7 +48,8 @@ class Favorite extends HTMLElement {
     button.className = 'stop-item__toggle-favorite';
     button.addEventListener('click', (event) => { this.toggleFavorite(event); });
     let image = document.createElement('i');
-    image.className = 'bd-icon';
+    image.className = 'material-icons';
+    image.innerHTML = 'favorite_border';
 
     button.appendChild(image);
     this.appendChild(button);

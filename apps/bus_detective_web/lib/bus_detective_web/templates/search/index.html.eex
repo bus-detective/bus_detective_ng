@@ -3,19 +3,19 @@
   <div class="action-banner action-banner--fixed-top">
     <%= link "", to: home_page_path(@conn, :index), class: "button button--home" %>
     <%= link to: home_page_path(@conn, :index), class: "button button--return" do %>
-      <i class="bd-icon bd-icon--arrow-left "></i>
+      <i class="material-icons">arrow_back</i>
     <% end %>
     <%= form_tag(search_path(@conn, :index), method: :get, class: "search__form search") do %>
       <input type="text" name="search_query" placeholder="Search by street name" class="search__query" autofocus="false" autocorrect="false" data-test="search_query">
       <button type="submit" class="button search__submit" data-test="search_button">
-        <i class="bd-icon bd-icon--search"></i>
+        <i class="material-icons">search</i>
       </button>
     <% end %>
   </div>
 
   <div class="list">
     <section class="section">
-      <h2 class="light"><i class="bd-icon bd-icon--search"></i> Search results</h2>
+      <h2 class="light"><i class="material-icons">search</i> Search results</h2>
       <%= if Enum.empty?(@results) do %>
         <p class="text-center">No stops found</p>
       <% else %>
