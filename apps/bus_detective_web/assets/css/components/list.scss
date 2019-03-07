@@ -46,14 +46,6 @@
   line-height: 1.25;
   padding-right: $padding;
   width: calc(100% - 2.1em);
-
-  .list--home & {
-    @media screen and (max-width: 520px) {
-      font-size: $ms-1;
-      font-weight: 400;
-      margin-left: $padding / 2;
-    }
-  }
 }
 
 .list-item__title--route {
