@@ -11,7 +11,7 @@
         <%= form_tag(search_path(@conn, :index), method: :get, class: "search__form") do %>
           <input type="text" name="search_query" placeholder="Search by street name" class="search__query" data-test="search_query">
           <button type="submit" class="button search__submit" data-test="search_button">
-            <i class="bd-icon bd-icon--search"></i>
+            <i class="material-icons">search</i>
           </button>
         <% end %>
       </div>
@@ -21,8 +21,7 @@
     <div class="list--home push-sides">
       <section class="section push-top">
         <h2 class="white pull--left">
-          <i class="bd-icon bd-icon--heart"></i>
-          Favorites
+          Favorite Stops
         </h2>
         <%= link to: favorite_path(@conn, :index) do %>
         <h2 class="pull--right button--small push-top-5">View All</h2>

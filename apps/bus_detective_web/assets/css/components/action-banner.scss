@@ -16,7 +16,7 @@
   .stop-item__toggle-favorite {
     @extend .button, .button--fav;
 
-    .bd-icon--heart {
+    .material-icons {
       color: #fff;
     }
   }

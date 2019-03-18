@@ -2,15 +2,27 @@
   box-sizing: border-box;
 }
 
-body {
-  position: relative;
-  font-family: 'Cooper Hewitt', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+html {
+  font-family: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
   font-size: $base-font-size;
   color: $bd-dark-gray;
   font-weight: 400;
   text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
+  -webkit-font-smoothing: subpixel-antialiased;
   -moz-osx-font-smoothing: grayscale;
+  font-variant-ligatures: common-ligatures contextual;
+  font-variant-alternates: styleset(ss01) character-variant(cv08);
+  font-variant-numeric: diagonal-fractions;
+  font-kerning: normal;
+  font-feature-settings: "calt" 1, "tnum" 0, "frac" 1, "case" 1, "ss01" 1, "cv08" 1, "kern" 1, "liga" 1;
+}
+
+@supports (font-variation-settings: normal) {
+  html { font-family: 'Inter var', sans-serif; }
+}
+
+body {
+  position: relative;
 }
 
 html, body {

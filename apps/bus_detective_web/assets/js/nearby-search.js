@@ -22,7 +22,8 @@ class NearbySearch extends HTMLElement {
         <input type="hidden" name="latitude" value="" />
         <input type="hidden" name="longitude" value="" />
         <button type="submit" class="nav__button button push-top">
-          <i class="bd-icon bd-icon--pin"></i>Nearby
+          <i class="material-icons">place</i>
+          Nearby Stops
         </button>
       </form>
     `;

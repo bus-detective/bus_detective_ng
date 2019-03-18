@@ -5,7 +5,7 @@
   <div class="action-banner">
     <%= link "", to: home_page_path(@conn, :index), class: "button button--home" %>
     <a class="button button--return" href="javascript:history.back()">
-      <i class="bd-icon bd-icon--arrow-left "></i>
+      <i class="material-icons">arrow_back</i>
     </a>
     <bd-favorite stop-id="<%= Phoenix.Param.to_param(@stop) %>"></bd-favorite>
     <bd-expand-map></bd-expand-map>
