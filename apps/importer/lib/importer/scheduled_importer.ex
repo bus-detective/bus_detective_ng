@@ -33,11 +33,12 @@ defmodule Importer.ScheduledImporter do
     {:ok, %{feed_name: feed_name, gtfs_schedule_url: gtfs_schedule_url}}
   end
 
-  def handle_info(:work, state = %{ feed_name: feed_name, gtfs_schedule_url: gtfs_schedule_url }) do
+  def handle_info(:work, state = %{feed_name: feed_name, gtfs_schedule_url: gtfs_schedule_url}) do
     case Importer.import_from_url(feed_name, gtfs_schedule_url) do
-      {:ok, type } -> Logger.info("Successfully imported #{type} for #{feed_name}.")
+      {:ok, type} -> Logger.info("Successfully imported #{type} for #{feed_name}.")
       {:error, error_type} -> Logger.error("Importer process for #{feed_name} failed: #{error_type}")
     end
+
     tomorrow =
       Timex.now()
       |> Timex.shift(days: 1)
