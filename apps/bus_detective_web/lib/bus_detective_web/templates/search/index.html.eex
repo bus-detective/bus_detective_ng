@@ -15,7 +15,7 @@
 
   <div class="list">
     <section class="section">
-      <h2 class="light"><i class="material-icons">search</i> Search results</h2>
+      <h2 class="light">Search results</h2>
       <%= if Enum.empty?(@results) do %>
         <p class="text-center">No stops found</p>
       <% else %>
