@@ -19,20 +19,25 @@ module.exports = {
       // },
       {
         test: /\.scss$/,
-        use: ExtractTextPlugin.extract({
-          use: [{
-            loader: "css-loader"
-          }, {
-            loader: "postcss-loader"
-          }, {
-            loader: "sass-loader",
-            options: {
-              precision: 8
-            }
-          }],
-          fallback: 'style-loader'
-        })
-      }, {
+        use: ['css-loader', 'sass-loader']
+      },
+      // {
+      //   test: /\.scss$/,
+      //   use: ExtractTextPlugin.extract({
+      //     use: [{
+      //       loader: "css-loader"
+      //     }, {
+      //       loader: "postcss-loader"
+      //     }, {
+      //       loader: "sass-loader",
+      //       options: {
+      //         precision: 8
+      //       }
+      //     }],
+      //     fallback: 'style-loader'
+      //   })
+      // }, 
+      {
         test: /\.(svg|ttf|eot|woff|woff2)$/,
         use: {
           loader: 'file-loader',

@@ -1,6 +1,6 @@
 import moment from 'moment';
 import 'moment-timezone';
-
+import css from '../css/app.scss';
 /* global HTMLElement */
 
 class Departure extends HTMLElement {
@@ -17,6 +17,7 @@ class Departure extends HTMLElement {
   }
 
   connectedCallback () {
+    console.log(css);
     const update = () => {
       if (this.isPast()) {
         this.classList.add('event--past');
@@ -27,9 +28,12 @@ class Departure extends HTMLElement {
       }
       setTimeout(update, 1000);
     };
-    update();
-    this.innerHTML = `
-    <div class="${this.departure.removed ? 'removed' : ''} ${this.departure.added ? 'added' : ''}">
+    this.attachShadow({mode: 'open'});
+    this.shadowRoot.innerHTML = `
+    <style>
+      ${css}
+    </style>
+    <div id="main" class="${this.departure.removed ? 'removed' : ''} ${this.departure.added ? 'added' : ''}">
       <div class="event__time">${this.displayedTime}</div>
       <div class="event__event-details">
         <div class="event__marker"></div>
@@ -43,7 +47,6 @@ class Departure extends HTMLElement {
         </div>
       </div>
     </div>
-
     `;
   }
 
