@@ -14,4 +14,7 @@ config :logger, :console,
   format: "$time $metadata[$level] $message\n",
   metadata: [:user_id]
 
+# disable autoupdate with invalid 2019a data
+config :tzdata, :autoupdate, :disabled
+
 import_config "#{Mix.env()}.exs"
