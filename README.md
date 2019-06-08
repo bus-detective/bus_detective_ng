@@ -62,6 +62,15 @@ brew install postgresql postgis
 
 * Run `mix test` from the project root for tests
 
+### Deployment
+
+Deployment to heroku should be fairly straight forward. You will want to add the following environment variables which will be picked up by prod.exs in the import and realtime apps:
+
+* FEED_NAME
+* FEED_SCHEDULE_URL
+* FEED_TRIP_UPDATES_URL
+* FEED_VEHICLE_POSITIONS_URL
+
 ## License
 
 This project rocks and uses (MIT-LICENSE).
