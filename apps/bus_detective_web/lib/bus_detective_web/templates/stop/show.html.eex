@@ -1,6 +1,11 @@
 <div class="stop">
   <script>window.stopId = '<%= @stop.id %>';</script>
-  <bd-stop-map bus-icon-url="/images/bus.png" latitude="<%= latitude(@stop) %>" longitude="<%= longitude(@stop) %>"></bd-stop-map>
+  <bd-stop-map bus-icon-url="/images/bus.png" latitude="<%= latitude(@stop) %>" longitude="<%= longitude(@stop) %>">
+  </bd-stop-map>
+
+  <div class="attribution">
+    <p>&copy; OpenStreetMap contributors, CC-BY-SA,<br>Tiles courtesy of Humanitarian OpenStreetMap Team</p>
+  </div>
 
   <div class="action-banner">
     <%= link "", to: home_page_path(@conn, :index), class: "button button--home" %>
@@ -26,7 +31,5 @@
     </div>
   </div>
 
-  <div class="attribution">
-    <p>&copy; OpenStreetMap contributors, CC-BY-SA, Tiles courtesy of Humanitarian OpenStreetMap Team</p>
-  </div>
+
 </div>

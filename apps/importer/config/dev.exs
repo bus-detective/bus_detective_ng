@@ -3,7 +3,7 @@ use Mix.Config
 config :importer,
   schedules: %{
     "SORTA" => %{
-      gtfs_schedule_url: "http://www.go-metro.com/uploads/GTFS/google_transit_info.zip"
+      gtfs_schedule_url: "https://www.go-metro.com/uploads/GTFS/google_transit_info.zip"
     }
   }
 
