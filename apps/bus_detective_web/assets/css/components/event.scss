@@ -1,3 +1,8 @@
+.event {
+  display: block;
+  height: ($padding * 7);
+}
+
 .event--past {
   display: block;
   opacity: 0.5;
@@ -24,9 +29,8 @@
   float: left;
   position: relative;
   width: 76.4%;
-  height: ($padding * 7);
+  height: 100%;
   padding-left: ($padding * 2);
-  // padding-bottom: ($padding * 3.33);
   border-left: 2px solid $bd-light-gray;
   & > p {
     font-size: $ms0;

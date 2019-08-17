@@ -15,10 +15,10 @@ class Timestamp extends HTMLElement {
   get displayedTimestamp () {
     const now = moment();
     const timestamp = moment(this.timestamp);
-    const timestampOffset = timestamp.diff(now);
-    const timestampOffsetDuration = moment.duration(timestampOffset);
+    const relativeTime = timestamp.diff(now);
+    const relativeTimeDuration = moment.duration(relativeTime);
 
-    return timestampOffsetDuration.minutes() + "m";
+    return relativeTimeDuration.minutes() + "m";
   }
 
   connectedCallback () {

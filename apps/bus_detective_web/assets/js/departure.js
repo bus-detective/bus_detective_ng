@@ -17,6 +17,8 @@ class Departure extends HTMLElement {
   }
 
   connectedCallback () {
+    this.classList.add('event');
+
     const update = () => {
       if (this.isPast()) {
         this.classList.add('event--past');
