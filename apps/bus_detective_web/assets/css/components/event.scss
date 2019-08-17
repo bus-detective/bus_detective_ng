@@ -7,8 +7,16 @@
   float: left;
   width: 23.6%;
   padding-right: ($padding * 2);
-  font-size: $ms0;
-  text-align: right;
+}
+
+.event__schedule_time {
+  margin-top: 0;
+  text-align: center;
+}
+
+.event__relative-time {
+  font-size: $ms-1;
+  text-align: center;
   color: $bd-gray;
 }
 
@@ -16,9 +24,10 @@
   float: left;
   position: relative;
   width: 76.4%;
+  height: ($padding * 7);
   padding-left: ($padding * 2);
-  padding-bottom: ($padding * 3.33);
-  border-left: 3px solid $bd-light-gray;
+  // padding-bottom: ($padding * 3.33);
+  border-left: 2px solid $bd-light-gray;
   & > p {
     font-size: $ms0;
     line-height: 20px;
@@ -44,25 +53,29 @@
   background-color: #fff;
   border: 4px solid $bd-gray;
   border-radius: 50%;
-  box-shadow: 0 0 0 4px #fff;
+  box-shadow: 0 0 0 0.5rem #fff;
+
+  .tag {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
 }
 
 .event__title {
-  margin: $padding 0;
-}
-
-.event__relative-time {
-  color: $bd-gray;
+  margin-top: 0;
 }
 
 // http://stackoverflow.com/a/13287975
-.event--future:first-child, :not(.event--future) + .event--future {
+.event--future:first-child,
+:not(.event--future) + .event--future {
   .event__time {
     color: $bd-dark-gray;
   }
   .event__marker {
     border: 3px solid $bd-dark-gray;
     background-color: $bd-dark-gray;
-    box-shadow: 0 0 0 4px #fff, 0 0 0 4px #fff inset;
+    box-shadow: 0 0 0 4px #fff, 0 0 0 3px #fff inset;
   }
 }

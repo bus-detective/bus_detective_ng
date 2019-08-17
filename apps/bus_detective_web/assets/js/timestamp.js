@@ -13,7 +13,12 @@ class Timestamp extends HTMLElement {
   }
 
   get displayedTimestamp () {
-    return moment(this.timestamp).fromNow();
+    const now = moment();
+    const timestamp = moment(this.timestamp);
+    const timestampOffset = timestamp.diff(now);
+    const timestampOffsetDuration = moment.duration(timestampOffset);
+
+    return timestampOffsetDuration.minutes() + "m";
   }
 
   connectedCallback () {
