@@ -1,23 +1,14 @@
 .tag {
-  float: left;
-  display: inline-block;
-  width: 15.82%;
-  min-width: 3.5em;
-  height: 20px;
-  margin-right: 1%;
-  margin-bottom: 2px;
+  display: block;
   border-radius: $border-radius;
   color: #FFFFFF;
   background-color: $bd-light-gray;
   text-align: center;
   font-size: $ms-2;
   font-weight: 500;
-  line-height: 20px;
+  line-height: $ms1;
   padding: 0 2px;
   white-space: nowrap;
-  &:nth-of-type(6n) {
-    margin-right: 0;
-  }
 }
 
 .tag--blue {

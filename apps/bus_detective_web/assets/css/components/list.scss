@@ -76,15 +76,15 @@
 }
 
 .list-item__details {
-  @include clearfix;
   margin-top: $padding / 2;
 
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(3em, 1fr));
+  grid-gap: $padding / 2;
+
   .tag {
-    min-width: 15.82%;
-    width: auto;
-    height: $ms0;
     font-size: $ms-3;
-    line-height: $ms0;
+    line-height: $ms1;
   }
 }
 

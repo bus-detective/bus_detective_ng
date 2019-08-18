@@ -22,6 +22,12 @@
   }
 }
 
+.detail-header__details {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(3.5em, 1fr));
+  grid-gap: $padding / 2;
+}
+
 .deatil-header__distance, .deatil-header__location, {
   line-height: 20px;
   color: $bd-gray;
