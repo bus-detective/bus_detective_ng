@@ -2,6 +2,7 @@
   display: inline-block;
   height: 40px;
   width: 40px;
+  min-width: 40px;
   padding: 0;
   color: $bd-gray;
   font-size: 1rem;
@@ -19,7 +20,6 @@
 .button--return {
   color: #fff;
   background-color: transparentize($bd-blue, 0.15);
-  margin-left: 10px;
 }
 
 .button--fav {

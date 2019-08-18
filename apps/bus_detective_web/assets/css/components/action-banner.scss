@@ -30,7 +30,7 @@
   width: 100%;
   z-index: 10;
   display: flex;
-  padding: 0;
+  padding: $padding;
 
   .button--home {
     background-size: 55%;
@@ -41,14 +41,18 @@
 
   .button--return {
     flex-basis: 40px;
-    margin: 10px;
+  }
+
+  .search__submit {
+    right: $padding / 2;
   }
 
   .search {
-    flex-basis: calc(100% - 100px);
-    margin: 10px;
+    margin-left: $padding;
 
     .search__query {
+      padding-right: $padding * 3;
+      border: 1px solid $bd-light-gray;
       box-shadow: none;
     }
   }
