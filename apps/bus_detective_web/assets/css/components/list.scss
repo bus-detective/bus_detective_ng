@@ -45,28 +45,13 @@
   font-size: $ms0;
   font-weight: 600;
   line-height: $ms3;
-
-  small {
-    font-size: $ms-1;
-    font-weight: 400;
-    margin-left : $padding / 2;
-  }
-
-  .tag {
-    position: relative;
-    top: -4px;
-    width: 15.85%;
-    height: 20px;
-    font-size: 14px;
-    line-height: 20px;
-  }
 }
 
 .list-item__subtitle {
-  margin: ($padding / 4) 0 $padding;
+  margin: 0 0 ($padding / 2);
   font-size: $ms-1;
   font-weight: 400;
-  line-height: $ms2;
+  line-height: $ms4;
   color: $bd-gray;
   text-transform: capitalize;
 }
