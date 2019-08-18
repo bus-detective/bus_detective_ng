@@ -19,8 +19,8 @@
 .map__toggle-expanded {
   position: absolute;
   display: block;
-  top: 10px;
-  right: 10px;
+  top: $padding;
+  right: $padding;
   color: $bd-gray;
   z-index: 500;
 }
@@ -34,4 +34,8 @@
 
 .leaflet-marker-icon, .leaflet-tooltip {
   transition: transform 0.6s $ease;
+}
+
+.leaflet-control-zoom.leaflet-bar.leaflet-control {
+  margin: ($padding * 3) ($padding / 2) 0 0;
 }
