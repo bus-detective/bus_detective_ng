@@ -32,33 +32,27 @@
 
 .list-item__button {
   float: right;
+  margin: 0;
   color: $bd-light-gray;
+  font-size: $ms1;
   line-height: 2.15;
 }
 
-.list-item__title, .list-item__button {
-  font-size: $ms1;
-  line-height: 2;
-  margin: 0;
-}
-
 .list-item__title {
-  line-height: 1.25;
-  padding-right: $padding;
   width: calc(100% - 2.1em);
-}
-
-.list-item__title--route {
+  margin: 0;
+  padding-right: $padding;
   font-size: $ms0;
-}
+  font-weight: 600;
+  line-height: $ms3;
 
-.list-item__title small {
-  font-size: $ms-1;
-  font-weight: 400;
-  margin-left : $padding / 2;
-}
+  small {
+    font-size: $ms-1;
+    font-weight: 400;
+    margin-left : $padding / 2;
+  }
 
-.list-item__title .tag {
+  .tag {
     position: relative;
     top: -4px;
     width: 15.85%;
@@ -66,21 +60,36 @@
     font-size: 14px;
     line-height: 20px;
   }
+}
+
+.list-item__subtitle {
+  margin: ($padding / 4) 0 $padding;
+  font-size: $ms-1;
+  font-weight: 400;
+  line-height: $ms2;
+  color: $bd-gray;
+  text-transform: capitalize;
+}
+
+.list-item__title--route {
+  font-size: $ms0;
+}
 
 .list-item__details {
   @include clearfix;
   margin-top: $padding / 2;
+
+  .tag {
+    min-width: 15.82%;
+    width: auto;
+    height: $ms0;
+    font-size: $ms-3;
+    line-height: $ms0;
+  }
 }
 
-.list-item__details .tag {
-  min-width: 15.82%;
-  width: auto;
-  height: $ms0;
-  font-size: $ms-3;
-  line-height: $ms0;
-}
-
-.list-item__distance, .list-item__location {
+.list-item__distance,
+.list-item__location {
   margin-top: $padding / 5;
   line-height: $ms0;
   color: $bd-gray;

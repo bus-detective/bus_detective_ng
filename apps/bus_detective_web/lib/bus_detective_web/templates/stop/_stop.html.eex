@@ -3,7 +3,8 @@
     <div class="flex__cell flex__cell--large">
       <a href="<%= stop_path(BusDetectiveWeb.Endpoint, :show, @stop) %>" class="unstyled">
         <bd-favorite stop-id="<%= Phoenix.Param.to_param(@stop) %>"></bd-favorite>
-        <h1 class="list-item__title"><%= @stop.name %><small class="light"><%= BusDetective.GTFS.Stop.direction(@stop) %></small></h1>
+        <h3 class="list-item__title"><%= @stop.name %></h1>
+        <p class="list-item__subtitle"><%= BusDetective.GTFS.Stop.direction(@stop) %></p>
         <div class="list-item__details">
           <%= for route <- @stop.routes do %>
             <bd-route bg-color="<%= route.color %>" color="<%= route.text_color %>" name="<%= route.short_name %>"></bd-route>

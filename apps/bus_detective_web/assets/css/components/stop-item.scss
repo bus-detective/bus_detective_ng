@@ -27,14 +27,6 @@
   float: right;
   color: $bd-light-gray;
   background-color: #fff;
-  // same height as the stop-item title
-  line-height: 38px;
-  // make the hit area square
-  width: 38px;
-  // align line item favorite icon with search icon in the control bar at the top of the screen
-  margin-right: -$padding;
-  text-align: center;
-  border-radius: $border-radius;
 
   .list--home & {
     @media screen and (max-width: 520px) {
