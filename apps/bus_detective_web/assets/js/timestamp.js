@@ -18,7 +18,11 @@ class Timestamp extends HTMLElement {
     const relativeTime = timestamp.diff(now);
     const relativeTimeDuration = moment.duration(relativeTime);
 
-    return relativeTimeDuration.minutes() + "m";
+    if (relativeTimeDuration.minutes() < 0) {
+      return null;
+    } else {
+      return relativeTimeDuration.minutes() + "m";
+    }
   }
 
   connectedCallback () {
