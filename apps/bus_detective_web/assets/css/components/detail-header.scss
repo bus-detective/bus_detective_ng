@@ -1,8 +1,11 @@
 .detail-header {
   @include clearfix;
-  position: relative;
-  padding: $padding;
+  position: sticky;
+  top: 0;
+  padding: $padding $padding ($padding * 1.5);
+  background-color: #ffffff;
   box-shadow: 0 0px 2px 2px transparentize($bd-dark-gray, 0.85);
+  z-index: 1;
 }
 
 .detail-header__title {
@@ -17,6 +20,12 @@
     font-size: $ms1;
     line-height: 30px;
   }
+}
+
+.detail-header__details {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(3.5em, 1fr));
+  grid-gap: $padding / 2;
 }
 
 .deatil-header__distance, .deatil-header__location, {

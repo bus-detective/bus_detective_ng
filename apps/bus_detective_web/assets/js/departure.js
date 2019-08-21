@@ -13,10 +13,12 @@ class Departure extends HTMLElement {
   }
 
   get displayedTime () {
-    return moment(this.departure.time).format('hh:mm');
+    return moment(this.departure.time).format('h:mm');
   }
 
   connectedCallback () {
+    this.classList.add('event');
+
     const update = () => {
       if (this.isPast()) {
         this.classList.add('event--past');
@@ -30,15 +32,14 @@ class Departure extends HTMLElement {
     update();
     this.innerHTML = `
     <div class="${this.departure.removed ? 'removed' : ''} ${this.departure.added ? 'added' : ''}">
-      <div class="event__time">${this.displayedTime}</div>
+      <div class="event__time">
+        <p class="event__schedule_time">${this.displayedTime}</p>
+        <p class="event__relative-time"><bd-timestamp timestamp="${this.departure.time}"></bd-timestamp></p>
+      </div>
       <div class="event__event-details">
-        <div class="event__marker"></div>
+        <div class="event__marker">
+        <bd-route bg-color="${this.departure.route_color}" color="${this.departure.route_text_color}" name="${this.departure.route_name}"></bd-route></div>
         <div>
-          <bd-route bg-color="${this.departure.route_color}" color="${this.departure.route_text_color}" name="${this.departure.route_name}"></bd-route>
-          <span class="event__relative-time">
-            ${this.departure.realtime ? '' : 'scheduled'}
-            <bd-timestamp timestamp="${this.departure.time}"></bd-timestamp>
-          </span>
           <p class="event__title">${this.departure.headsign}</p>
         </div>
       </div>

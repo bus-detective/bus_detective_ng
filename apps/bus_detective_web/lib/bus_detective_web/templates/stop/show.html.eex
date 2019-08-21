@@ -8,7 +8,6 @@
   </div>
 
   <div class="action-banner">
-    <%= link "", to: home_page_path(@conn, :index), class: "button button--home" %>
     <a class="button button--return" href="javascript:history.back()">
       <i class="material-icons">arrow_back</i>
     </a>
@@ -20,7 +19,7 @@
     <h1 class="detail-header__title qa-stop-name"><%= @stop.name %></h1>
     <div class="detail-header__details">
       <%= for route <- @stop.routes do %>
-        <bd-route bg-color="<%= route.color %>" color="<%= route.text_color %>" name="<%= route.short_name %>"></bd-route>
+        <bd-route bg-color="<%= route.color %>" name="<%= route.short_name %>"></bd-route>
       <% end %>
     </div>
   </div>

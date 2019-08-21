@@ -13,7 +13,8 @@ class FavoriteStop extends HTMLElement {
         <div class="flex__cell flex__cell--large">
           <a href="/stops/${this.favoriteStop.id}" class="unstyled">
             <bd-favorite stop-id="${this.favoriteStop.id}"></bd-favorite>
-            <h1 class="list-item__title">${this.favoriteStop.name}<small class="light">${this.favoriteStop.direction}</small></h1>
+            <h1 class="list-item__title">${this.favoriteStop.name}</h1>
+            <p class="list-item__subtitle">${this.favoriteStop.direction}</p>
             <div class="list-item__details">
               ${this.favoriteStop.routes.map((route) => `
                 <bd-route bg-color="${route.color}" color="${route.text_color}" name="${route.short_name}"></bd-route>

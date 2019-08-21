@@ -13,7 +13,16 @@ class Timestamp extends HTMLElement {
   }
 
   get displayedTimestamp () {
-    return moment(this.timestamp).fromNow();
+    const now = moment();
+    const timestamp = moment(this.timestamp);
+    const relativeTime = timestamp.diff(now);
+    const relativeTimeDuration = moment.duration(relativeTime);
+
+    if (relativeTimeDuration.minutes() < 0) {
+      return null;
+    } else {
+      return relativeTimeDuration.minutes() + "m";
+    }
   }
 
   connectedCallback () {

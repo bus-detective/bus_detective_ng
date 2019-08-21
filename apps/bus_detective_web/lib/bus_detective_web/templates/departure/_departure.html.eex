@@ -4,13 +4,14 @@
     <div class="event__marker"></div>
     <div>
       <bd-route bg-color="<%= @departure.route.color %>" color="<%= @departure.route.text_color %>" name="<%= @departure.route.short_name %>"></bd-route>
-      <span class="event__relative-time">
+
+      <p class="event__title"><%= @departure.trip.headsign %></p>
+      <p class="event__relative-time">
         <%= unless @departure.realtime? do %>
           scheduled
         <% end %>
         <bd-timestamp timestamp="<%= Timex.format!(@departure.time, "{ISO:Extended}") %>"></bd-timestamp>
-      </span>
-      <p class="event__title"><%= @departure.trip.headsign %></p>
+      </p>
     </div>
   </div>
 </bd-departure>

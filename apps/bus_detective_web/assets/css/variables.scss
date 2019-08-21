@@ -10,7 +10,7 @@ $bd-red: #ED7161;
 $bd-dark-gray: #4D4D4D;
 $bd-gray: #9F9F9F;
 $bd-light-gray: #DFDFDF;
-$bd-lighter-gray: #EDF0F2;
+$bd-lighter-gray: #EFF3F5;
 
 $primary-color: #0094BA;
 $secondary-color: #FF7B00;
@@ -43,9 +43,9 @@ $ms-3: 0.618rem;  // 9.888px
 // --- DISPLAY --- \\
 // --------------- \\
 
-$padding: 1em;
+$padding: 1rem;
 $border-radius: 2px;
-$box-shadow: 0px 1px 2px transparentize($bd-dark-gray, 0.75);
+$box-shadow: 0px 1px 3px transparentize($bd-dark-gray, 0.85);
 
 
 // ------------------- \\
