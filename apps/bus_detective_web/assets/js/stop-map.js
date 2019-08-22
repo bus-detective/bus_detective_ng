@@ -110,7 +110,7 @@ class StopMap extends HTMLElement {
     });
 
     var center = [this.latitude, this.longitude];
-    this.map.setView(center, 16);
+    this.map.setView(center, 17);
     this.map.addLayer(Leaflet.tileLayer(TILE_URL, {detectRetina: true}));
     Leaflet.layerGroup().addTo(this.map);
     Leaflet.marker(center).addTo(this.map);
