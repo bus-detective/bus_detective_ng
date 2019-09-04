@@ -1,6 +1,5 @@
 /* global HTMLElement */
 class Route extends HTMLElement {
-
   get bgcolor () {
     return this.getAttribute('bg-color');
   }

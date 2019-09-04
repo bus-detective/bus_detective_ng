@@ -21,7 +21,7 @@ class Timestamp extends HTMLElement {
     if (relativeTimeDuration.minutes() < 0) {
       return null;
     } else {
-      return relativeTimeDuration.minutes() + "m";
+      return relativeTimeDuration.minutes() + 'm';
     }
   }
 
