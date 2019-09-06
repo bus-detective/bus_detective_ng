@@ -59,7 +59,7 @@ defmodule BusDetectiveWeb.Mixfile do
       {:phoenix_live_reload, "~> 1.0", only: :dev},
       {:phoenix_pubsub, "~> 1.0"},
       {:poison, "~> 3.1"},
-      {:wallaby, "~> 0.20.0", [runtime: false, only: :test]}
+      {:wallaby, "~> 0.22", [runtime: false, only: :test]}
     ]
   end
 

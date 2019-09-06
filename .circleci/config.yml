@@ -1,0 +1,154 @@
+version: 2.0
+
+install_hex_rebar: &install_hex_rebar
+
+jobs:
+  build:
+    docker:
+      - image: circleci/elixir:1.9.1-node-browsers
+        environment:
+          MIX_ENV: test
+      - image: mdillon/postgis:11-alpine
+        environment:
+          # Match apps/explorer/config/test.exs config :explorer, Explorer.Repo, database
+          POSTGRES_DB: explorer_test
+          # match PGPASSWORD for elixir image above
+          POSTGRES_PASSWORD: postgres
+          # match PGUSER for elixir image above
+          POSTGRES_USER: postgres
+
+    steps:
+      - checkout
+      - run:
+          name: Install hex and rebar
+          command: |
+            mix local.hex --force
+            mix local.rebar --force
+      - run:
+         name: Start Chrome Driver
+         command: /usr/local/bin/chromedriver
+         background: true
+      - run:
+          name: "ELIXIR_VERSION.lock"
+          command: echo "${ELIXIR_VERSION}" > ELIXIR_VERSION.lock
+      - run:
+          name: "OTP_VERSION.lock"
+          command: echo "${OTP_VERSION}" > OTP_VERSION.lock
+      - restore_cache:
+          keys:
+            - v1-mix-compile-{{ checksum "OTP_VERSION.lock" }}-{{ checksum "ELIXIR_VERSION.lock" }}-{{ checksum "mix.lock" }}
+            - v1-mix-compile-{{ checksum "OTP_VERSION.lock" }}-{{ checksum "ELIXIR_VERSION.lock" }}-{{ checksum "mix.exs" }}
+            - v1-mix-compile-{{ checksum "OTP_VERSION.lock" }}-{{ checksum "ELIXIR_VERSION.lock" }}
+
+      - run: mix deps.get
+
+      - restore_cache:
+          keys:
+            - v1-npm-install-{{ .Branch }}-{{ checksum "apps/bus_detective_web/assets/package-lock.json" }}
+            - v1-npm-install-{{ .Branch }}
+            - v1-npm-install
+
+      - run:
+          command: npm install
+          working_directory: "apps/bus_detective_web/assets"
+
+      - save_cache:
+          key: v1-npm-install-{{ .Branch }}-{{ checksum "apps/bus_detective_web/assets/package-lock.json" }}
+          paths: "apps/bus_detective_web/assets/node_modules"
+
+      - save_cache:
+          key: v1-npm-install-{{ .Branch }}
+          paths: "apps/bus_detective_web/assets/node_modules"
+
+      - save_cache:
+          key: v1-npm-install
+          paths: "apps/bus_detective_web/assets/node_modules"
+
+      - run: mix compile
+
+      - save_cache:
+          key: v1-mix-compile-{{ checksum "OTP_VERSION.lock" }}-{{ checksum "ELIXIR_VERSION.lock" }}-{{ checksum "mix.lock" }}
+          paths:
+            - deps
+            - _build
+      - save_cache:
+          key: v1-mix-compile-{{ checksum "OTP_VERSION.lock" }}-{{ checksum "ELIXIR_VERSION.lock" }}-{{ checksum "mix.exs" }}
+          paths:
+            - deps
+            - _build
+      - save_cache:
+          key: v1-mix-compile-{{ checksum "OTP_VERSION.lock" }}-{{ checksum "ELIXIR_VERSION.lock" }}
+          paths:
+            - deps
+            - _build
+
+      - run:
+          name: Build assets
+          command: node node_modules/webpack/bin/webpack.js --mode development
+          working_directory: "apps/bus_detective_web/assets"
+
+      - run: mix format --check-formatted
+      - run: mix credo --strict
+      - run: mix do ecto.create, ecto.migrate && mix coveralls.html --umbrella
+
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .circleci
+            - .credo.exs
+            - .formatter.exs
+            - .git
+            - .gitignore
+            - ELIXIR_VERSION.lock
+            - OTP_VERSION.lock
+            - _build
+            - apps
+            - config
+            - deps
+            - mix.exs
+            - mix.lock
+
+  deploy-staging:
+    docker:
+      - image: buildpack-deps:trusty
+    steps:
+      - checkout
+      - run:
+          name: Deploy Master to Heroku
+          command: |
+            git push https://heroku:$HEROKU_API_KEY@git.heroku.com/$HEROKU_STAGING_APP_NAME.git master
+
+  deploy-production:
+    docker:
+      - image: buildpack-deps:trusty
+    steps:
+      - checkout
+      - run:
+          name: Deploy Master to Heroku
+          command: |
+            git push https://heroku:$HEROKU_API_KEY@git.heroku.com/$HEROKU_PRODUCTION_APP_NAME.git $CIRCLE_TAG
+
+
+
+workflows:
+  version: 2
+  primary:
+    jobs:
+      - build:
+          filters:
+            tags:
+              only: /v.*/
+      - deploy_staging:
+          filters:
+            branches:
+              only: /master/
+          requires:
+            - build
+      - deploy_production:
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /v.*/
+          requires:
+            - build
