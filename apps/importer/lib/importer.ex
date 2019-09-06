@@ -49,7 +49,7 @@ defmodule Importer do
 
   defp download_gtfs_file(url) do
     {:ok, tmp_file} = Briefly.create()
-    %HTTPoison.Response{body: body} = HTTPoison.get!(url)
+    %HTTPoison.Response{body: body} = HTTPoison.get!(url, follow_redirect: true)
     File.write!(tmp_file, body)
     {:ok, tmp_file}
   end
