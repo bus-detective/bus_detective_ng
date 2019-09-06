@@ -108,7 +108,7 @@ jobs:
             - mix.exs
             - mix.lock
 
-  deploy-staging:
+  deploy_staging:
     docker:
       - image: buildpack-deps:trusty
     steps:
@@ -118,7 +118,7 @@ jobs:
           command: |
             git push https://heroku:$HEROKU_API_KEY@git.heroku.com/$HEROKU_STAGING_APP_NAME.git master
 
-  deploy-production:
+  deploy_production:
     docker:
       - image: buildpack-deps:trusty
     steps:
