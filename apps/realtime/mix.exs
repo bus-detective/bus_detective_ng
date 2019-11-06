@@ -41,7 +41,7 @@ defmodule Realtime.MixProject do
   defp deps do
     [
       {:exprotobuf, "~> 1.2.9"},
-      {:httpoison, "~> 0.12"},
+      {:httpoison, "~> 1.6"},
       {:timex, "~> 3.1"}
     ]
   end
