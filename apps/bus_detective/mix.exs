@@ -67,6 +67,7 @@ defmodule BusDetective.Mixfile do
   defp env_aliases(:dev), do: []
 
   defp env_aliases(_) do
-    [compile: "compile --warnings-as-errors"]
+    # [compile: "compile --warnings-as-errors"]
+    []
   end
 end

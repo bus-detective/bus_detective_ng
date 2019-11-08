@@ -13,14 +13,26 @@ defmodule BusDetective.Umbrella.Mixfile do
         "coveralls.html": :test
       ],
       start_permanent: Mix.env() == :prod,
-      test_coverage: [tool: ExCoveralls]
+      test_coverage: [tool: ExCoveralls],
+      releases: [
+        foo: [
+          version: "0.0.1",
+          applications: [
+            bus_detective: :permanent,
+            bus_detective_web: :permanent,
+            importer: :permanent,
+            realtime: :permanent
+          ]
+        ]
+      ]
     ]
   end
 
   defp aliases(:dev), do: []
 
   defp aliases(_) do
-    [compile: "compile --warnings-as-errors"]
+    # [compile: "compile --warnings-as-errors"]
+    []
   end
 
   # Dependencies listed here are available only for this project

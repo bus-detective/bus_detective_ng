@@ -67,7 +67,7 @@ defmodule BusDetective.GTFS.StopSearch do
         ^ts_query_terms,
         ^ts_query_terms
       ),
-      stop.id == pg_search.pg_search_id
+      on: stop.id == pg_search.pg_search_id
     )
     |> order_by([stop, pg_search], desc: pg_search.rank, asc: stop.id)
   end
