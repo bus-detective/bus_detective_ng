@@ -14,6 +14,11 @@ config :logger, :console,
   format: "$time $metadata[$level] $message\n",
   metadata: [:user_id]
 
+# kubernetes
+config :el_kube, ElKube.Repo,
+  adapter: Ecto.Adapters.Postgres,
+  pool_size: 10
+  
 # disable autoupdate with invalid 2019a data
 config :tzdata, :autoupdate, :disabled
 
