@@ -48,14 +48,14 @@ defmodule BusDetective.Mixfile do
   defp deps do
     [
       {:credo, "~> 0.9.1", only: [:dev, :test], runtime: false},
-      {:ecto, "~> 2.1"},
+      {:ecto, "~> 3.0"},
       {:ex_cldr, "~> 1.6.4"},
       {:ex_cldr_numbers, "~> 1.5.1"},
-      {:ex_machina, "~> 2.2", only: [:dev, :test]},
+      {:ex_machina, "~> 2.3", only: [:dev, :test]},
       {:geo_postgis, "~> 2.0"},
       {:postgrex, ">= 0.0.0"},
       {:realtime, in_umbrella: true},
-      {:scrivener_ecto, "~> 1.0"},
+      {:scrivener_ecto, "~> 2.2.0"},
       {:timex, "~> 3.1"}
     ]
   end
@@ -67,6 +67,7 @@ defmodule BusDetective.Mixfile do
   defp env_aliases(:dev), do: []
 
   defp env_aliases(_) do
-    [compile: "compile --warnings-as-errors"]
+    # [compile: "compile --warnings-as-errors"]
+    []
   end
 end

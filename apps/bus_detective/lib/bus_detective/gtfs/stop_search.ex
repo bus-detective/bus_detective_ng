@@ -60,14 +60,14 @@ defmodule BusDetective.GTFS.StopSearch do
       [stop],
       pg_search in fragment(
         ~s{
-        SELECT "stops"."id" AS pg_search_id,
+        (SELECT "stops"."id" AS pg_search_id,
         ts_rank(to_tsvector('english', coalesce("stops"."name"::text, '')) || to_tsvector('english', coalesce("stops"."code"::text, '')), to_tsquery('english', ?)), 0 AS rank
-        FROM "stops" WHERE to_tsvector('english', coalesce("stops"."name"::text, '')) || to_tsvector('english', coalesce("stops"."code"::text, '')) @@ to_tsquery('english', ?)
+        FROM "stops" WHERE to_tsvector('english', coalesce("stops"."name"::text, '')) || to_tsvector('english', coalesce("stops"."code"::text, '')) @@ to_tsquery('english', ?))
       },
         ^ts_query_terms,
         ^ts_query_terms
       ),
-      stop.id == pg_search.pg_search_id
+      on: stop.id == pg_search.pg_search_id
     )
     |> order_by([stop, pg_search], desc: pg_search.rank, asc: stop.id)
   end

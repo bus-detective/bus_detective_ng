@@ -1,5 +1,13 @@
 defmodule BusDetective.Repo do
-  use Ecto.Repo, otp_app: :bus_detective
+  use Ecto.Repo, otp_app: :bus_detective,
+  adapter: Ecto.Adapters.Postgres,
+  username: "postgres",
+  password: "postgres",
+  database: "bus_detective_dev",
+  hostname: "localhost",
+  pool_size: 10,
+  types: BusDetective.PostgresTypes
+  
   use Scrivener, page_size: 100
 
   @doc """

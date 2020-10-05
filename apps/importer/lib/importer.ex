@@ -152,8 +152,8 @@ defmodule Importer do
           url: raw_route["route_url"],
           color: route_color,
           text_color: ColorFunctions.text_color_for_bg_color(route_color, raw_route["route_text_color"]),
-          inserted_at: Ecto.DateTime.utc(),
-          updated_at: Ecto.DateTime.utc()
+          inserted_at: NaiveDateTime.truncate(NaiveDateTime.utc_now(), :second),
+          updated_at: NaiveDateTime.truncate(NaiveDateTime.utc_now(), :second)
         }
       end)
       |> GTFSImport.bulk_create_routes()
@@ -183,8 +183,8 @@ defmodule Importer do
           service_id: service_id,
           date: date,
           exception: exception,
-          inserted_at: Ecto.DateTime.utc(),
-          updated_at: Ecto.DateTime.utc()
+          inserted_at: NaiveDateTime.truncate(NaiveDateTime.utc_now(), :second),
+          updated_at: NaiveDateTime.truncate(NaiveDateTime.utc_now(), :second)
         }
       end)
       |> GTFSImport.bulk_create_service_exceptions()
@@ -224,8 +224,8 @@ defmodule Importer do
           sunday: sunday,
           start_date: start_date,
           end_date: end_date,
-          inserted_at: Ecto.DateTime.utc(),
-          updated_at: Ecto.DateTime.utc()
+          inserted_at: NaiveDateTime.truncate(NaiveDateTime.utc_now(), :second),
+          updated_at: NaiveDateTime.truncate(NaiveDateTime.utc_now(), :second)
         }
       end)
       |> GTFSImport.bulk_create_services()
@@ -257,8 +257,8 @@ defmodule Importer do
           feed_id: feed_id,
           geometry: %Geo.LineString{srid: 4326, coordinates: coordinates},
           remote_id: shape_id,
-          inserted_at: Ecto.DateTime.utc(),
-          updated_at: Ecto.DateTime.utc()
+          inserted_at: NaiveDateTime.truncate(NaiveDateTime.utc_now(), :second),
+          updated_at: NaiveDateTime.truncate(NaiveDateTime.utc_now(), :second)
         }
       end)
       |> Stream.chunk_every(500)
@@ -299,8 +299,8 @@ defmodule Importer do
           shape_dist_traveled: shape_dist_traveled,
           arrival_time: arrival_time,
           departure_time: departure_time,
-          inserted_at: Ecto.DateTime.utc(),
-          updated_at: Ecto.DateTime.utc()
+          inserted_at: NaiveDateTime.truncate(NaiveDateTime.utc_now(), :second),
+          updated_at: NaiveDateTime.truncate(NaiveDateTime.utc_now(), :second)
         }
       end)
       |> Stream.chunk_every(1000)
@@ -349,8 +349,8 @@ defmodule Importer do
           parent_station: raw_stop["parent_station"],
           timezone: raw_stop["stop_timezone"],
           wheelchair_boarding: wheelchair_boarding,
-          inserted_at: Ecto.DateTime.utc(),
-          updated_at: Ecto.DateTime.utc()
+          inserted_at: NaiveDateTime.truncate(NaiveDateTime.utc_now(), :second),
+          updated_at: NaiveDateTime.truncate(NaiveDateTime.utc_now(), :second)
         }
       end)
       |> Stream.chunk_every(1000)
@@ -390,8 +390,8 @@ defmodule Importer do
           block_id: raw_trip["block_id"],
           wheelchair_accessible: to_integer(raw_trip["wheelchair_accessible"]),
           bikes_allowed: to_integer(raw_trip["bikes_allowed"]),
-          inserted_at: Ecto.DateTime.utc(),
-          updated_at: Ecto.DateTime.utc()
+          inserted_at: NaiveDateTime.truncate(NaiveDateTime.utc_now(), :second),
+          updated_at: NaiveDateTime.truncate(NaiveDateTime.utc_now(), :second)
         }
       end)
       |> Stream.chunk_every(1000)
